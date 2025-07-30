@@ -4,230 +4,321 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Halaman Login</title>
+    <title>Login - SPK Penerimaan BPNT</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;800&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Urbanist', sans-serif;
-            background: linear-gradient(135deg, #f107a3, #7b2ff7, #00ffe7);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            font-family: 'Inter', sans-serif;
         }
 
-        @keyframes gradientShift {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
+        .hero-bg {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+            position: relative;
         }
 
-        .glass {
-            background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease-in-out;
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
         }
 
-        .glass:hover {
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.12);
-            transform: translateY(-2px);
-        }
-
-        .btn-fancy {
-            background: linear-gradient(to right, #ffcc70, #ff7eb3);
-            color: black;
-            font-weight: 600;
-            padding: 0.75rem 1.5rem;
-            border-radius: 9999px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        .btn-primary {
+            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
             transition: all 0.3s ease;
         }
 
-        .btn-fancy:hover {
-            transform: scale(1.05);
-            background: linear-gradient(to right, #ff7eb3, #ffcc70);
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .icon-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .login-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .input-focus:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .error-notification {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-close:hover {
+            background-color: rgba(239, 68, 68, 0.2);
         }
     </style>
 </head>
 
-<body class="min-h-screen flex items-center justify-center px-4">
-    <div class="glass w-full max-w-md p-8 space-y-6 text-white relative border border-white/40">
-        <div class="flex justify-center">
-            <img src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" alt="Avatar"
-                class="w-20 h-20 rounded-full border-4 border-white shadow-lg">
+<body class="hero-bg min-h-screen flex items-center justify-center">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="icon-float absolute top-20 left-10">
+            <div class="w-16 h-16 bg-white bg-opacity-10 rounded-full"></div>
         </div>
-
-        <div class="text-center">
-            <h1 class="text-3xl font-extrabold">Selamat Datang</h1>
-            <p class="text-sm text-white/80 mt-2">Silakan masuk untuk melanjutkan ke SMART SPK</p>
+        <div class="icon-float absolute top-40 right-20" style="animation-delay: 1s;">
+            <div class="w-12 h-12 bg-white bg-opacity-10 rounded-full"></div>
         </div>
+        <div class="icon-float absolute bottom-32 left-20" style="animation-delay: 2s;">
+            <div class="w-20 h-20 bg-white bg-opacity-10 rounded-full"></div>
+        </div>
+        <div class="icon-float absolute bottom-20 right-10" style="animation-delay: 0.5s;">
+            <div class="w-14 h-14 bg-white bg-opacity-10 rounded-full"></div>
+        </div>
+    </div>
 
-        <form method="POST" action="{{ route('login') }}" class="space-y-4">
-            @csrf
-
-            {{-- Notifikasi session error --}}
-            @if(session('error'))
-                <div id="errorAlert"
-                    class="flex items-center justify-between gap-2 p-3 border border-red-300 bg-red-100 text-red-700 text-sm rounded-md shadow-sm">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M18 10c0 4.418-3.582 8-8 8s-8-3.582-8-8 3.582-8 8-8 8 3.582 8 8zm-9 4h2v2H9v-2zm0-8h2v6H9V6z"
-                                clip-rule="evenodd" />
+    <div class="relative z-10 w-full max-w-6xl mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Left Side - Welcome Content -->
+            <div class="text-white space-y-6">
+                <!-- Logo and Title -->
+                <div class="flex items-center space-x-3 mb-8">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                         </svg>
-                        <span>{{ session('error') }}</span>
                     </div>
-                    <button onclick="document.getElementById('errorAlert').remove()"
-                        class="text-red-500 hover:text-red-700">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+                    <div>
+                        <div class="font-bold text-xl">SPK BPNT</div>
+                        <div class="text-sm text-blue-100">Kabupaten Cirebon</div>
+                    </div>
                 </div>
-            @endif
 
+                <div>
+                    <h1 class="text-4xl font-bold mb-4">
+                        Sistem Pendukung Keputusan
+                    </h1>
+                    <h2 class="text-2xl font-semibold text-yellow-300 mb-6">
+                        Penerimaan BPNT
+                    </h2>
+                    <p class="text-lg text-blue-100 leading-relaxed">
+                        Menggunakan metode SMART (Simple Multi-Attribute Rating Technique)
+                        untuk memberikan transparansi dan akurasi dalam proses seleksi
+                        penerima Bantuan Pangan Non Tunai.
+                    </p>
+                </div>
 
-            {{-- Validasi --}}
-            @if($errors->any())
-                <div id="loginErrorAlert"
-                    class="flex items-start justify-between gap-2 p-3 border border-red-300 bg-red-100 text-red-700 text-sm rounded-md shadow-sm">
-                    <div class="flex gap-2">
-                        {{-- Alert Icon --}}
-                        <svg class="w-5 h-5 mt-0.5 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                            viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M18 10c0 4.418-3.582 8-8 8s-8-3.582-8-8 3.582-8 8-8 8 3.582 8 8zm-9 4h2v2H9v-2zm0-8h2v6H9V6z"
-                                clip-rule="evenodd" />
-                        </svg>
+                <!-- Features List -->
+                <div class="space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <span class="text-blue-100">Proses seleksi objektif dan transparan</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <span class="text-blue-100">Perhitungan otomatis dan akurat</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <span class="text-blue-100">Interface yang mudah digunakan</span>
+                    </div>
+                </div>
 
-                        {{-- Error Message(s) --}}
-                        <ul class="list-disc list-inside space-y-1">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                <!-- Character Illustrations -->
+                <div class="flex justify-center space-x-6 mt-8">
+                    <div class="icon-float">
+                        <div
+                            class="w-16 h-20 bg-gradient-to-b from-purple-400 to-purple-600 rounded-t-full rounded-b-lg relative">
+                            <div
+                                class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full">
+                            </div>
+                            <div
+                                class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="icon-float" style="animation-delay: 0.5s;">
+                        <div
+                            class="w-16 h-20 bg-gradient-to-b from-red-400 to-red-600 rounded-t-full rounded-b-lg relative">
+                            <div
+                                class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full">
+                            </div>
+                            <div
+                                class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="icon-float" style="animation-delay: 1s;">
+                        <div
+                            class="w-16 h-20 bg-gradient-to-b from-blue-400 to-blue-600 rounded-t-full rounded-b-lg relative">
+                            <div
+                                class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full">
+                            </div>
+                            <div
+                                class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Login Form -->
+            <div class="login-card rounded-3xl p-8 lg:p-10">
+                <div class="mb-4">
+                    <h2 class="text-3xl font-bold text-gray-1000 mb-4">Login Member</h2>
+                    <p class="text-gray-600">Masuk untuk mengakses sistem SPK BPNT</p>
+                </div>
+
+                <form method="POST" action="{{ route('login') }}" class="space-y-6" id="loginForm">
+                    @csrf
+                    
+                    <!-- Error Notification -->
+                    <div id="errorNotification" class="error-notification bg-red-50 border border-red-200 rounded-xl p-4 flex items-start space-x-3" style="display: none;">
+                        <div class="flex-shrink-0">
+                            <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="flex-grow">
+                            <h4 class="text-sm font-medium text-red-800">Login Gagal</h4>
+                            <p class="text-sm text-red-700">Email atau password yang Anda masukkan salah. Silakan periksa kembali dan coba lagi.</p>
+                        </div>
+                        <button type="button" onclick="closeErrorNotification()" class="error-close flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center hover:bg-red-100 transition-colors">
+                            <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
                     </div>
 
-                    {{-- Close Button --}}
-                    <button onclick="document.getElementById('loginErrorAlert').remove()"
-                        class="text-red-500 hover:text-red-700">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                        <input type="email" name="email" value="{{ old('email') }}" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none input-focus transition-all @error('email') border-red-500 @enderror"
+                            placeholder="Masukkan Email Anda">
+                        @error('email')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" name="password" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none input-focus transition-all @error('password') border-red-500 @enderror"
+                            placeholder="Masukkan password Anda">
+                        @error('password')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="remember" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-gray-600">Ingat saya</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="w-full btn-primary text-white py-3 rounded-xl font-semibold text-lg">
+                        Login Sekarang
                     </button>
+                </form>
+
+                <div class="mt-8 text-center">
                 </div>
-            @endif
+
+                <!-- Quick Info -->
+                <div class="mt-8 p-4 bg-blue-50 rounded-xl">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-blue-800">Informasi Sistem</p>
+                            <p class="text-xs text-blue-600">Menggunakan metode SMART untuk proses seleksi yang objektif</p>
+                        </div>
+                    </div>
+                </div>
 
 
-            {{-- Email --}}
-            <div>
-                <label for="email" class="block text-sm font-medium mb-1">Email</label>
-                <input type="email" name="email" id="email" required
-                    class="w-full px-4 py-2 rounded-md bg-white/90 text-black focus:outline-none focus:ring-2 focus:ring-pink-400">
-                <p id="email-error" class="text-red-500 text-sm mt-1 hidden">Email harus mengandung simbol '@'.</p>
             </div>
+        </div>
+    </div>
 
-            {{-- Password --}}
-            <div class="relative">
-                <label for="password" class="block text-sm font-medium mb-1">Password</label>
-                <input type="password" name="password" id="password" required
-                    class="w-full px-4 py-2 rounded-md bg-white/90 text-black focus:outline-none focus:ring-2 focus:ring-pink-400 pr-10">
-                <span class="absolute right-3 bottom-2 cursor-pointer" onclick="togglePassword()">
-                    <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    <svg id="eyeOff" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700 hidden" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.056 10.056 0 012.588-4.263m3.105-2.106A9.969 9.969 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.05 10.05 0 01-4.134 5.129M15 12a3 3 0 01-3 3m0 0a3 3 0 01-3-3m6 0a3 3 0 01-6 0m12 0c0-1.045-.162-2.05-.462-3M3 3l18 18" />
-                    </svg>
-                </span>
-            </div>
-
-            {{-- Remember Me --}}
-            <div class="flex justify-between items-center">
-                <label class="flex items-center text-sm">
-                    <input type="checkbox" name="remember" class="mr-2">
-                    Ingat saya
-                </label>
-            </div>
-
-            {{-- Tombol Login --}}
-            <button id="login-btn" type="submit" class="btn-fancy w-full flex items-center justify-center gap-2">
-                <span id="btn-text">Masuk</span>
-                <svg id="loading-spinner" class="w-4 h-4 animate-spin hidden" xmlns="http://www.w3.org/2000/svg"
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                </svg>
-            </button>
-        </form>
+    <!-- Footer Info -->
+    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center">
+        <p class="text-white text-sm opacity-75">
+            &copy; 2025 SPK BPNT Kabupaten Cirebon - Transparansi dalam Setiap Keputusan
+        </p>
     </div>
 
     <script>
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const eyeOpen = document.getElementById('eyeOpen');
-            const eyeOff = document.getElementById('eyeOff');
-
-            const isVisible = passwordInput.type === 'text';
-            passwordInput.type = isVisible ? 'password' : 'text';
-            eyeOpen.classList.toggle('hidden', !isVisible);
-            eyeOff.classList.toggle('hidden', isVisible);
+        function closeErrorNotification() {
+            const notification = document.getElementById('errorNotification');
+            notification.style.display = 'none';
         }
 
-        const emailInput = document.getElementById('email');
-        const errorElement = document.getElementById('email-error');
-        emailInput.addEventListener('input', () => {
-            if (!emailInput.value.includes('@')) {
-                errorElement.classList.remove('hidden');
-            } else {
-                errorElement.classList.add('hidden');
-            }
-        });
-
-        const rememberCheckbox = document.querySelector('input[name="remember"]');
-        document.addEventListener("DOMContentLoaded", () => {
-            const savedEmail = localStorage.getItem('rememberedEmail');
-            if (savedEmail) {
-                emailInput.value = savedEmail;
-                rememberCheckbox.checked = true;
-            }
-        });
-
-        document.querySelector('form').addEventListener('submit', (e) => {
-            const btn = document.getElementById('login-btn');
-            const spinner = document.getElementById('loading-spinner');
-            const text = document.getElementById('btn-text');
-
-            btn.disabled = true;
-            spinner.classList.remove('hidden');
-            text.textContent = 'Memproses...';
-
-            if (rememberCheckbox.checked) {
-                localStorage.setItem('rememberedEmail', emailInput.value);
-            } else {
-                localStorage.removeItem('rememberedEmail');
+        // Auto hide error notification after 8 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const notification = document.getElementById('errorNotification');
+            if (notification && notification.style.display !== 'none') {
+                setTimeout(() => {
+                    closeErrorNotification();
+                }, 8000);
             }
         });
     </script>
+
 </body>
 
 </html>

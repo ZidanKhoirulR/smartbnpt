@@ -107,20 +107,27 @@ class SMARTController extends Controller
                 $nilaiSubKriteria = $penilaianData->subKriteria->bobot;
                 $divisor = $nilaiMax - $nilaiMin;
 
-                // Perhitungan utility dengan skala 1-10
+                // PERBAIKAN UTAMA: Logika utility untuk program bantuan sosial (BPNT)
+                // Semua kriteria diperlakukan sebagai COST (nilai rendah = kebutuhan tinggi = utility tinggi)
                 if ($divisor == 0) {
                     // Jika semua nilai sama
                     $nilai = 5.5; // Nilai tengah
                 } else {
-                    if ($jenisKriteria == 'benefit') {
-                        // Untuk benefit: nilai tinggi = utility tinggi
-                        // Formula: ((nilai - min) / (max - min)) * 9 + 1
+                    // Untuk semua kriteria dalam konteks BPNT:
+                    // - Pendapatan rendah = butuh bantuan = utility tinggi
+                    // - Tanggungan banyak = butuh bantuan = utility tinggi  
+                    // - Kondisi rumah buruk = butuh bantuan = utility tinggi
+                    // - Aset sedikit = butuh bantuan = utility tinggi
+                    // - Pekerjaan tidak stabil = butuh bantuan = utility tinggi
+
+                    // Formula untuk semua kriteria: ((max - nilai) / (max - min)) * 9 + 1
+                    // Semakin rendah nilai asli, semakin tinggi utility
+                    if ($jenisKriteria === 'benefit') {
                         $nilai = (($nilaiSubKriteria - $nilaiMin) / $divisor) * 9 + 1;
-                    } else { // cost
-                        // Untuk cost: nilai tinggi = utility rendah
-                        // Formula: ((max - nilai) / (max - min)) * 9 + 1
+                    } else {
                         $nilai = (($nilaiMax - $nilaiSubKriteria) / $divisor) * 9 + 1;
                     }
+
                 }
 
                 // Pastikan nilai dalam rentang 1-10
