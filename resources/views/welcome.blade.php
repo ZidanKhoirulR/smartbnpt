@@ -87,9 +87,12 @@
         }
 
         @keyframes float {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0px);
             }
+
             50% {
                 transform: translateY(-10px);
             }
@@ -104,6 +107,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -118,13 +122,14 @@
             from {
                 opacity: 0;
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        /* SMARTER Animated Text */
+        /* SMARTER Animated Text - FIXED */
         .smarter-text {
             font-size: 5rem;
             font-weight: 800;
@@ -135,41 +140,78 @@
 
         .smarter-letter {
             display: inline-block;
-            animation: letterBounce 2s ease-in-out infinite;
+            animation: letterPulse 3s ease-in-out infinite;
             margin: 0 0.1em;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            transform-origin: center bottom;
         }
 
-        .smarter-letter:nth-child(1) { color: #ef4444; animation-delay: 0s; }
-        .smarter-letter:nth-child(2) { color: #f97316; animation-delay: 0.1s; }
-        .smarter-letter:nth-child(3) { color: #eab308; animation-delay: 0.2s; }
-        .smarter-letter:nth-child(4) { color: #22c55e; animation-delay: 0.3s; }
-        .smarter-letter:nth-child(5) { color: #3b82f6; animation-delay: 0.4s; }
-        .smarter-letter:nth-child(6) { color: #8b5cf6; animation-delay: 0.5s; }
-        .smarter-letter:nth-child(7) { color: #ec4899; animation-delay: 0.6s; }
+        .smarter-letter:nth-child(1) {
+            color: #ef4444;
+            animation-delay: 0s;
+        }
 
-        @keyframes letterBounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0) scale(1);
+        .smarter-letter:nth-child(2) {
+            color: #f97316;
+            animation-delay: 0.2s;
+        }
+
+        .smarter-letter:nth-child(3) {
+            color: #eab308;
+            animation-delay: 0.4s;
+        }
+
+        .smarter-letter:nth-child(4) {
+            color: #22c55e;
+            animation-delay: 0.6s;
+        }
+
+        .smarter-letter:nth-child(5) {
+            color: #3b82f6;
+            animation-delay: 0.8s;
+        }
+
+        .smarter-letter:nth-child(6) {
+            color: #8b5cf6;
+            animation-delay: 1.0s;
+        }
+
+        .smarter-letter:nth-child(7) {
+            color: #ec4899;
+            animation-delay: 1.2s;
+        }
+
+        @keyframes letterPulse {
+
+            0%,
+            70%,
+            100% {
+                transform: translateY(0) scale(1) rotateZ(0deg);
+                filter: drop-shadow(0 0 0px currentColor);
             }
-            40% {
-                transform: translateY(-20px) scale(1.1);
+
+            15% {
+                transform: translateY(-30px) scale(1.2) rotateZ(-5deg);
+                filter: drop-shadow(0 0 20px currentColor);
             }
-            60% {
-                transform: translateY(-10px) scale(1.05);
+
+            35% {
+                transform: translateY(-15px) scale(1.1) rotateZ(3deg);
+                filter: drop-shadow(0 0 15px currentColor);
             }
         }
 
         .smarter-glow {
-            animation: glow 2s ease-in-out infinite alternate;
+            animation: continuousGlow 2s ease-in-out infinite alternate;
         }
 
-        @keyframes glow {
+        @keyframes continuousGlow {
             from {
                 text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
             }
+
             to {
-                text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+                text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor;
             }
         }
 
@@ -193,6 +235,8 @@
 
         .about-section {
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            padding: 100px 0;
         }
 
         section {
@@ -208,9 +252,41 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
+            }
+        }
+
+        /* About section improvements */
+        .about-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            height: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .about-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        @media (max-width: 768px) {
+            .smarter-text {
+                font-size: 3rem;
             }
         }
     </style>
@@ -235,16 +311,18 @@
 
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center space-x-8">
-                <a href="#beranda" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Beranda</a>
                 <a href="/login" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Login</a>
-                <button onclick="checkResult()" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Cek Hasil</button>
-                <a href="#tentang" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Tentang Kami</a>
+                <button onclick="checkResult()"
+                    class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Cek Hasil</button>
+                <a href="#tentang" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Tentang
+                    Kami</a>
             </div>
 
             <!-- Mobile Menu Button -->
             <button class="md:hidden text-gray-700" onclick="toggleMobileMenu()">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                    </path>
                 </svg>
             </button>
         </div>
@@ -252,15 +330,15 @@
         <!-- Mobile Menu -->
         <div id="mobileMenu" class="mobile-menu md:hidden mt-4 px-6 py-4 bg-white rounded-lg mx-6">
             <div class="space-y-3">
-                <a href="#beranda" class="block text-gray-700 hover:text-blue-600 font-medium">Beranda</a>
                 <a href="/login" class="block text-gray-700 hover:text-blue-600 font-medium">Login</a>
-                <button onclick="checkResult()" class="block text-gray-700 hover:text-blue-600 font-medium text-left w-full">Cek Hasil</button>
+                <button onclick="checkResult()"
+                    class="block text-gray-700 hover:text-blue-600 font-medium text-left w-full">Cek Hasil</button>
                 <a href="#tentang" class="block text-gray-700 hover:text-blue-600 font-medium">Tentang Kami</a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section / Beranda -->
+    <!-- Hero Section -->
     <section id="beranda" class="hero-bg min-h-screen pt-24">
         <!-- Background Pattern -->
         <div class="absolute inset-0 overflow-hidden">
@@ -343,7 +421,8 @@
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-blue-800">Informasi</p>
-                                <p class="text-xs text-blue-600">Pastikan NIK yang dimasukkan sesuai dengan KTP dan terdaftar di sistem</p>
+                                <p class="text-xs text-blue-600">Pastikan NIK yang dimasukkan sesuai dengan KTP dan
+                                    terdaftar di sistem</p>
                             </div>
                         </div>
                     </div>
@@ -424,97 +503,120 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Quick Access Buttons -->
-            <div class="text-center space-y-4 slide-in" style="animation-delay: 0.8s;">
-                <h3 class="text-2xl font-bold text-white mb-6">Akses Cepat</h3>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="/login" class="btn-primary text-white px-8 py-4 rounded-xl font-semibold text-lg inline-flex items-center justify-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                        </svg>
-                        Login Sistem
-                    </a>
-                    <button onclick="checkResult()" class="btn-secondary text-white px-8 py-4 rounded-xl font-semibold text-lg">
-                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                        Cek Hasil BPNT
-                    </button>
-                </div>
-            </div>
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="tentang" class="about-section py-20">
+    <!-- About Section - FIXED -->
+    <section id="tentang" class="about-section">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-gray-900 mb-4">Tentang Kami</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                <h2 class="text-5xl font-bold text-gray-900 mb-6">Tentang Kami</h2>
+                <p class="text-2xl text-gray-600 max-w-4xl mx-auto">
                     Komitmen kami dalam memberikan layanan terbaik untuk masyarakat Kabupaten Cirebon
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
-                <div class="space-y-6">
-                    <h3 class="text-3xl font-bold text-gray-900">Visi & Misi</h3>
-                    <div class="space-y-4">
-                        <div class="bg-white p-6 rounded-xl shadow-lg">
-                            <h4 class="text-xl font-semibold text-blue-600 mb-3 flex items-center">
-                                <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                            </svg>
-                        </div>
-                        <h4 class="text-2xl font-bold text-gray-900 mb-4">Komitmen Kualitas</h4>
-                        <p class="text-gray-700 leading-relaxed">
-                            Dengan menggunakan metode SMARTER, kami berkomitmen memberikan hasil seleksi
-                            yang akurat, fair, dan dapat dipertanggungjawabkan kepada seluruh masyarakat.
-                        </p>
+            <!-- Visi & Misi Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+                <!-- Visi -->
+                <div class="about-card">
+                    <div class="feature-icon bg-blue-100">
+                        <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                            <path fill-rule="evenodd"
+                                d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                                clip-rule="evenodd" />
+                        </svg>
                     </div>
+                    <h3 class="text-3xl font-bold text-blue-600 mb-6 text-center">Visi</h3>
+                    <p class="text-gray-700 text-lg leading-relaxed text-center">
+                        Mewujudkan distribusi bantuan sosial yang tepat sasaran, transparan, dan akuntabel
+                        untuk kesejahteraan masyarakat Kabupaten Cirebon melalui implementasi teknologi
+                        sistem pendukung keputusan yang modern dan reliable.
+                    </p>
+                </div>
+
+                <!-- Misi -->
+                <div class="about-card">
+                    <div class="feature-icon bg-green-100">
+                        <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <h3 class="text-3xl font-bold text-green-600 mb-6 text-center">Misi</h3>
+                    <ul class="text-gray-700 text-lg space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-green-500 text-2xl mr-3 mt-1">•</span>
+                            <span>Mengimplementasikan sistem seleksi yang objektif dan terukur menggunakan metode
+                                SMARTER</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 text-2xl mr-3 mt-1">•</span>
+                            <span>Memberikan transparansi penuh dalam proses pengambilan keputusan penerima
+                                bantuan</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 text-2xl mr-3 mt-1">•</span>
+                            <span>Melakukan evaluasi dan perbaikan berkelanjutan untuk meningkatkan kualitas
+                                layanan</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 text-2xl mr-3 mt-1">•</span>
+                            <span>Memastikan bantuan tepat sasaran sesuai kriteria yang telah ditetapkan</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
-            <!-- Additional Information Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
-                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <h4 class="text-xl font-semibold text-gray-900 mb-2">Akurasi Tinggi</h4>
-                    <p class="text-gray-600">Metode SMARTER memberikan akurasi hingga 98% dalam seleksi penerima bantuan</p>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <!-- Feature Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div class="about-card text-center">
+                    <div class="feature-icon bg-green-100">
                         <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
                                 d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                                 clip-rule="evenodd" />
                         </svg>
                     </div>
-                    <h4 class="text-xl font-semibold text-gray-900 mb-2">Transparansi</h4>
-                    <p class="text-gray-600">Proses seleksi yang transparan dan dapat dipertanggungjawabkan kepada publik</p>
+                    <h4 class="text-2xl font-semibold text-gray-900 mb-4">Transparansi</h4>
+                    <p class="text-gray-600 text-lg leading-relaxed">
+                        Proses seleksi yang transparan dan dapat dipertanggungjawabkan kepada publik
+                        dengan dokumentasi lengkap setiap tahapan evaluasi.
+                    </p>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
-                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div class="about-card text-center">
+                    <div class="feature-icon bg-purple-100">
                         <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
                                 d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                                 clip-rule="evenodd" />
                         </svg>
                     </div>
-                    <h4 class="text-xl font-semibold text-gray-900 mb-2">Evaluasi Berkelanjutan</h4>
-                    <p class="text-gray-600">Sistem review dan evaluasi berkelanjutan untuk perbaikan kualitas layanan</p>
+                    <h4 class="text-2xl font-semibold text-gray-900 mb-4">Evaluasi Berkelanjutan</h4>
+                    <p class="text-gray-600 text-lg leading-relaxed">
+                        Sistem review dan evaluasi berkelanjutan untuk perbaikan kualitas layanan
+                        dan peningkatan efektivitas program bantuan sosial.
+                    </p>
                 </div>
             </div>
         </div>
     </section>
+
+    <div class="about-card text-center p-6 rounded-xl shadow-lg bg-white">
+        <div class="feature-icon bg-blue-100 w-16 h-16 mx-auto flex items-center justify-center rounded-full mb-4">
+            <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <h4 class="text-2xl font-semibold text-gray-900 mb-2">Akurasi Tinggi</h4>
+        <p class="text-gray-600 text-lg leading-relaxed">
+            Metode SMARTER memberikan akurasi hingga 98% dalam seleksi penerima bantuan
+            dengan multi-kriteria yang objektif dan terukur.
+        </p>
+    </div>
 
     <!-- Footer -->
     <footer class="text-white py-16">
@@ -532,12 +634,14 @@
                             </svg>
                             <div>
                                 <p class="font-medium">Alamat Kantor</p>
-                                <p class="text-blue-100 text-sm">Jl. Sunan Kalijaga No. 7, Sumber, Kabupaten Cirebon, Jawa Barat 45611</p>
+                                <p class="text-blue-100 text-sm">Jl. Sunan Kalijaga No. 7, Sumber, Kabupaten Cirebon,
+                                    Jawa Barat 45611</p>
                             </div>
                         </div>
                         <div class="flex items-center space-x-3">
                             <svg class="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                                <path
+                                    d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                             </svg>
                             <div>
                                 <p class="font-medium">Telepon</p>
@@ -585,12 +689,19 @@
                 <div class="space-y-4">
                     <h4 class="text-2xl font-bold mb-6">Tautan Cepat</h4>
                     <div class="space-y-3">
-                        <a href="/login" class="block text-blue-100 hover:text-yellow-300 transition-colors text-left">Login Sistem</a>
-                        <button onclick="checkResult()" class="block text-blue-100 hover:text-yellow-300 transition-colors text-left">Cek Status BPNT</button>
-                        <a href="#" class="block text-blue-100 hover:text-yellow-300 transition-colors">Panduan Penggunaan</a>
+                        <a href="/login"
+                            class="block text-blue-100 hover:text-yellow-300 transition-colors text-left">Login
+                            Sistem</a>
+                        <button onclick="checkResult()"
+                            class="block text-blue-100 hover:text-yellow-300 transition-colors text-left">Cek Status
+                            BPNT</button>
+                        <a href="#" class="block text-blue-100 hover:text-yellow-300 transition-colors">Panduan
+                            Penggunaan</a>
                         <a href="#" class="block text-blue-100 hover:text-yellow-300 transition-colors">FAQ</a>
-                        <a href="#" class="block text-blue-100 hover:text-yellow-300 transition-colors">Bantuan Teknis</a>
-                        <a href="https://cirebonkab.go.id" class="block text-blue-100 hover:text-yellow-300 transition-colors">Website Resmi Pemkab</a>
+                        <a href="#" class="block text-blue-100 hover:text-yellow-300 transition-colors">Bantuan
+                            Teknis</a>
+                        <a href="https://cirebonkab.go.id"
+                            class="block text-blue-100 hover:text-yellow-300 transition-colors">Website Resmi Pemkab</a>
                     </div>
                 </div>
 
@@ -643,7 +754,7 @@
         // Sample database NIK untuk simulasi
         const validNIKs = [
             '3209012345671234',
-            '3209123456781234', 
+            '3209123456781234',
             '3209234567891234',
             '3209345678901234',
             '3209456789012345',
@@ -671,8 +782,12 @@
         }
 
         function showErrorNotification(message, title = 'Error') {
+            // Remove any existing notifications first
+            const existingNotifications = document.querySelectorAll('.error-notification');
+            existingNotifications.forEach(notification => notification.remove());
+
             const notification = document.createElement('div');
-            notification.className = 'error-notification fixed top-20 left-1/2 transform -translate-x-1/2 bg-red-50 border border-red-200 rounded-xl p-4 flex items-start space-x-3 max-w-md w-full mx-4 z-50 shadow-lg';
+            notification.className = 'error-notification bg-red-50 border border-red-200 rounded-xl p-4 flex items-start space-x-3 max-w-md w-full mx-auto mt-4 shadow-lg';
             notification.innerHTML = `
                 <div class="flex-shrink-0">
                     <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
@@ -691,9 +806,11 @@
                     </svg>
                 </button>
             `;
-            
-            document.body.appendChild(notification);
-            
+
+            // Insert notification in the search container
+            const searchContainer = document.querySelector('.max-w-2xl.mx-auto');
+            searchContainer.appendChild(notification);
+
             // Auto remove after 5 seconds
             setTimeout(() => {
                 if (notification.parentNode) {
@@ -929,50 +1046,3 @@
     </script>
 
 </body>
-
-</html>M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                    <path fill-rule="evenodd"
-                                        d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                Visi
-                            </h4>
-                            <p class="text-gray-700">Mewujudkan distribusi bantuan sosial yang tepat sasaran,
-                                transparan, dan akuntabel untuk kesejahteraan masyarakat Kabupaten Cirebon.</p>
-                        </div>
-                        <div class="bg-white p-6 rounded-xl shadow-lg">
-                            <h4 class="text-xl font-semibold text-green-600 mb-3 flex items-center">
-                                <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                Misi
-                            </h4>
-                            <ul class="text-gray-700 space-y-2">
-                                <li class="flex items-start">
-                                    <span class="text-green-500 mr-2">•</span>
-                                    Mengimplementasikan sistem seleksi yang objektif dan terukur
-                                </li>
-                                <li class="flex items-start">
-                                    <span class="text-green-500 mr-2">•</span>
-                                    Memberikan transparansi penuh dalam proses pengambilan keputusan
-                                </li>
-                                <li class="flex items-start">
-                                    <span class="text-green-500 mr-2">•</span>
-                                    Melakukan evaluasi dan perbaikan berkelanjutan
-                                </li>
-                                <li class="flex items-start">
-                                    <span class="text-green-500 mr-2">•</span>
-                                    Memastikan bantuan tepat sasaran sesuai kriteria yang ditetapkan
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-8">
-                    <div class="text-center">
-                        <div class="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="
