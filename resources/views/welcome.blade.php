@@ -129,7 +129,7 @@
             }
         }
 
-        /* SMARTER Animated Text - FIXED */
+        /* SMARTER Animated Text */
         .smarter-text {
             font-size: 5rem;
             font-weight: 800;
@@ -147,37 +147,44 @@
         }
 
         .smarter-letter:nth-child(1) {
-            color: #ef4444;
+            color: #ffffff;
+            text-shadow: 0 0 20px #ff0080, 0 0 40px #ff0080, 0 0 60px #ff0080;
             animation-delay: 0s;
         }
 
         .smarter-letter:nth-child(2) {
-            color: #f97316;
+            color: #ffffff;
+            text-shadow: 0 0 20px #ff8000, 0 0 40px #ff8000, 0 0 60px #ff8000;
             animation-delay: 0.2s;
         }
 
         .smarter-letter:nth-child(3) {
-            color: #eab308;
+            color: #ffffff;
+            text-shadow: 0 0 20px #ffff00, 0 0 40px #ffff00, 0 0 60px #ffff00;
             animation-delay: 0.4s;
         }
 
         .smarter-letter:nth-child(4) {
-            color: #22c55e;
+            color: #ffffff;
+            text-shadow: 0 0 20px #00ff00, 0 0 40px #00ff00, 0 0 60px #00ff00;
             animation-delay: 0.6s;
         }
 
         .smarter-letter:nth-child(5) {
-            color: #3b82f6;
+            color: #ffffff;
+            text-shadow: 0 0 20px #0080ff, 0 0 40px #0080ff, 0 0 60px #0080ff;
             animation-delay: 0.8s;
         }
 
         .smarter-letter:nth-child(6) {
-            color: #8b5cf6;
+            color: #ffffff;
+            text-shadow: 0 0 20px #8000ff, 0 0 40px #8000ff, 0 0 60px #8000ff;
             animation-delay: 1.0s;
         }
 
         .smarter-letter:nth-child(7) {
-            color: #ec4899;
+            color: #ffffff;
+            text-shadow: 0 0 20px #ff0040, 0 0 40px #ff0040, 0 0 60px #ff0040;
             animation-delay: 1.2s;
         }
 
@@ -187,31 +194,60 @@
             70%,
             100% {
                 transform: translateY(0) scale(1) rotateZ(0deg);
-                filter: drop-shadow(0 0 0px currentColor);
+                filter: brightness(1);
             }
 
             15% {
-                transform: translateY(-30px) scale(1.2) rotateZ(-5deg);
-                filter: drop-shadow(0 0 20px currentColor);
+                transform: translateY(-40px) scale(1.3) rotateZ(-8deg);
+                filter: brightness(1.5);
             }
 
             35% {
-                transform: translateY(-15px) scale(1.1) rotateZ(3deg);
-                filter: drop-shadow(0 0 15px currentColor);
+                transform: translateY(-20px) scale(1.15) rotateZ(5deg);
+                filter: brightness(1.2);
+            }
+
+            50% {
+                transform: translateY(-10px) scale(1.05) rotateZ(-2deg);
+                filter: brightness(1.1);
             }
         }
 
         .smarter-glow {
-            animation: continuousGlow 2s ease-in-out infinite alternate;
+            animation: continuousGlow 3s ease-in-out infinite alternate, letterFloat 4s ease-in-out infinite;
         }
 
         @keyframes continuousGlow {
-            from {
-                text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+            0% {
+                filter: brightness(1) saturate(1);
             }
 
-            to {
-                text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor;
+            50% {
+                filter: brightness(1.3) saturate(1.2);
+            }
+
+            100% {
+                filter: brightness(1.6) saturate(1.5);
+            }
+        }
+
+        @keyframes letterFloat {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            25% {
+                transform: translateY(-8px) rotate(1deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotate(0deg);
+            }
+
+            75% {
+                transform: translateY(-8px) rotate(-1deg);
             }
         }
 
@@ -284,10 +320,135 @@
             margin: 0 auto 1.5rem auto;
         }
 
-        @media (max-width: 768px) {
-            .smarter-text {
-                font-size: 3rem;
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            min-width: 220px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            z-index: 1000;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            margin-top: 8px;
+            padding: 8px 0;
+        }
+
+        .dropdown-content a,
+        .dropdown-content button {
+            color: #374151;
+            padding: 14px 20px;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            border-radius: 8px;
+            margin: 2px 8px;
+            width: calc(100% - 16px);
+        }
+
+        .dropdown-content a:first-child,
+        .dropdown-content button:first-child {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .dropdown-content a:last-child,
+        .dropdown-content button:last-child {
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .dropdown-content a:hover,
+        .dropdown-content button:hover {
+            background-color: #f3f4f6;
+            color: #3b82f6;
+            transform: translateX(4px);
+        }
+
+        .dropdown:hover .dropdown-content,
+        .dropdown.active .dropdown-content {
+            display: block;
+            animation: dropdownFadeIn 0.3s ease;
+        }
+
+        .dropdown-content::before {
+            content: '';
+            position: absolute;
+            top: -16px;
+            left: 0;
+            right: 0;
+            height: 16px;
+            background: transparent;
+        }
+
+        @keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
             }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown:hover .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* Mobile dropdown styles */
+        .mobile-dropdown {
+            position: relative;
+        }
+
+        .mobile-dropdown-content {
+            display: none;
+            background-color: #f9fafb;
+            border-radius: 8px;
+            margin-top: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .mobile-dropdown-content.active {
+            display: block;
+        }
+
+        .mobile-dropdown-content a,
+        .mobile-dropdown-content button {
+            color: #374151;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            border-radius: 6px;
+            margin: 4px 0;
+        }
+
+        .mobile-dropdown-content a:hover,
+        .mobile-dropdown-content button:hover {
+            background-color: #e5e7eb;
+            color: #3b82f6;
         }
     </style>
 </head>
@@ -310,12 +471,44 @@
             </div>
 
             <!-- Desktop Menu -->
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="/login" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Login</a>
-                <button onclick="checkResult()"
-                    class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Cek Hasil</button>
-                <a href="#tentang" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Tentang
+            <div class="hidden md:flex items-center space-x-4">
+                <a href="#beranda"
+                    class="text-gray-700 hover:text-blue-600 font-medium transition-colors px-3 py-2 rounded-lg hover:bg-blue-50">Beranda</a>
+                <div class="dropdown" id="desktopDropdown">
+                    <button onclick="toggleDesktopDropdown()"
+                        class="text-gray-700 hover:text-blue-600 font-medium transition-colors px-3 py-2 rounded-lg hover:bg-blue-50 flex items-center space-x-1">
+                        <span>Cek Hasil</span>
+                        <svg class="w-4 h-4 dropdown-arrow" id="desktopDropdownArrow" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </button>
+                    <div class="dropdown-content" id="desktopDropdownContent">
+                        <a href="#cekStatusSection" class="flex items-center space-x-3">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <span>Cek Status BPNT</span>
+                        </a>
+                        <button onclick="downloadData()" class="flex items-center space-x-3">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                            <span>Unduh Data Hasil</span>
+                        </button>
+                    </div>
+                </div>
+                <a href="#tentang"
+                    class="text-gray-700 hover:text-blue-600 font-medium transition-colors px-3 py-2 rounded-lg hover:bg-blue-50">Tentang
                     Kami</a>
+                <a href="#kontak"
+                    class="text-gray-700 hover:text-blue-600 font-medium transition-colors px-3 py-2 rounded-lg hover:bg-blue-50">Kontak</a>
+                <a href="/login"
+                    class="bg-blue-600 text-white hover:bg-blue-700 font-medium transition-colors px-4 py-2 rounded-lg">Login</a>
             </div>
 
             <!-- Mobile Menu Button -->
@@ -328,12 +521,45 @@
         </div>
 
         <!-- Mobile Menu -->
-        <div id="mobileMenu" class="mobile-menu md:hidden mt-4 px-6 py-4 bg-white rounded-lg mx-6">
+        <div id="mobileMenu" class="mobile-menu md:hidden mt-4 px-6 py-4 bg-white rounded-lg mx-6 shadow-lg">
             <div class="space-y-3">
-                <a href="/login" class="block text-gray-700 hover:text-blue-600 font-medium">Login</a>
-                <button onclick="checkResult()"
-                    class="block text-gray-700 hover:text-blue-600 font-medium text-left w-full">Cek Hasil</button>
-                <a href="#tentang" class="block text-gray-700 hover:text-blue-600 font-medium">Tentang Kami</a>
+                <a href="#beranda"
+                    class="block text-gray-700 hover:text-blue-600 font-medium py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors">Beranda</a>
+                <div class="mobile-dropdown">
+                    <button onclick="toggleMobileDropdown()"
+                        class="flex items-center justify-between w-full text-gray-700 hover:text-blue-600 font-medium py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors">
+                        <span>Cek Hasil</span>
+                        <svg class="w-4 h-4 dropdown-arrow" id="mobileDropdownArrow" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </button>
+                    <div class="mobile-dropdown-content" id="mobileDropdownContent">
+                        <button onclick="scrollToCekStatus(); toggleMobileMenu();" class="flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <span>Cek Status BPNT</span>
+                        </button>
+                        <button onclick="downloadData(); toggleMobileMenu();" class="flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                            <span>Unduh Data Hasil</span>
+                        </button>
+                    </div>
+                </div>
+                <a href="#tentang"
+                    class="block text-gray-700 hover:text-blue-600 font-medium py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors">Tentang
+                    Kami</a>
+                <a href="#kontak"
+                    class="block text-gray-700 hover:text-blue-600 font-medium py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors">Kontak</a>
+                <a href="/login"
+                    class="block bg-blue-600 text-white hover:bg-blue-700 font-medium py-2 px-3 rounded-lg transition-colors text-center">Login</a>
             </div>
         </div>
     </nav>
@@ -381,7 +607,8 @@
             </div>
 
             <!-- Search NIK Section -->
-            <div class="welcome-card rounded-3xl p-8 lg:p-12 mb-8 slide-in" style="animation-delay: 0.2s;">
+            <div id="cekStatusSection" class="welcome-card rounded-3xl p-8 lg:p-12 mb-8 slide-in"
+                style="animation-delay: 0.2s;">
                 <div class="text-center mb-8">
                     <h3 class="text-3xl font-bold text-gray-900 mb-4">Cek Status Penerima BPNT</h3>
                     <p class="text-lg text-gray-600">Masukkan NIK untuk mengetahui status penerimaan bantuan Anda</p>
@@ -506,7 +733,7 @@
         </div>
     </section>
 
-    <!-- About Section - FIXED -->
+    <!-- About Section -->
     <section id="tentang" class="about-section">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
@@ -588,6 +815,19 @@
                 </div>
 
                 <div class="about-card text-center">
+                    <div class="feature-icon bg-blue-100">
+                        <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-semibold text-gray-900 mb-4">Akurasi Tinggi</h4>
+                    <p class="text-gray-600 text-lg leading-relaxed">
+                        Metode SMARTER memberikan akurasi hingga 98% dalam seleksi penerima bantuan
+                        dengan multi-kriteria yang objektif dan terukur.
+                    </p>
+                </div>
+
+                <div class="about-card text-center">
                     <div class="feature-icon bg-purple-100">
                         <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
@@ -605,23 +845,10 @@
         </div>
     </section>
 
-    <div class="about-card text-center p-6 rounded-xl shadow-lg bg-white">
-        <div class="feature-icon bg-blue-100 w-16 h-16 mx-auto flex items-center justify-center rounded-full mb-4">
-            <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        </div>
-        <h4 class="text-2xl font-semibold text-gray-900 mb-2">Akurasi Tinggi</h4>
-        <p class="text-gray-600 text-lg leading-relaxed">
-            Metode SMARTER memberikan akurasi hingga 98% dalam seleksi penerima bantuan
-            dengan multi-kriteria yang objektif dan terukur.
-        </p>
-    </div>
-
     <!-- Footer -->
-    <footer class="text-white py-16">
+    <footer id="kontak" class="text-white py-16">
         <div class="max-w-7xl mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Contact Info -->
                 <div class="space-y-4">
                     <h4 class="text-2xl font-bold mb-6">Kontak Kami</h4>
@@ -685,26 +912,6 @@
                     </div>
                 </div>
 
-                <!-- Quick Links -->
-                <div class="space-y-4">
-                    <h4 class="text-2xl font-bold mb-6">Tautan Cepat</h4>
-                    <div class="space-y-3">
-                        <a href="/login"
-                            class="block text-blue-100 hover:text-yellow-300 transition-colors text-left">Login
-                            Sistem</a>
-                        <button onclick="checkResult()"
-                            class="block text-blue-100 hover:text-yellow-300 transition-colors text-left">Cek Status
-                            BPNT</button>
-                        <a href="#" class="block text-blue-100 hover:text-yellow-300 transition-colors">Panduan
-                            Penggunaan</a>
-                        <a href="#" class="block text-blue-100 hover:text-yellow-300 transition-colors">FAQ</a>
-                        <a href="#" class="block text-blue-100 hover:text-yellow-300 transition-colors">Bantuan
-                            Teknis</a>
-                        <a href="https://cirebonkab.go.id"
-                            class="block text-blue-100 hover:text-yellow-300 transition-colors">Website Resmi Pemkab</a>
-                    </div>
-                </div>
-
                 <!-- Emergency Contact -->
                 <div class="space-y-4">
                     <h4 class="text-2xl font-bold mb-6">Kontak Darurat</h4>
@@ -765,20 +972,113 @@
             '3209901234567890'
         ];
 
-        function toggleMobileMenu() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            mobileMenu.classList.toggle('active');
+        @media(max - width: 768px) {
+            .smarter - text {
+                font - size: 3rem;
+            }
+        }
+        // Show confirmation dialog
+        const confirmed = confirm('Apakah Anda yakin ingin mengunduh data hasil SMARTER?\n\nData yang akan diunduh:\n- Hasil perhitungan SMARTER\n- Ranking penerima BPNT\n- Status keputusan\n\nFile: BPNT_Results_2025.xlsx');
+
+        if (confirmed) {
+            // Show loading notification
+            showDownloadNotification('Memproses unduhan data...', 'info');
+
+            // Simulate download process
+            setTimeout(() => {
+                // In real implementation, this would trigger actual file download
+                // For demo purposes, we'll show success message
+                showDownloadNotification('Data berhasil diunduh! File tersimpan di folder Downloads.', 'success');
+
+                // You can add actual download logic here:
+                // const link = document.createElement('a');
+                // link.href = '/download/bpnt-results';
+                // link.download = 'BPNT_Results_2025.xlsx';
+                // link.click();
+            }, 2000);
+        }
+        }
+
+        function showDownloadNotification(message, type = 'info') {
+            // Remove any existing notifications first
+            const existingNotifications = document.querySelectorAll('.download-notification');
+            existingNotifications.forEach(notification => notification.remove());
+
+            const notification = document.createElement('div');
+            let bgColor = type === 'success' ? 'bg-green-50 border-green-200' : 'bg-blue-50 border-blue-200';
+            let iconColor = type === 'success' ? 'bg-green-500' : 'bg-blue-500';
+            let textColor = type === 'success' ? 'text-green-800' : 'text-blue-800';
+            let icon = type === 'success' ?
+                '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>' :
+                '<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>';
+
+            notification.className = `download-notification ${bgColor} border rounded-xl p-4 flex items-start space-x-3 max-w-md w-full mx-auto mt-4 shadow-lg fixed top-20 left-1/2 transform -translate-x-1/2 z-50`;
+            notification.style.animation = 'slideIn 0.3s ease-out';
+            notification.innerHTML = `
+                <div class="flex-shrink-0">
+                    <div class="w-6 h-6 ${iconColor} rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            ${icon}
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex-grow">
+                    <p class="text-sm ${textColor}">${message}</p>
+                </div>
+                <button onclick="this.parentElement.remove()" class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors">
+                    <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Auto remove after 5 seconds for info, 3 seconds for success
+            const timeout = type === 'success' ? 3000 : 5000;
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, timeout);
+        }
+
+        function toggleMobileDropdown() {
+            const content = document.getElementById('mobileDropdownContent');
+            const arrow = document.getElementById('mobileDropdownArrow');
+
+            content.classList.toggle('active');
+            arrow.style.transform = content.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+
+        function scrollToCekStatus() {
+            // Scroll to the specific section "Cek Status Penerima BPNT"
+            const cekStatusSection = document.getElementById('cekStatusSection');
+            if (cekStatusSection) {
+                cekStatusSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+
+                // Optional: Focus on the NIK input after scrolling
+                setTimeout(() => {
+                    const nikInput = document.getElementById('nikInput');
+                    if (nikInput) {
+                        nikInput.focus();
+                        // Add a subtle highlight effect
+                        nikInput.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.3)';
+                        setTimeout(() => {
+                            nikInput.style.boxShadow = '';
+                        }, 2000);
+                    }
+                }, 600);
+            }
         }
 
         function checkResult() {
-            // Scroll to NIK search section
-            const searchSection = document.getElementById('nikInput');
-            if (searchSection) {
-                searchSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                setTimeout(() => {
-                    searchSection.focus();
-                }, 500);
-            }
+            // This function can still be used for other purposes
+            // or redirect to the same scrollToCekStatus function
+            scrollToCekStatus();
         }
 
         function showErrorNotification(message, title = 'Error') {
@@ -1016,13 +1316,24 @@
                 });
             });
 
-            // Close mobile menu when clicking outside
+            // Close dropdowns when clicking outside
             document.addEventListener('click', function (event) {
                 const mobileMenu = document.getElementById('mobileMenu');
+                const desktopDropdown = document.getElementById('desktopDropdown');
                 const menuButton = event.target.closest('button');
 
-                if (!mobileMenu.contains(event.target) && !menuButton) {
+                // Close mobile menu
+                if (!mobileMenu.contains(event.target) && !menuButton?.onclick?.toString().includes('toggleMobileMenu')) {
                     mobileMenu.classList.remove('active');
+                }
+
+                // Close desktop dropdown
+                if (!desktopDropdown.contains(event.target)) {
+                    desktopDropdown.classList.remove('active');
+                    const arrow = document.getElementById('desktopDropdownArrow');
+                    if (arrow) {
+                        arrow.style.transform = 'rotate(0deg)';
+                    }
                 }
             });
 
@@ -1046,3 +1357,5 @@
     </script>
 
 </body>
+
+</html>
