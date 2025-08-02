@@ -198,7 +198,7 @@
                             Penerimaan BPNT
                         </h2>
                         <p class="text-lg text-blue-100 leading-relaxed">
-                            Menggunakan metode SMARTER (Simple Multi-Attribute Rating Technique Extended to Ranking)
+                            Menggunakan metode SMARTER (Simple Multi-Attribute Rating Technique Exploiting Ranks)
                             untuk memberikan transparansi dan akurasi dalam proses seleksi
                             penerima Bantuan Pangan Non Tunai.
                         </p>
@@ -241,36 +241,21 @@
                     <!-- Character Illustrations -->
                     <div class="flex justify-center space-x-6 mt-8">
                         <div class="icon-float">
-                            <div
-                                class="w-16 h-20 bg-gradient-to-b from-purple-400 to-purple-600 rounded-t-full rounded-b-lg relative">
-                                <div
-                                    class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full">
-                                </div>
-                                <div
-                                    class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg">
-                                </div>
+                            <div class="w-16 h-20 bg-gradient-to-b from-purple-400 to-purple-600 rounded-t-full rounded-b-lg relative">
+                                <div class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full"></div>
+                                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg"></div>
                             </div>
                         </div>
                         <div class="icon-float" style="animation-delay: 0.5s;">
-                            <div
-                                class="w-16 h-20 bg-gradient-to-b from-red-400 to-red-600 rounded-t-full rounded-b-lg relative">
-                                <div
-                                    class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full">
-                                </div>
-                                <div
-                                    class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg">
-                                </div>
+                            <div class="w-16 h-20 bg-gradient-to-b from-red-400 to-red-600 rounded-t-full rounded-b-lg relative">
+                                <div class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full"></div>
+                                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg"></div>
                             </div>
                         </div>
                         <div class="icon-float" style="animation-delay: 1s;">
-                            <div
-                                class="w-16 h-20 bg-gradient-to-b from-blue-400 to-blue-600 rounded-t-full rounded-b-lg relative">
-                                <div
-                                    class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full">
-                                </div>
-                                <div
-                                    class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg">
-                                </div>
+                            <div class="w-16 h-20 bg-gradient-to-b from-blue-400 to-blue-600 rounded-t-full rounded-b-lg relative">
+                                <div class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full"></div>
+                                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg"></div>
                             </div>
                         </div>
                     </div>
@@ -278,30 +263,9 @@
 
                 <!-- Right Side - Login Form -->
                 <div class="login-card rounded-3xl p-8 lg:p-10">
-                    <div class="mb-4">
+                    <div class="mb-6">
                         <h2 class="text-3xl font-bold text-gray-900 mb-4">Login Member</h2>
                         <p class="text-gray-600">Masuk untuk mengakses sistem SPK BPNT</p>
-                    </div>
-
-                    <!-- Demo Credentials Info -->
-                    <div class="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                        <div class="flex items-start space-x-3">
-                            <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mt-0.5">
-                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-medium text-blue-800 mb-1">Akun Demo</h4>
-                                <div class="text-xs text-blue-700 space-y-1">
-                                    <p><strong>Email:</strong> admin@bpnt.go.id</p>
-                                    <p><strong>Password:</strong> admin123</p>
-                                    <p class="text-blue-600">Gunakan kredensial di atas untuk login demo</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <form method="POST" action="{{ route('login') }}" class="space-y-6" id="loginForm">
@@ -352,14 +316,10 @@
                                 <input type="password" name="password" id="password" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none input-focus transition-all @error('password') border-red-500 @enderror pr-12"
                                     placeholder="Masukkan password Anda">
-                                <button type="button" onclick="togglePassword()"
-                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                                    <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                    <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                     </svg>
                                 </button>
                             </div>
@@ -374,14 +334,9 @@
                                     class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="ml-2 text-sm text-gray-600">Ingat saya</span>
                             </label>
-                            <button type="button" onclick="fillDemoCredentials()"
-                                class="text-sm text-blue-600 hover:text-blue-800 transition-colors">
-                                Isi Kredensial Demo
-                            </button>
                         </div>
 
-                        <button type="submit"
-                            class="w-full btn-primary text-white py-3 rounded-xl font-semibold text-lg">
+                        <button type="submit" class="w-full btn-primary text-white py-3 rounded-xl font-semibold text-lg">
                             Login Sekarang
                         </button>
                     </form>
@@ -404,8 +359,7 @@
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-blue-800">Informasi Sistem</p>
-                                <p class="text-xs text-blue-600">Menggunakan metode SMARTER untuk proses seleksi yang
-                                    objektif</p>
+                                <p class="text-xs text-blue-600">Menggunakan metode SMARTER untuk proses seleksi yang objektif</p>
                             </div>
                         </div>
                     </div>
@@ -441,7 +395,7 @@
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');
-
+            
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 eyeIcon.innerHTML = `
@@ -454,22 +408,6 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                 `;
             }
-        }
-
-        function fillDemoCredentials() {
-            document.querySelector('input[name="email"]').value = 'admin@bpnt.go.id';
-            document.querySelector('input[name="password"]').value = 'admin123';
-
-            // Add visual feedback
-            const button = event.target;
-            const originalText = button.textContent;
-            button.textContent = '✓ Kredensial Diisi';
-            button.classList.add('text-green-600');
-
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.classList.remove('text-green-600');
-            }, 2000);
         }
 
         // Auto hide error notification after 8 seconds
@@ -488,34 +426,6 @@
 
                 if (!mobileMenu.contains(event.target) && !menuButton) {
                     mobileMenu.classList.remove('active');
-                }
-            });
-
-            // Auto-fill demo credentials hint
-            const emailInput = document.querySelector('input[name="email"]');
-            const passwordInput = document.querySelector('input[name="password"]');
-
-            emailInput.addEventListener('focus', function () {
-                if (!this.value) {
-                    this.placeholder = 'Coba: admin@bpnt.go.id';
-                }
-            });
-
-            emailInput.addEventListener('blur', function () {
-                if (!this.value) {
-                    this.placeholder = 'Masukkan Email Anda';
-                }
-            });
-
-            passwordInput.addEventListener('focus', function () {
-                if (!this.value) {
-                    this.placeholder = 'Coba: admin123';
-                }
-            });
-
-            passwordInput.addEventListener('blur', function () {
-                if (!this.value) {
-                    this.placeholder = 'Masukkan password Anda';
                 }
             });
         });

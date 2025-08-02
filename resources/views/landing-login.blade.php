@@ -190,7 +190,7 @@
                             Penerimaan BPNT
                         </h2>
                         <p class="text-lg text-blue-100 leading-relaxed">
-                            Menggunakan metode SMARTER (Simple Multi-Attribute Rating Technique Extended to Ranking)
+                            Menggunakan metode SMARTER (Simple Multi-Attribute Rating Technique Exploiting Ranks)
                             untuk memberikan transparansi dan akurasi dalam proses seleksi
                             penerima Bantuan Pangan Non Tunai.
                         </p>
@@ -255,28 +255,9 @@
 
                 <!-- Right Side - Login Form -->
                 <div class="login-card rounded-3xl p-8 lg:p-10">
-                    <div class="mb-4">
+                    <div class="mb-6">
                         <h2 class="text-3xl font-bold text-gray-900 mb-4">Login Member</h2>
                         <p class="text-gray-600">Masuk untuk mengakses sistem SPK BPNT</p>
-                    </div>
-
-                    <!-- Demo Credentials Info -->
-                    <div class="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                        <div class="flex items-start space-x-3">
-                            <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mt-0.5">
-                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-medium text-blue-800 mb-1">Akun Demo</h4>
-                                <div class="text-xs text-blue-700 space-y-1">
-                                    <p><strong>Email:</strong> admin@bpnt.go.id</p>
-                                    <p><strong>Password:</strong> admin123</p>
-                                    <p class="text-blue-600">Gunakan kredensial di atas untuk login demo</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <form method="POST" action="{{ route('login') }}" class="space-y-6" id="loginForm">
@@ -345,9 +326,6 @@
                                     class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="ml-2 text-sm text-gray-600">Ingat saya</span>
                             </label>
-                            <button type="button" onclick="fillDemoCredentials()" class="text-sm text-blue-600 hover:text-blue-800 transition-colors">
-                                Isi Kredensial Demo
-                            </button>
                         </div>
 
                         <button type="submit" class="w-full btn-primary text-white py-3 rounded-xl font-semibold text-lg">
@@ -424,22 +402,6 @@
             }
         }
 
-        function fillDemoCredentials() {
-            document.querySelector('input[name="email"]').value = 'admin@bpnt.go.id';
-            document.querySelector('input[name="password"]').value = 'admin123';
-            
-            // Add visual feedback
-            const button = event.target;
-            const originalText = button.textContent;
-            button.textContent = '✓ Kredensial Diisi';
-            button.classList.add('text-green-600');
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.classList.remove('text-green-600');
-            }, 2000);
-        }
-
         // Auto hide error notification after 8 seconds
         document.addEventListener('DOMContentLoaded', function () {
             const notification = document.getElementById('errorNotification');
@@ -456,34 +418,6 @@
 
                 if (!mobileMenu.contains(event.target) && !menuButton) {
                     mobileMenu.classList.remove('active');
-                }
-            });
-
-            // Auto-fill demo credentials hint
-            const emailInput = document.querySelector('input[name="email"]');
-            const passwordInput = document.querySelector('input[name="password"]');
-            
-            emailInput.addEventListener('focus', function() {
-                if (!this.value) {
-                    this.placeholder = 'Coba: admin@bpnt.go.id';
-                }
-            });
-            
-            emailInput.addEventListener('blur', function() {
-                if (!this.value) {
-                    this.placeholder = 'Masukkan Email Anda';
-                }
-            });
-            
-            passwordInput.addEventListener('focus', function() {
-                if (!this.value) {
-                    this.placeholder = 'Coba: admin123';
-                }
-            });
-            
-            passwordInput.addEventListener('blur', function() {
-                if (!this.value) {
-                    this.placeholder = 'Masukkan password Anda';
                 }
             });
         });

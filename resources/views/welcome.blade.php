@@ -279,6 +279,10 @@
             scroll-margin-top: 80px;
         }
 
+        #cekStatusSection {
+            scroll-margin-top: 120px;
+        }
+
         .error-notification {
             animation: slideIn 0.3s ease-out;
         }
@@ -450,6 +454,12 @@
             background-color: #e5e7eb;
             color: #3b82f6;
         }
+
+        @media(max-width: 768px) {
+            .smarter-text {
+                font-size: 3rem;
+            }
+        }
     </style>
 </head>
 
@@ -485,13 +495,13 @@
                         </svg>
                     </button>
                     <div class="dropdown-content" id="desktopDropdownContent">
-                        <a href="#cekStatusSection" class="flex items-center space-x-3">
+                        <button onclick="scrollToCekStatus()" class="flex items-center space-x-3">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
                             <span>Cek Status BPNT</span>
-                        </a>
+                        </button>
                         <button onclick="downloadData()" class="flex items-center space-x-3">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -661,7 +671,7 @@
                 <div class="text-center mb-8">
                     <h3 class="text-4xl font-bold text-gray-900 mb-4">Metode SMARTER</h3>
                     <p class="text-xl text-gray-600 max-w-4xl mx-auto">
-                        Simple Multi-Attribute Rating Technique Extended to Ranking dengan Evaluation dan Review
+                        Simple Multi-Attribute Rating Technique Exploiting Ranks
                     </p>
                 </div>
 
@@ -673,33 +683,33 @@
                     </div>
                     <div class="bg-orange-50 rounded-xl p-6 text-center hover:bg-orange-100 transition-colors">
                         <div class="text-3xl font-bold text-orange-600 mb-2">M</div>
-                        <div class="font-semibold text-lg mb-1 text-gray-900">Multi-Attribute</div>
+                        <div class="font-semibold text-lg mb-1 text-gray-900">Multi</div>
                         <div class="text-sm text-gray-600">Banyak kriteria</div>
                     </div>
                     <div class="bg-yellow-50 rounded-xl p-6 text-center hover:bg-yellow-100 transition-colors">
                         <div class="text-3xl font-bold text-yellow-600 mb-2">A</div>
-                        <div class="font-semibold text-lg mb-1 text-gray-900">Rating</div>
-                        <div class="text-sm text-gray-600">Sistem penilaian</div>
+                        <div class="font-semibold text-lg mb-1 text-gray-900">Attribute</div>
+                        <div class="text-sm text-gray-600">Banyak atribut</div>
                     </div>
                     <div class="bg-green-50 rounded-xl p-6 text-center hover:bg-green-100 transition-colors">
                         <div class="text-3xl font-bold text-green-600 mb-2">R</div>
-                        <div class="font-semibold text-lg mb-1 text-gray-900">Technique</div>
-                        <div class="text-sm text-gray-600">Teknik tervalidasi</div>
+                        <div class="font-semibold text-lg mb-1 text-gray-900">Rating</div>
+                        <div class="text-sm text-gray-600">Sistem penilaian</div>
                     </div>
                     <div class="bg-blue-50 rounded-xl p-6 text-center hover:bg-blue-100 transition-colors">
                         <div class="text-3xl font-bold text-blue-600 mb-2">T</div>
-                        <div class="font-semibold text-lg mb-1 text-gray-900">Extended</div>
-                        <div class="text-sm text-gray-600">Diperluas dengan ranking</div>
+                        <div class="font-semibold text-lg mb-1 text-gray-900">Technique</div>
+                        <div class="text-sm text-gray-600">Teknik tervalidasi</div>
                     </div>
                     <div class="bg-purple-50 rounded-xl p-6 text-center hover:bg-purple-100 transition-colors">
                         <div class="text-3xl font-bold text-purple-600 mb-2">E</div>
-                        <div class="font-semibold text-lg mb-1 text-gray-900">Evaluation</div>
-                        <div class="text-sm text-gray-600">Evaluasi berkelanjutan</div>
+                        <div class="font-semibold text-lg mb-1 text-gray-900">Exploiting</div>
+                        <div class="text-sm text-gray-600">Memanfaatkan</div>
                     </div>
                     <div class="bg-pink-50 rounded-xl p-6 text-center hover:bg-pink-100 transition-colors">
                         <div class="text-3xl font-bold text-pink-600 mb-2">R</div>
-                        <div class="font-semibold text-lg mb-1 text-gray-900">Review</div>
-                        <div class="text-sm text-gray-600">Review sistematis</div>
+                        <div class="font-semibold text-lg mb-1 text-gray-900">Ranks</div>
+                        <div class="text-sm text-gray-600">Peringkat preferensi</div>
                     </div>
                 </div>
             </div>
@@ -711,7 +721,7 @@
                     <div>
                         <div class="text-4xl font-bold text-blue-600 mb-2" id="accuracy">98%</div>
                         <div class="text-gray-700 font-medium">Akurasi Seleksi</div>
-                        <div class="text-sm text-gray-500">Extended evaluation</div>
+                        <div class="text-sm text-gray-500">Exploiting ranks</div>
                     </div>
                     <div>
                         <div class="text-4xl font-bold text-green-600 mb-2" id="speed">15x</div>
@@ -972,31 +982,27 @@
             '3209901234567890'
         ];
 
-        @media(max - width: 768px) {
-            .smarter - text {
-                font - size: 3rem;
+        function downloadData() {
+            // Show confirmation dialog
+            const confirmed = confirm('Apakah Anda yakin ingin mengunduh data hasil SMARTER?\n\nData yang akan diunduh:\n- Hasil perhitungan SMARTER\n- Ranking penerima BPNT\n- Status keputusan\n\nFile: BPNT_Results_2025.xlsx');
+
+            if (confirmed) {
+                // Show loading notification
+                showDownloadNotification('Memproses unduhan data...', 'info');
+
+                // Simulate download process
+                setTimeout(() => {
+                    // In real implementation, this would trigger actual file download
+                    // For demo purposes, we'll show success message
+                    showDownloadNotification('Data berhasil diunduh! File tersimpan di folder Downloads.', 'success');
+
+                    // You can add actual download logic here:
+                    // const link = document.createElement('a');
+                    // link.href = '/download/bpnt-results';
+                    // link.download = 'BPNT_Results_2025.xlsx';
+                    // link.click();
+                }, 2000);
             }
-        }
-        // Show confirmation dialog
-        const confirmed = confirm('Apakah Anda yakin ingin mengunduh data hasil SMARTER?\n\nData yang akan diunduh:\n- Hasil perhitungan SMARTER\n- Ranking penerima BPNT\n- Status keputusan\n\nFile: BPNT_Results_2025.xlsx');
-
-        if (confirmed) {
-            // Show loading notification
-            showDownloadNotification('Memproses unduhan data...', 'info');
-
-            // Simulate download process
-            setTimeout(() => {
-                // In real implementation, this would trigger actual file download
-                // For demo purposes, we'll show success message
-                showDownloadNotification('Data berhasil diunduh! File tersimpan di folder Downloads.', 'success');
-
-                // You can add actual download logic here:
-                // const link = document.createElement('a');
-                // link.href = '/download/bpnt-results';
-                // link.download = 'BPNT_Results_2025.xlsx';
-                // link.click();
-            }, 2000);
-        }
         }
 
         function showDownloadNotification(message, type = 'info') {
@@ -1043,6 +1049,24 @@
             }, timeout);
         }
 
+        function toggleDesktopDropdown() {
+            const dropdown = document.getElementById('desktopDropdown');
+            const dropdownContent = document.getElementById('desktopDropdownContent');
+            const dropdownArrow = document.getElementById('desktopDropdownArrow');
+
+            if (dropdown && dropdownContent && dropdownArrow) {
+                dropdown.classList.toggle('active');
+
+                if (dropdown.classList.contains('active')) {
+                    dropdownContent.style.display = 'block';
+                    dropdownArrow.style.transform = 'rotate(180deg)';
+                } else {
+                    dropdownContent.style.display = 'none';
+                    dropdownArrow.style.transform = 'rotate(0deg)';
+                }
+            }
+        }
+
         function toggleMobileDropdown() {
             const content = document.getElementById('mobileDropdownContent');
             const arrow = document.getElementById('mobileDropdownArrow');
@@ -1051,27 +1075,53 @@
             arrow.style.transform = content.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
         }
 
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            if (mobileMenu) {
+                mobileMenu.classList.toggle('active');
+            }
+        }
+
         function scrollToCekStatus() {
+            // Close desktop dropdown first
+            const desktopDropdown = document.getElementById('desktopDropdown');
+            const desktopDropdownContent = document.getElementById('desktopDropdownContent');
+            const desktopDropdownArrow = document.getElementById('desktopDropdownArrow');
+
+            if (desktopDropdown) {
+                desktopDropdown.classList.remove('active');
+                if (desktopDropdownContent) {
+                    desktopDropdownContent.style.display = 'none';
+                }
+                if (desktopDropdownArrow) {
+                    desktopDropdownArrow.style.transform = 'rotate(0deg)';
+                }
+            }
+
             // Scroll to the specific section "Cek Status Penerima BPNT"
             const cekStatusSection = document.getElementById('cekStatusSection');
             if (cekStatusSection) {
-                cekStatusSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
+                // Calculate offset for fixed navbar
+                const navbarHeight = 100; // Sesuaikan dengan tinggi navbar Anda
+                const elementPosition = cekStatusSection.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
                 });
 
-                // Optional: Focus on the NIK input after scrolling
+                // Focus on the NIK input after scrolling
                 setTimeout(() => {
                     const nikInput = document.getElementById('nikInput');
                     if (nikInput) {
                         nikInput.focus();
-                        // Add a subtle highlight effect
                         nikInput.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.3)';
                         setTimeout(() => {
                             nikInput.style.boxShadow = '';
                         }, 2000);
                     }
-                }, 600);
+                }, 800);
             }
         }
 
@@ -1173,7 +1223,7 @@
                                     <div>
                                         <p><strong>Skor SMARTER:</strong> ${smarterScore} / 100</p>
                                         <p><strong>Ranking:</strong> ${ranking} dari 1,250 pendaftar</p>
-                                        <p><strong>Tanggal Penetapan:</strong> 15 Januari 2025</p>
+                                        <p><strong>Tanggal Penetapan:</strong> 15 September 2025</p>
                                     </div>
                                 </div>
                                 <div class="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
@@ -1330,7 +1380,11 @@
                 // Close desktop dropdown
                 if (!desktopDropdown.contains(event.target)) {
                     desktopDropdown.classList.remove('active');
+                    const dropdownContent = document.getElementById('desktopDropdownContent');
                     const arrow = document.getElementById('desktopDropdownArrow');
+                    if (dropdownContent) {
+                        dropdownContent.style.display = 'none';
+                    }
                     if (arrow) {
                         arrow.style.transform = 'rotate(0deg)';
                     }
