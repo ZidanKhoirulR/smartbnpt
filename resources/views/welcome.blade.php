@@ -87,12 +87,9 @@
         }
 
         @keyframes float {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: translateY(0px);
             }
-
             50% {
                 transform: translateY(-10px);
             }
@@ -107,7 +104,6 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -122,7 +118,6 @@
             from {
                 opacity: 0;
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -145,55 +140,21 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .smarter-letter:nth-child(1) {
-            color: #ef4444;
-            animation-delay: 0s;
-        }
-
-        .smarter-letter:nth-child(2) {
-            color: #f97316;
-            animation-delay: 0.1s;
-        }
-
-        .smarter-letter:nth-child(3) {
-            color: #eab308;
-            animation-delay: 0.2s;
-        }
-
-        .smarter-letter:nth-child(4) {
-            color: #22c55e;
-            animation-delay: 0.3s;
-        }
-
-        .smarter-letter:nth-child(5) {
-            color: #3b82f6;
-            animation-delay: 0.4s;
-        }
-
-        .smarter-letter:nth-child(6) {
-            color: #8b5cf6;
-            animation-delay: 0.5s;
-        }
-
-        .smarter-letter:nth-child(7) {
-            color: #ec4899;
-            animation-delay: 0.6s;
-        }
+        .smarter-letter:nth-child(1) { color: #ef4444; animation-delay: 0s; }
+        .smarter-letter:nth-child(2) { color: #f97316; animation-delay: 0.1s; }
+        .smarter-letter:nth-child(3) { color: #eab308; animation-delay: 0.2s; }
+        .smarter-letter:nth-child(4) { color: #22c55e; animation-delay: 0.3s; }
+        .smarter-letter:nth-child(5) { color: #3b82f6; animation-delay: 0.4s; }
+        .smarter-letter:nth-child(6) { color: #8b5cf6; animation-delay: 0.5s; }
+        .smarter-letter:nth-child(7) { color: #ec4899; animation-delay: 0.6s; }
 
         @keyframes letterBounce {
-
-            0%,
-            20%,
-            50%,
-            80%,
-            100% {
+            0%, 20%, 50%, 80%, 100% {
                 transform: translateY(0) scale(1);
             }
-
             40% {
                 transform: translateY(-20px) scale(1.1);
             }
-
             60% {
                 transform: translateY(-10px) scale(1.05);
             }
@@ -207,7 +168,6 @@
             from {
                 text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
             }
-
             to {
                 text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
             }
@@ -231,34 +191,27 @@
             background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
         }
 
-        /* About section styling */
         .about-section {
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
         }
 
-        /* Loading animation for login */
-        .loading {
-            display: none;
-        }
-
-        .loading.active {
-            display: inline-block;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Smooth section transitions */
         section {
             scroll-margin-top: 80px;
+        }
+
+        .error-notification {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
@@ -283,24 +236,15 @@
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center space-x-8">
                 <a href="#beranda" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Beranda</a>
-                <button onclick="loginPage()" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">
-                    Login
-                    <svg class="loading w-4 h-4 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                </button>
-                <button onclick="checkResult()"
-                    class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Cek Hasil</button>
-                <a href="#tentang" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Tentang
-                    Kami</a>
+                <a href="/login" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Login</a>
+                <button onclick="checkResult()" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Cek Hasil</button>
+                <a href="#tentang" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Tentang Kami</a>
             </div>
 
             <!-- Mobile Menu Button -->
             <button class="md:hidden text-gray-700" onclick="toggleMobileMenu()">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
-                    </path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             </button>
         </div>
@@ -309,10 +253,8 @@
         <div id="mobileMenu" class="mobile-menu md:hidden mt-4 px-6 py-4 bg-white rounded-lg mx-6">
             <div class="space-y-3">
                 <a href="#beranda" class="block text-gray-700 hover:text-blue-600 font-medium">Beranda</a>
-                <button onclick="loginPage()"
-                    class="block text-gray-700 hover:text-blue-600 font-medium text-left w-full">Login</button>
-                <button onclick="checkResult()"
-                    class="block text-gray-700 hover:text-blue-600 font-medium text-left w-full">Cek Hasil</button>
+                <a href="/login" class="block text-gray-700 hover:text-blue-600 font-medium">Login</a>
+                <button onclick="checkResult()" class="block text-gray-700 hover:text-blue-600 font-medium text-left w-full">Cek Hasil</button>
                 <a href="#tentang" class="block text-gray-700 hover:text-blue-600 font-medium">Tentang Kami</a>
             </div>
         </div>
@@ -340,9 +282,7 @@
             <!-- Welcome Header -->
             <div class="text-center text-white mb-12 fade-in">
                 <h1 class="text-6xl font-bold mb-4">Selamat Datang</h1>
-                <h2 class="text-4xl font-semibold text-yellow-300 mb-6">
-                    SPK Metode
-                </h2>
+                <h2 class="text-4xl font-semibold text-yellow-300 mb-6">SPK Metode</h2>
 
                 <!-- Animated SMARTER Text -->
                 <div class="smarter-text mb-6">
@@ -388,21 +328,7 @@
 
                     <!-- Search Result -->
                     <div id="searchResult" class="search-result rounded-xl p-6 mt-6 hidden">
-                        <div class="flex items-start space-x-4">
-                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                                <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <h4 class="text-lg font-semibold text-gray-900 mb-2">Status Penerima BPNT</h4>
-                                <div id="resultContent" class="space-y-2 text-gray-700">
-                                    <!-- Result will be populated here -->
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Result will be populated here -->
                     </div>
 
                     <!-- Info Box -->
@@ -417,8 +343,7 @@
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-blue-800">Informasi</p>
-                                <p class="text-xs text-blue-600">Pastikan NIK yang dimasukkan sesuai dengan KTP dan
-                                    terdaftar di sistem</p>
+                                <p class="text-xs text-blue-600">Pastikan NIK yang dimasukkan sesuai dengan KTP dan terdaftar di sistem</p>
                             </div>
                         </div>
                     </div>
@@ -474,7 +399,7 @@
             </div>
 
             <!-- Statistics -->
-            <div class="welcome-card rounded-3xl p-8 lg:p-10 slide-in" style="animation-delay: 0.6s;">
+            <div class="welcome-card rounded-3xl p-8 lg:p-10 mb-8 slide-in" style="animation-delay: 0.6s;">
                 <h3 class="text-3xl font-bold text-gray-900 text-center mb-8">Keunggulan Metode SMARTER</h3>
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
                     <div>
@@ -504,16 +429,14 @@
             <div class="text-center space-y-4 slide-in" style="animation-delay: 0.8s;">
                 <h3 class="text-2xl font-bold text-white mb-6">Akses Cepat</h3>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onclick="loginPage()"
-                        class="btn-primary text-white px-8 py-4 rounded-xl font-semibold text-lg">
-                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a href="/login" class="btn-primary text-white px-8 py-4 rounded-xl font-semibold text-lg inline-flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                         </svg>
                         Login Sistem
-                    </button>
-                    <button onclick="checkResult()"
-                        class="btn-secondary text-white px-8 py-4 rounded-xl font-semibold text-lg">
+                    </a>
+                    <button onclick="checkResult()" class="btn-secondary text-white px-8 py-4 rounded-xl font-semibold text-lg">
                         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -542,53 +465,7 @@
                         <div class="bg-white p-6 rounded-xl shadow-lg">
                             <h4 class="text-xl font-semibold text-blue-600 mb-3 flex items-center">
                                 <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                    <path fill-rule="evenodd"
-                                        d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                Visi
-                            </h4>
-                            <p class="text-gray-700">Mewujudkan distribusi bantuan sosial yang tepat sasaran,
-                                transparan, dan akuntabel untuk kesejahteraan masyarakat Kabupaten Cirebon.</p>
-                        </div>
-                        <div class="bg-white p-6 rounded-xl shadow-lg">
-                            <h4 class="text-xl font-semibold text-green-600 mb-3 flex items-center">
-                                <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                Misi
-                            </h4>
-                            <ul class="text-gray-700 space-y-2">
-                                <li class="flex items-start">
-                                    <span class="text-green-500 mr-2">•</span>
-                                    Mengimplementasikan sistem seleksi yang objektif dan terukur
-                                </li>
-                                <li class="flex items-start">
-                                    <span class="text-green-500 mr-2">•</span>
-                                    Memberikan transparansi penuh dalam proses pengambilan keputusan
-                                </li>
-                                <li class="flex items-start">
-                                    <span class="text-green-500 mr-2">•</span>
-                                    Melakukan evaluasi dan perbaikan berkelanjutan
-                                </li>
-                                <li class="flex items-start">
-                                    <span class="text-green-500 mr-2">•</span>
-                                    Memastikan bantuan tepat sasaran sesuai kriteria yang ditetapkan
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-8">
-                    <div class="text-center">
-                        <div class="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                             </svg>
                         </div>
                         <h4 class="text-2xl font-bold text-gray-900 mb-4">Komitmen Kualitas</h4>
@@ -609,8 +486,7 @@
                         </svg>
                     </div>
                     <h4 class="text-xl font-semibold text-gray-900 mb-2">Akurasi Tinggi</h4>
-                    <p class="text-gray-600">Metode SMARTER memberikan akurasi hingga 98% dalam seleksi penerima bantuan
-                    </p>
+                    <p class="text-gray-600">Metode SMARTER memberikan akurasi hingga 98% dalam seleksi penerima bantuan</p>
                 </div>
 
                 <div class="bg-white p-6 rounded-xl shadow-lg text-center">
@@ -622,8 +498,7 @@
                         </svg>
                     </div>
                     <h4 class="text-xl font-semibold text-gray-900 mb-2">Transparansi</h4>
-                    <p class="text-gray-600">Proses seleksi yang transparan dan dapat dipertanggungjawabkan kepada
-                        publik</p>
+                    <p class="text-gray-600">Proses seleksi yang transparan dan dapat dipertanggungjawabkan kepada publik</p>
                 </div>
 
                 <div class="bg-white p-6 rounded-xl shadow-lg text-center">
@@ -635,8 +510,7 @@
                         </svg>
                     </div>
                     <h4 class="text-xl font-semibold text-gray-900 mb-2">Evaluasi Berkelanjutan</h4>
-                    <p class="text-gray-600">Sistem review dan evaluasi berkelanjutan untuk perbaikan kualitas layanan
-                    </p>
+                    <p class="text-gray-600">Sistem review dan evaluasi berkelanjutan untuk perbaikan kualitas layanan</p>
                 </div>
             </div>
         </div>
@@ -658,14 +532,12 @@
                             </svg>
                             <div>
                                 <p class="font-medium">Alamat Kantor</p>
-                                <p class="text-blue-100 text-sm">Jl. Sunan Kalijaga No. 7, Sumber, Kabupaten Cirebon,
-                                    Jawa Barat 45611</p>
+                                <p class="text-blue-100 text-sm">Jl. Sunan Kalijaga No. 7, Sumber, Kabupaten Cirebon, Jawa Barat 45611</p>
                             </div>
                         </div>
                         <div class="flex items-center space-x-3">
                             <svg class="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                             </svg>
                             <div>
                                 <p class="font-medium">Telepon</p>
@@ -713,19 +585,12 @@
                 <div class="space-y-4">
                     <h4 class="text-2xl font-bold mb-6">Tautan Cepat</h4>
                     <div class="space-y-3">
-                        <button onclick="loginPage()"
-                            class="block text-blue-100 hover:text-yellow-300 transition-colors text-left">Login
-                            Sistem</button>
-                        <button onclick="checkResult()"
-                            class="block text-blue-100 hover:text-yellow-300 transition-colors text-left">Cek Status
-                            BPNT</button>
-                        <a href="#" class="block text-blue-100 hover:text-yellow-300 transition-colors">Panduan
-                            Penggunaan</a>
+                        <a href="/login" class="block text-blue-100 hover:text-yellow-300 transition-colors text-left">Login Sistem</a>
+                        <button onclick="checkResult()" class="block text-blue-100 hover:text-yellow-300 transition-colors text-left">Cek Status BPNT</button>
+                        <a href="#" class="block text-blue-100 hover:text-yellow-300 transition-colors">Panduan Penggunaan</a>
                         <a href="#" class="block text-blue-100 hover:text-yellow-300 transition-colors">FAQ</a>
-                        <a href="#" class="block text-blue-100 hover:text-yellow-300 transition-colors">Bantuan
-                            Teknis</a>
-                        <a href="https://cirebonkab.go.id"
-                            class="block text-blue-100 hover:text-yellow-300 transition-colors">Website Resmi Pemkab</a>
+                        <a href="#" class="block text-blue-100 hover:text-yellow-300 transition-colors">Bantuan Teknis</a>
+                        <a href="https://cirebonkab.go.id" class="block text-blue-100 hover:text-yellow-300 transition-colors">Website Resmi Pemkab</a>
                     </div>
                 </div>
 
@@ -753,148 +618,112 @@
                 </div>
             </div>
 
-            <!-- Office Locations Section -->
-            <div class="border-t border-blue-400 border-opacity-30 mt-12 pt-8">
-                <h4 class="text-2xl font-bold mb-6 text-center">Lokasi Pelayanan BPNT</h4>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white bg-opacity-10 p-6 rounded-xl">
-                        <h5 class="font-bold text-yellow-300 mb-2">Kantor Pusat</h5>
-                        <p class="text-blue-100 text-sm">Dinas Sosial Kabupaten Cirebon</p>
-                        <p class="text-blue-100 text-sm">Jl. Sunan Kalijaga No. 7, Sumber</p>
-                        <p class="text-blue-100 text-sm">Kode Pos: 45611</p>
-                    </div>
-                    <div class="bg-white bg-opacity-10 p-6 rounded-xl">
-                        <h5 class="font-bold text-yellow-300 mb-2">Kantor Cabang Utara</h5>
-                        <p class="text-blue-100 text-sm">Jl. Raya Pantura Km. 25</p>
-                        <p class="text-blue-100 text-sm">Kecamatan Losari</p>
-                        <p class="text-blue-100 text-sm">Telp: (0231) 654-321</p>
-                    </div>
-                    <div class="bg-white bg-opacity-10 p-6 rounded-xl">
-                        <h5 class="font-bold text-yellow-300 mb-2">Kantor Cabang Selatan</h5>
-                        <p class="text-blue-100 text-sm">Jl. Raya Cirebon-Kuningan</p>
-                        <p class="text-blue-100 text-sm">Kecamatan Dukupuntang</p>
-                        <p class="text-blue-100 text-sm">Telp: (0231) 987-654</p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Bottom Footer -->
-            <div class="border-t border-blue-400 border-opacity-30 mt-8 pt-8">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
-                    <div>
-                        <div class="flex items-center space-x-3 mb-4">
-                            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                                <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="font-bold text-xl">SPK BPNT Kabupaten Cirebon</div>
-                                <div class="text-sm text-blue-100">Metode SMARTER - Keputusan yang Lebih Baik</div>
-                            </div>
+            <div class="border-t border-blue-400 border-opacity-30 mt-12 pt-8">
+                <div class="text-center">
+                    <div class="flex items-center justify-center space-x-3 mb-4">
+                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                            </svg>
                         </div>
-                        <div class="space-y-1 text-blue-100 text-sm">
-                            <p><strong>NPWP:</strong> 00.123.456.7-321.000</p>
-                            <p><strong>Fax:</strong> (0231) 321-457</p>
-                            <p><strong>Website:</strong> sosial.cirebonkab.go.id</p>
-                            <div class="mt-2 inline-block px-3 py-1 bg-green-500 bg-opacity-20 rounded-full">
-                                <span class="text-green-200 text-xs font-medium">ISO 9001:2015 Certified</span>
-                            </div>
+                        <div>
+                            <div class="font-bold text-xl">SPK BPNT Kabupaten Cirebon</div>
+                            <div class="text-sm text-blue-100">Metode SMARTER - Keputusan yang Lebih Baik</div>
                         </div>
                     </div>
-
-                    <div class="text-center lg:text-right">
-                        <div class="space-y-2">
-                            <p class="text-white text-sm">
-                                &copy; 2025 Dinas Sosial Kabupaten Cirebon
-                            </p>
-                            <p class="text-blue-100 text-xs">
-                                Dikembangkan dengan metode SMARTER untuk pelayanan yang optimal
-                            </p>
-                            <div class="flex justify-center lg:justify-end space-x-4 mt-4">
-                                <a href="#" class="text-blue-100 hover:text-yellow-300 transition-colors"
-                                    title="Twitter">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
-                                    </svg>
-                                </a>
-                                <a href="#" class="text-blue-100 hover:text-yellow-300 transition-colors"
-                                    title="Facebook">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                                    </svg>
-                                </a>
-                                <a href="#" class="text-blue-100 hover:text-yellow-300 transition-colors"
-                                    title="Instagram">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.64.4 3.18 1.15 4.54-.6 2.25-1.57 4.28-1.57 4.28s2.54-.85 5.23-1.69c1.32.77 2.85 1.23 4.5 1.23 5.46 0 9.91-4.45 9.91-9.91C21.35 6.45 16.9 2 12.04 2zm0 14.82c-1.05 0-2.07-.26-2.96-.74l-2.13.71.71-2.13c-.48-.89-.74-1.91-.74-2.96 0-3.39 2.76-6.15 6.15-6.15s6.15 2.76 6.15 6.15-2.76 6.12-6.18 6.12z" />
-                                    </svg>
-                                </a>
-                                <a href="#" class="text-blue-100 hover:text-yellow-300 transition-colors"
-                                    title="YouTube">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                    <p class="text-white text-sm">&copy; 2025 Dinas Sosial Kabupaten Cirebon</p>
+                    <p class="text-blue-100 text-xs">Dikembangkan dengan metode SMARTER untuk pelayanan yang optimal</p>
                 </div>
             </div>
         </div>
     </footer>
 
     <script>
+        // Sample database NIK untuk simulasi
+        const validNIKs = [
+            '3209012345671234',
+            '3209123456781234', 
+            '3209234567891234',
+            '3209345678901234',
+            '3209456789012345',
+            '3209567890123456',
+            '3209678901234567',
+            '3209789012345678',
+            '3209890123456789',
+            '3209901234567890'
+        ];
+
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobileMenu');
             mobileMenu.classList.toggle('active');
         }
 
-        function loginPage() {
-            const button = event.target;
-            const loading = button.querySelector('.loading');
-
-            // Show loading animation
-            if (loading) {
-                loading.classList.add('active');
+        function checkResult() {
+            // Scroll to NIK search section
+            const searchSection = document.getElementById('nikInput');
+            if (searchSection) {
+                searchSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => {
+                    searchSection.focus();
+                }, 500);
             }
-            button.style.pointerEvents = 'none';
-
-            // Simulate navigation to login page
-            setTimeout(() => {
-                alert('Mengarahkan ke halaman login...\n\n✅ SPK BPNT - Metode SMARTER\n✅ Login dengan kredensial yang valid\n✅ Akses dashboard admin\n✅ Kelola data penerima BPNT\n\n📋 Fitur Login:\n• Validasi pengguna\n• Session management\n• Role-based access\n• Security measures');
-
-                // Reset button state
-                if (loading) {
-                    loading.classList.remove('active');
-                }
-                button.style.pointerEvents = 'auto';
-            }, 2000);
         }
 
-        function checkResult() {
-            alert('🔍 Fitur Cek Hasil BPNT:\n\n• Cek status penerimaan bantuan\n• Lihat riwayat distribusi bantuan\n• Download surat keterangan penerima\n• Informasi jadwal pengambilan\n• Status verifikasi dokumen\n\n💡 Tip: Gunakan kolom pencarian NIK di halaman utama untuk akses cepat!');
+        function showErrorNotification(message, title = 'Error') {
+            const notification = document.createElement('div');
+            notification.className = 'error-notification fixed top-20 left-1/2 transform -translate-x-1/2 bg-red-50 border border-red-200 rounded-xl p-4 flex items-start space-x-3 max-w-md w-full mx-4 z-50 shadow-lg';
+            notification.innerHTML = `
+                <div class="flex-shrink-0">
+                    <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex-grow">
+                    <h4 class="text-sm font-medium text-red-800">${title}</h4>
+                    <p class="text-sm text-red-700">${message}</p>
+                </div>
+                <button onclick="this.parentElement.remove()" class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center hover:bg-red-100 transition-colors">
+                    <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
         }
 
         function searchNIK() {
             const nikInput = document.getElementById('nikInput');
             const nik = nikInput.value.trim();
             const resultDiv = document.getElementById('searchResult');
-            const resultContent = document.getElementById('resultContent');
 
             if (nik.length !== 16) {
-                alert('⚠️ NIK harus terdiri dari 16 digit angka');
+                showErrorNotification('NIK harus terdiri dari 16 digit angka', 'Format NIK Salah');
                 nikInput.focus();
                 return;
             }
 
             if (!/^\d{16}$/.test(nik)) {
-                alert('⚠️ NIK hanya boleh berisi angka');
+                showErrorNotification('NIK hanya boleh berisi angka', 'Format NIK Salah');
                 nikInput.focus();
+                return;
+            }
+
+            // Check if NIK exists in our sample database
+            if (!validNIKs.includes(nik)) {
+                showErrorNotification('NIK tidak terdaftar di Database, silahkan menghubungi petugas', 'NIK Tidak Ditemukan');
+                nikInput.focus();
+                resultDiv.classList.add('hidden');
                 return;
             }
 
@@ -1089,7 +918,7 @@
             }
         });
 
-        // Format NIK input (add spaces for better readability)
+        // Format NIK input
         document.getElementById('nikInput').addEventListener('input', function (e) {
             let value = e.target.value.replace(/\s/g, '').replace(/\D/g, '');
             if (value.length > 16) {
@@ -1097,17 +926,53 @@
             }
             e.target.value = value;
         });
-
-        // Add enter key support for mobile menu links
-        document.querySelectorAll('#mobileMenu a, #mobileMenu button').forEach(link => {
-            link.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    this.click();
-                }
-            });
-        });
     </script>
 
 </body>
 
-</html>
+</html>M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                    <path fill-rule="evenodd"
+                                        d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                Visi
+                            </h4>
+                            <p class="text-gray-700">Mewujudkan distribusi bantuan sosial yang tepat sasaran,
+                                transparan, dan akuntabel untuk kesejahteraan masyarakat Kabupaten Cirebon.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                            <h4 class="text-xl font-semibold text-green-600 mb-3 flex items-center">
+                                <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                Misi
+                            </h4>
+                            <ul class="text-gray-700 space-y-2">
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-2">•</span>
+                                    Mengimplementasikan sistem seleksi yang objektif dan terukur
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-2">•</span>
+                                    Memberikan transparansi penuh dalam proses pengambilan keputusan
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-2">•</span>
+                                    Melakukan evaluasi dan perbaikan berkelanjutan
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-2">•</span>
+                                    Memastikan bantuan tepat sasaran sesuai kriteria yang ditetapkan
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-8">
+                    <div class="text-center">
+                        <div class="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="
