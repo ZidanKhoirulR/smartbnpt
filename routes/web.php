@@ -6,14 +6,14 @@ use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SMARTController;
+use App\Http\Controllers\SMARTERController;
 use App\Http\Controllers\SubKriteriaController;
+use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
+Route::post('/search-nik', [WelcomeController::class, 'searchNik'])->name('search.nik');
 
 // Tetap pakai controller untuk handle POST login
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])
@@ -76,19 +76,19 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::group([
-        'prefix' => 'smart',
+        'prefix' => 'smarter',
     ], function () {
-        Route::get('/normalisasi-bobot', [SMARTController::class, 'indexNormalisasiBobot'])->name('normalisasi-bobot');
-        Route::post('/normalisasi-bobot', [SMARTController::class, 'perhitunganNormalisasiBobot'])->name('normalisasi-bobot.perhitungan');
+        Route::get('/normalisasi-bobot', [SMARTERController::class, 'indexNormalisasiBobot'])->name('normalisasi-bobot');
+        Route::post('/normalisasi-bobot', [SMARTERController::class, 'perhitunganNormalisasiBobot'])->name('normalisasi-bobot.perhitungan');
 
-        Route::get('/nilai-utility', [SMARTController::class, 'indexNilaiUtility'])->name('nilai-utility');
-        Route::post('/nilai-utility', [SMARTController::class, 'perhitunganNilaiUtility'])->name('nilai-utility.perhitungan');
+        Route::get('/nilai-utility', [SMARTERController::class, 'indexNilaiUtility'])->name('nilai-utility');
+        Route::post('/nilai-utility', [SMARTERController::class, 'perhitunganNilaiUtility'])->name('nilai-utility.perhitungan');
 
-        Route::get('/nilai-akhir', [SMARTController::class, 'indexNilaiAkhir'])->name('nilai-akhir');
-        Route::post('/nilai-akhir', [SMARTController::class, 'perhitunganNilaiAkhir'])->name('nilai-akhir.perhitungan');
+        Route::get('/nilai-akhir', [SMARTERController::class, 'indexNilaiAkhir'])->name('nilai-akhir');
+        Route::post('/nilai-akhir', [SMARTERController::class, 'perhitunganNilaiAkhir'])->name('nilai-akhir.perhitungan');
 
-        Route::get('/perhitungan', [SMARTController::class, 'indexPerhitungan'])->name('perhitungan');
-        Route::post('/perhitungan', [SMARTController::class, 'perhitunganMetode'])->name('perhitungan.smart');
+        Route::get('/perhitungan', [SMARTERController::class, 'indexPerhitungan'])->name('perhitungan');
+        Route::post('/perhitungan', [SMARTERController::class, 'perhitunganMetode'])->name('perhitungan.smart');
 
         Route::get('/pdf-hasil-akhir', [PDFController::class, 'pdf_hasil'])->name('pdf.hasilAkhir');
     });

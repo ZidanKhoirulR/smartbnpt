@@ -28,7 +28,17 @@ class AlternatifController extends Controller
         } else {
             $kode = "A00001";
         }
-        return view('dashboard.alternatif.index', compact('title', 'alternatif', 'kode'));
+
+        // Generate NIK suggestion
+        $lastNik = Alternatif::orderBy('nik', 'desc')->first();
+        if ($lastNik && is_numeric($lastNik->nik)) {
+            $nikSuggestion = (string) ((int) $lastNik->nik + 1);
+            $nikSuggestion = str_pad($nikSuggestion, 16, '0', STR_PAD_LEFT);
+        } else {
+            $nikSuggestion = '3201234567890001';
+        }
+
+        return view('dashboard.alternatif.index', compact('title', 'alternatif', 'kode', 'nikSuggestion'));
     }
 
     /**
@@ -138,5 +148,13 @@ class AlternatifController extends Controller
         } else {
             return to_route('alternatif')->with('error', 'Alternatif Gagal Disimpan');
         }
+    }
+
+    /**
+     * Search alternatif by NIK for public access
+     */
+    public function searchByNik($nik)
+    {
+        return Alternatif::where('nik', $nik)->first();
     }
 }

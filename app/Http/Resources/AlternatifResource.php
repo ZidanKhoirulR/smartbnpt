@@ -17,6 +17,7 @@ class AlternatifResource extends JsonResource
         return [
             'id' => $this->id,
             'kode' => $this->kode,
+            'nik' => $this->nik,
             'alternatif' => $this->alternatif,
             'keterangan' => $this->keterangan,
         ];

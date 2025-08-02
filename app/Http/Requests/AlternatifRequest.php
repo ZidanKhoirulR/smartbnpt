@@ -1,30 +1,233 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Controllers;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\AlternatifRequest;
+use App\Http\Resources\AlternatifResource;
+use App\Imports\AlternatifImport;
+use App\Models\Alternatif;
+use App\Models\Kriteria;
+use App\Models\NilaiAkhir;
+use App\Models\NilaiUtility;
+use App\Models\Penilaian;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
-class AlternatifRequest extends FormRequest
+class AlternatifController extends Controller
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Display a listing of the resource.
      */
-    public function authorize(): bool
+    public function index()
     {
-        return true;
+        $title = "Alternatif";
+        $alternatif = AlternatifResource::collection(Alternatif::orderBy('kode', 'asc')->get());
+        $lastKode = Alternatif::orderBy('kode', 'desc')->first();
+        if ($lastKode) {
+            $kode = "A" . str_pad((int) substr($lastKode->kode, 1) + 1, 5, '0', STR_PAD_LEFT);
+        } else {
+            $kode = "A00001";
+        }
+
+        // Generate NIK suggestion
+        $lastNik = Alternatif::orderBy('nik', 'desc')->first();
+        if ($lastNik && is_numeric($lastNik->nik)) {
+            $nikSuggestion = (string)((int)$lastNik->nik + 1);
+            $nikSuggestion = str_pad($nikSuggestion, 16, '0', STR_PAD_LEFT);
+        } else {
+            $nikSuggestion = '3201234567890001';
+        }
+
+        return view('dashboard.alternatif.index', compact('title', 'alternatif', 'kode', 'nikSuggestion'));
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * Store a newly created resource in storage.
      */
-    public function rules(): array
+    public function store(AlternatifRequest $request)
     {
-        return [
-            'kode' => 'required|string|max:6|unique:alternatif,kode,' . $this->id,
-            'alternatif' => 'required|string|max:255',
-            'keterangan' => 'nullable|string',
-        ];
+        $validated = $request->validated();
+
+        $alternatif = Alternatif::create($validated);
+        $createPenilaian = true;
+        $kriteria = Kriteria::get('id');
+        if ($kriteria->first()) {
+            foreach ($kriteria as $item) {
+                $createPenilaian = Penilaian::create([
+                    'alternatif_id' => $alternatif->id,
+                    'kriteria_id' => $item->id,
+                    'sub_kriteria_id' => null,
+                ]);
+            }
+        }
+
+        if ($createPenilaian) {
+            return to_route('alternatif')->with('success', 'Alternatif Berhasil Disimpan');
+        } else {
+            return to_route('alternatif')->with('error', 'Alternatif Gagal Disimpan');
+        }
     }
-}
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Request $request)
+    {
+        return new AlternatifResource(Alternatif::find($request->alternatif_id));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Request $request)
+    {
+        return new AlternatifResource(Alternatif::find($request->alternatif_id));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(AlternatifRequest $request)
+    {
+        $validated = $request->validated();
+
+        $perbarui = Alternatif::where('id', $request->id)->update($validated);
+        if ($perbarui) {
+            return to_route('alternatif')->with('success', 'Alternatif Berhasil Diperbarui');
+        } else {
+            return to_route('alternatif')->with('error', 'Alternatif Gagal Diperbarui');
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function delete(Request $request)
+    {
+        $penilaian = Penilaian::where('alternatif_id', $request->alternatif_id)->first();
+        if ($penilaian) {
+            Penilaian::where('alternatif_id', $request->alternatif_id)->delete();
+        }
+        NilaiUtility::where('alternatif_id', $request->alternatif_id)->delete();
+        NilaiAkhir::where('alternatif_id', $request->alternatif_id)->delete();
+        $hapus = Alternatif::where('id', $request->alternatif_id)->delete();
+        if ($hapus) {
+            return to_route('alternatif')->with('success', 'Alternatif Berhasil Dihapus');
+        } else {
+            return to_route('alternatif')->with('err<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\AlternatifRequest;
+use App\Http\Resources\AlternatifResource;
+use App\Imports\AlternatifImport;
+use App\Models\Alternatif;
+use App\Models\Kriteria;
+use App\Models\NilaiAkhir;
+use App\Models\NilaiUtility;
+use App\Models\Penilaian;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+
+class AlternatifController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $title = "Alternatif";
+        $alternatif = AlternatifResource::collection(Alternatif::orderBy('kode', 'asc')->get());
+        $lastKode = Alternatif::orderBy('kode', 'desc')->first();
+        if ($lastKode) {
+            $kode = "A" . str_pad((int) substr($lastKode->kode, 1) + 1, 5, '0', STR_PAD_LEFT);
+        } else {
+            $kode = "A00001";
+        }
+
+        // Generate NIK suggestion
+        $lastNik = Alternatif::orderBy('nik', 'desc')->first();
+        if ($lastNik && is_numeric($lastNik->nik)) {
+            $nikSuggestion = (string)((int)$lastNik->nik + 1);
+            $nikSuggestion = str_pad($nikSuggestion, 16, '0', STR_PAD_LEFT);
+        } else {
+            $nikSuggestion = '3201234567890001';
+        }
+
+        return view('dashboard.alternatif.index', compact('title', 'alternatif', 'kode', 'nikSuggestion'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(AlternatifRequest $request)
+    {
+        $validated = $request->validated();
+
+        $alternatif = Alternatif::create($validated);
+        $createPenilaian = true;
+        $kriteria = Kriteria::get('id');
+        if ($kriteria->first()) {
+            foreach ($kriteria as $item) {
+                $createPenilaian = Penilaian::create([
+                    'alternatif_id' => $alternatif->id,
+                    'kriteria_id' => $item->id,
+                    'sub_kriteria_id' => null,
+                ]);
+            }
+        }
+
+        if ($createPenilaian) {
+            return to_route('alternatif')->with('success', 'Alternatif Berhasil Disimpan');
+        } else {
+            return to_route('alternatif')->with('error', 'Alternatif Gagal Disimpan');
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Request $request)
+    {
+        return new AlternatifResource(Alternatif::find($request->alternatif_id));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Request $request)
+    {
+        return new AlternatifResource(Alternatif::find($request->alternatif_id));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(AlternatifRequest $request)
+    {
+        $validated = $request->validated();
+
+        $perbarui = Alternatif::where('id', $request->id)->update($validated);
+        if ($perbarui) {
+            return to_route('alternatif')->with('success', 'Alternatif Berhasil Diperbarui');
+        } else {
+            return to_route('alternatif')->with('error', 'Alternatif Gagal Diperbarui');
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function delete(Request $request)
+    {
+        $penilaian = Penilaian::where('alternatif_id', $request->alternatif_id)->first();
+        if ($penilaian) {
+            Penilaian::where('alternatif_id', $request->alternatif_id)->delete();
+        }
+        NilaiUtility::where('alternatif_id', $request->alternatif_id)->delete();
+        NilaiAkhir::where('alternatif_id', $request->alternatif_id)->delete();
+        $hapus = Alternatif::where('id', $request->alternatif_id)->delete();
+        if ($hapus) {
+            return to_route('alternatif')->with('success', 'Alternatif Berhasil Dihapus');
+        } else {
+            return to_route('alternatif')->with('err
