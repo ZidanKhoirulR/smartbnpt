@@ -2,13 +2,16 @@
 <script src="{{ asset("js/argon-dashboard-tailwind.js") }}"></script>
 <script src="{{ asset("js/dropdown.js") }}"></script>
 <script src="{{ asset("js/sidenav-burger.js") }}"></script>
+<script src="{{ asset('js/elegant-auto-apply.js') }}"></script>
 
 {{-- ChartJS --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 {{-- JQuery --}}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+    integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 {{-- DataTables --}}
 <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>

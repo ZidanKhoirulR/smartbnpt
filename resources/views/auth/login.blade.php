@@ -104,10 +104,22 @@
         .mobile-menu.active {
             display: block;
         }
+
+        /* Fix untuk mencegah overlap footer */
+        .main-content {
+            min-height: calc(100vh - 120px);
+            padding-bottom: 80px;
+        }
+
+        .footer-info {
+            position: relative;
+            margin-top: 2rem;
+            padding: 1rem 0;
+        }
     </style>
 </head>
 
-<body class="hero-bg min-h-screen">
+<body class="hero-bg">
     <!-- Navigation -->
     <nav class="navbar fixed w-full z-50 px-6 py-4" id="navbar">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
@@ -156,9 +168,9 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="pt-24 flex items-center justify-center min-h-screen">
+    <div class="main-content pt-24 flex items-center justify-center">
         <!-- Background Pattern -->
-        <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
             <div class="icon-float absolute top-20 left-10">
                 <div class="w-16 h-16 bg-white bg-opacity-10 rounded-full"></div>
             </div>
@@ -241,21 +253,36 @@
                     <!-- Character Illustrations -->
                     <div class="flex justify-center space-x-6 mt-8">
                         <div class="icon-float">
-                            <div class="w-16 h-20 bg-gradient-to-b from-purple-400 to-purple-600 rounded-t-full rounded-b-lg relative">
-                                <div class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full"></div>
-                                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg"></div>
+                            <div
+                                class="w-16 h-20 bg-gradient-to-b from-purple-400 to-purple-600 rounded-t-full rounded-b-lg relative">
+                                <div
+                                    class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full">
+                                </div>
+                                <div
+                                    class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg">
+                                </div>
                             </div>
                         </div>
                         <div class="icon-float" style="animation-delay: 0.5s;">
-                            <div class="w-16 h-20 bg-gradient-to-b from-red-400 to-red-600 rounded-t-full rounded-b-lg relative">
-                                <div class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full"></div>
-                                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg"></div>
+                            <div
+                                class="w-16 h-20 bg-gradient-to-b from-red-400 to-red-600 rounded-t-full rounded-b-lg relative">
+                                <div
+                                    class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full">
+                                </div>
+                                <div
+                                    class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg">
+                                </div>
                             </div>
                         </div>
                         <div class="icon-float" style="animation-delay: 1s;">
-                            <div class="w-16 h-20 bg-gradient-to-b from-blue-400 to-blue-600 rounded-t-full rounded-b-lg relative">
-                                <div class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full"></div>
-                                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg"></div>
+                            <div
+                                class="w-16 h-20 bg-gradient-to-b from-blue-400 to-blue-600 rounded-t-full rounded-b-lg relative">
+                                <div
+                                    class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full">
+                                </div>
+                                <div
+                                    class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -316,10 +343,14 @@
                                 <input type="password" name="password" id="password" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none input-focus transition-all @error('password') border-red-500 @enderror pr-12"
                                     placeholder="Masukkan password Anda">
-                                <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                                    <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                <button type="button" onclick="togglePassword()"
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                    <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
                                 </button>
                             </div>
@@ -336,7 +367,8 @@
                             </label>
                         </div>
 
-                        <button type="submit" class="w-full btn-primary text-white py-3 rounded-xl font-semibold text-lg">
+                        <button type="submit"
+                            class="w-full btn-primary text-white py-3 rounded-xl font-semibold text-lg">
                             Login Sekarang
                         </button>
                     </form>
@@ -359,7 +391,8 @@
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-blue-800">Informasi Sistem</p>
-                                <p class="text-xs text-blue-600">Menggunakan metode SMARTER untuk proses seleksi yang objektif</p>
+                                <p class="text-xs text-blue-600">Menggunakan metode SMARTER untuk proses seleksi yang
+                                    objektif</p>
                             </div>
                         </div>
                     </div>
@@ -369,7 +402,7 @@
     </div>
 
     <!-- Footer Info -->
-    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center">
+    <div class="footer-info text-center">
         <p class="text-white text-sm opacity-75">
             &copy; 2025 SPK BPNT Kabupaten Cirebon - Transparansi dalam Setiap Keputusan
         </p>
@@ -395,7 +428,7 @@
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');
-            
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 eyeIcon.innerHTML = `

@@ -55,9 +55,12 @@
         }
 
         @keyframes float {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0px);
             }
+
             50% {
                 transform: translateY(-10px);
             }
@@ -83,6 +86,7 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -100,10 +104,22 @@
         .mobile-menu.active {
             display: block;
         }
+
+        /* Fix untuk mencegah overlap footer */
+        .main-content {
+            min-height: calc(100vh - 120px);
+            padding-bottom: 80px;
+        }
+
+        .footer-info {
+            position: relative;
+            margin-top: 2rem;
+            padding: 1rem 0;
+        }
     </style>
 </head>
 
-<body class="hero-bg min-h-screen">
+<body class="hero-bg">
     <!-- Navigation -->
     <nav class="navbar fixed w-full z-50 px-6 py-4" id="navbar">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
@@ -124,14 +140,17 @@
             <div class="hidden md:flex items-center space-x-8">
                 <a href="/" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Beranda</a>
                 <a href="/login" class="text-blue-600 font-semibold">Login</a>
-                <button onclick="checkResult()" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Cek Hasil</button>
-                <a href="/#tentang" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Tentang Kami</a>
+                <button onclick="checkResult()"
+                    class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Cek Hasil</button>
+                <a href="/#tentang" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Tentang
+                    Kami</a>
             </div>
 
             <!-- Mobile Menu Button -->
             <button class="md:hidden text-gray-700" onclick="toggleMobileMenu()">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                    </path>
                 </svg>
             </button>
         </div>
@@ -141,16 +160,17 @@
             <div class="space-y-3">
                 <a href="/" class="block text-gray-700 hover:text-blue-600 font-medium">Beranda</a>
                 <a href="/login" class="block text-blue-600 font-semibold">Login</a>
-                <button onclick="checkResult()" class="block text-gray-700 hover:text-blue-600 font-medium text-left w-full">Cek Hasil</button>
+                <button onclick="checkResult()"
+                    class="block text-gray-700 hover:text-blue-600 font-medium text-left w-full">Cek Hasil</button>
                 <a href="/#tentang" class="block text-gray-700 hover:text-blue-600 font-medium">Tentang Kami</a>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <div class="pt-24 flex items-center justify-center min-h-screen">
+    <div class="main-content pt-24 flex items-center justify-center">
         <!-- Background Pattern -->
-        <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
             <div class="icon-float absolute top-20 left-10">
                 <div class="w-16 h-16 bg-white bg-opacity-10 rounded-full"></div>
             </div>
@@ -233,21 +253,36 @@
                     <!-- Character Illustrations -->
                     <div class="flex justify-center space-x-6 mt-8">
                         <div class="icon-float">
-                            <div class="w-16 h-20 bg-gradient-to-b from-purple-400 to-purple-600 rounded-t-full rounded-b-lg relative">
-                                <div class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full"></div>
-                                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg"></div>
+                            <div
+                                class="w-16 h-20 bg-gradient-to-b from-purple-400 to-purple-600 rounded-t-full rounded-b-lg relative">
+                                <div
+                                    class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full">
+                                </div>
+                                <div
+                                    class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg">
+                                </div>
                             </div>
                         </div>
                         <div class="icon-float" style="animation-delay: 0.5s;">
-                            <div class="w-16 h-20 bg-gradient-to-b from-red-400 to-red-600 rounded-t-full rounded-b-lg relative">
-                                <div class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full"></div>
-                                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg"></div>
+                            <div
+                                class="w-16 h-20 bg-gradient-to-b from-red-400 to-red-600 rounded-t-full rounded-b-lg relative">
+                                <div
+                                    class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full">
+                                </div>
+                                <div
+                                    class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg">
+                                </div>
                             </div>
                         </div>
                         <div class="icon-float" style="animation-delay: 1s;">
-                            <div class="w-16 h-20 bg-gradient-to-b from-blue-400 to-blue-600 rounded-t-full rounded-b-lg relative">
-                                <div class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full"></div>
-                                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg"></div>
+                            <div
+                                class="w-16 h-20 bg-gradient-to-b from-blue-400 to-blue-600 rounded-t-full rounded-b-lg relative">
+                                <div
+                                    class="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-200 rounded-full">
+                                </div>
+                                <div
+                                    class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-lg">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -265,31 +300,31 @@
 
                         <!-- Error Notification -->
                         @if ($errors->any())
-                        <div id="errorNotification"
-                            class="error-notification bg-red-50 border border-red-200 rounded-xl p-4 flex items-start space-x-3">
-                            <div class="flex-shrink-0">
-                                <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
-                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <div id="errorNotification"
+                                class="error-notification bg-red-50 border border-red-200 rounded-xl p-4 flex items-start space-x-3">
+                                <div class="flex-shrink-0">
+                                    <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="flex-grow">
+                                    <h4 class="text-sm font-medium text-red-800">Login Gagal</h4>
+                                    <p class="text-sm text-red-700">Email atau password yang Anda masukkan salah. Silakan
+                                        periksa kembali dan coba lagi.</p>
+                                </div>
+                                <button type="button" onclick="closeErrorNotification()"
+                                    class="error-close flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center hover:bg-red-100 transition-colors">
+                                    <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
-                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
                                             clip-rule="evenodd" />
                                     </svg>
-                                </div>
+                                </button>
                             </div>
-                            <div class="flex-grow">
-                                <h4 class="text-sm font-medium text-red-800">Login Gagal</h4>
-                                <p class="text-sm text-red-700">Email atau password yang Anda masukkan salah. Silakan
-                                    periksa kembali dan coba lagi.</p>
-                            </div>
-                            <button type="button" onclick="closeErrorNotification()"
-                                class="error-close flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center hover:bg-red-100 transition-colors">
-                                <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
                         @endif
 
                         <div>
@@ -308,10 +343,14 @@
                                 <input type="password" name="password" id="password" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none input-focus transition-all @error('password') border-red-500 @enderror pr-12"
                                     placeholder="Masukkan password Anda">
-                                <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                                    <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                <button type="button" onclick="togglePassword()"
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                    <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
                                 </button>
                             </div>
@@ -328,7 +367,8 @@
                             </label>
                         </div>
 
-                        <button type="submit" class="w-full btn-primary text-white py-3 rounded-xl font-semibold text-lg">
+                        <button type="submit"
+                            class="w-full btn-primary text-white py-3 rounded-xl font-semibold text-lg">
                             Login Sekarang
                         </button>
                     </form>
@@ -351,7 +391,8 @@
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-blue-800">Informasi Sistem</p>
-                                <p class="text-xs text-blue-600">Menggunakan metode SMARTER untuk proses seleksi yang objektif</p>
+                                <p class="text-xs text-blue-600">Menggunakan metode SMARTER untuk proses seleksi yang
+                                    objektif</p>
                             </div>
                         </div>
                     </div>
@@ -361,7 +402,7 @@
     </div>
 
     <!-- Footer Info -->
-    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center">
+    <div class="footer-info text-center">
         <p class="text-white text-sm opacity-75">
             &copy; 2025 SPK BPNT Kabupaten Cirebon - Transparansi dalam Setiap Keputusan
         </p>
@@ -387,7 +428,7 @@
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');
-            
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 eyeIcon.innerHTML = `

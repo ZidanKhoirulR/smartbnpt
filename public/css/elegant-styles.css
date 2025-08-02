@@ -1,0 +1,358 @@
+/* Enhanced Button Styles */
+.btn-elegant {
+    @apply px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:ring-4 focus:ring-indigo-200 focus:outline-none border-0 !important;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    position: relative;
+}
+
+.btn-elegant:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.btn-elegant:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.btn-elegant:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Secondary Button */
+.btn-elegant-secondary {
+    @apply px-6 py-3 bg-gradient-to-r from-slate-100 to-slate-200 hover:from-slate-200 hover:to-slate-300 text-slate-700 font-semibold rounded-xl shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 border border-slate-300 focus:ring-4 focus:ring-slate-100 focus:outline-none !important;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    position: relative;
+}
+
+/* Success Button */
+.btn-elegant-success {
+    @apply px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:ring-4 focus:ring-emerald-200 focus:outline-none border-0 !important;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    position: relative;
+}
+
+/* Danger Button */
+.btn-elegant-danger {
+    @apply px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:ring-4 focus:ring-red-200 focus:outline-none border-0 !important;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    position: relative;
+}
+
+/* Warning Button */
+.btn-elegant-warning {
+    @apply px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:ring-4 focus:ring-amber-200 focus:outline-none border-0 !important;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    position: relative;
+}
+
+/* Small Button Variant */
+.btn-elegant-sm {
+    @apply px-4 py-2 text-sm !important;
+    min-height: 36px;
+}
+
+/* Large Button Variant */
+.btn-elegant-lg {
+    @apply px-8 py-4 text-lg !important;
+    min-height: 52px;
+}
+
+/* Form Input Styles */
+.form-elegant {
+    @apply w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 shadow-sm hover:shadow-md !important;
+    min-height: 44px;
+}
+
+.form-elegant:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Select Dropdown */
+select.form-elegant {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+/* Textarea */
+textarea.form-elegant {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Card Styles */
+.card-elegant {
+    @apply bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transition-all duration-200 hover:shadow-2xl !important;
+}
+
+.card-elegant-header {
+    @apply bg-gradient-to-r from-slate-50 to-indigo-50 dark:from-slate-800 dark:to-slate-700 px-6 py-4 border-b border-slate-200 dark:border-slate-600 !important;
+}
+
+.card-elegant-body {
+    @apply p-6 !important;
+}
+
+.card-elegant-footer {
+    @apply bg-slate-50 dark:bg-slate-800 px-6 py-4 border-t border-slate-200 dark:border-slate-600 !important;
+}
+
+/* Table Styles */
+.table-elegant {
+    @apply w-full bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-700 !important;
+}
+
+.table-elegant thead {
+    @apply bg-gradient-to-r from-slate-100 to-indigo-100 dark:from-slate-700 dark:to-slate-600 !important;
+}
+
+.table-elegant th {
+    @apply px-6 py-4 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider !important;
+}
+
+.table-elegant td {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300 border-t border-slate-200 dark:border-slate-700 !important;
+}
+
+.table-elegant tbody tr:hover {
+    @apply bg-slate-50 dark:bg-slate-700/50 !important;
+}
+
+/* Alert/Notification Styles */
+.alert-elegant {
+    @apply p-4 rounded-2xl border shadow-lg !important;
+}
+
+.alert-elegant-success {
+    @apply bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200 text-emerald-800 !important;
+}
+
+.alert-elegant-error {
+    @apply bg-gradient-to-r from-red-50 to-rose-50 border-red-200 text-red-800 !important;
+}
+
+.alert-elegant-warning {
+    @apply bg-gradient-to-r from-amber-50 to-yellow-50 border-amber-200 text-amber-800 !important;
+}
+
+.alert-elegant-info {
+    @apply bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 text-blue-800 !important;
+}
+
+/* Badge Styles */
+.badge-elegant {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium !important;
+}
+
+.badge-elegant-primary {
+    @apply bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300 !important;
+}
+
+.badge-elegant-success {
+    @apply bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 !important;
+}
+
+.badge-elegant-danger {
+    @apply bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 !important;
+}
+
+.badge-elegant-warning {
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 !important;
+}
+
+/* Modal Styles */
+.modal-elegant {
+    @apply fixed inset-0 z-50 overflow-y-auto !important;
+}
+
+.modal-elegant-backdrop {
+    @apply fixed inset-0 bg-slate-900/50 backdrop-blur-sm !important;
+}
+
+.modal-elegant-container {
+    @apply flex min-h-full items-center justify-center p-4 !important;
+}
+
+.modal-elegant-content {
+    @apply bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 max-w-md w-full !important;
+}
+
+.modal-elegant-header {
+    @apply px-6 py-4 border-b border-slate-200 dark:border-slate-700 !important;
+}
+
+.modal-elegant-body {
+    @apply px-6 py-4 !important;
+}
+
+.modal-elegant-footer {
+    @apply px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex justify-end space-x-3 !important;
+}
+
+/* Dropdown Styles */
+.dropdown-elegant {
+    @apply relative inline-block text-left !important;
+}
+
+.dropdown-elegant-menu {
+    @apply absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-2xl bg-white dark:bg-slate-800 shadow-2xl ring-1 ring-slate-200 dark:ring-slate-700 focus:outline-none !important;
+}
+
+.dropdown-elegant-item {
+    @apply flex items-center px-4 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors !important;
+}
+
+/* Loading Spinner */
+.spinner-elegant {
+    @apply inline-block w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin !important;
+}
+
+/* Progress Bar */
+.progress-elegant {
+    @apply w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden !important;
+}
+
+.progress-elegant-bar {
+    @apply h-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-300 !important;
+}
+
+/* Pagination */
+.pagination-elegant {
+    @apply flex items-center justify-center space-x-2 !important;
+}
+
+.pagination-elegant-item {
+    @apply px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors !important;
+}
+
+.pagination-elegant-item.active {
+    @apply bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-indigo-500 !important;
+}
+
+/* Override for SweetAlert2 buttons */
+.swal2-styled.swal2-confirm {
+    @apply btn-elegant !important;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+    border: none !important;
+    border-radius: 0.75rem !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 1.5rem !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.swal2-styled.swal2-cancel {
+    @apply btn-elegant-secondary !important;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%) !important;
+    color: #475569 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 0.75rem !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 1.5rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.swal2-styled.swal2-deny {
+    @apply btn-elegant-danger !important;
+    background: linear-gradient(135deg, #ef4444 0%, #f43f5e 100%) !important;
+    border: none !important;
+    border-radius: 0.75rem !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 1.5rem !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Override for DataTables buttons */
+.dt-button {
+    @apply btn-elegant-sm !important;
+    margin-right: 0.5rem !important;
+}
+
+.dt-button.buttons-create {
+    @apply btn-elegant-success !important;
+}
+
+.dt-button.buttons-edit {
+    @apply btn-elegant !important;
+}
+
+.dt-button.buttons-remove {
+    @apply btn-elegant-danger !important;
+}
+
+/* Auto-apply classes to common elements */
+button[type="submit"]:not([class*="btn-elegant"]):not(.swal2-styled) {
+    @apply btn-elegant !important;
+}
+
+button[type="button"]:not([class*="btn-elegant"]):not(.swal2-styled):not([class*="close"]):not([class*="dropdown"]) {
+    @apply btn-elegant-secondary !important;
+}
+
+input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([class*="form-elegant"]) {
+    @apply form-elegant !important;
+}
+
+select:not([class*="form-elegant"]) {
+    @apply form-elegant !important;
+}
+
+textarea:not([class*="form-elegant"]) {
+    @apply form-elegant !important;
+}
+
+/* Ensure buttons are always visible */
+.btn-elegant,
+.btn-elegant-secondary,
+.btn-elegant-success,
+.btn-elegant-danger,
+.btn-elegant-warning {
+    z-index: 10 !important;
+    position: relative !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: inline-flex !important;
+}
+
+/* Fix for buttons in modals */
+.modal .btn-elegant,
+.modal .btn-elegant-secondary,
+.modal .btn-elegant-success,
+.modal .btn-elegant-danger,
+.modal .btn-elegant-warning {
+    z-index: 1060 !important;
+}
+
+/* Fix for buttons in dropdowns */
+.dropdown-menu .btn-elegant,
+.dropdown-menu .btn-elegant-secondary,
+.dropdown-menu .btn-elegant-success,
+.dropdown-menu .btn-elegant-danger,
+.dropdown-menu .btn-elegant-warning {
+    z-index: 1070 !important;
+}
