@@ -13,6 +13,7 @@ use App\Models\NormalisasiBobot;
 use App\Models\Penilaian;
 use App\Models\SubKriteria;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class KriteriaController extends Controller
@@ -23,14 +24,24 @@ class KriteriaController extends Controller
     public function index()
     {
         $title = "Kriteria";
-        $kriteria = KriteriaResource::collection(Kriteria::orderBy('kode', 'asc')->get());
+
+        // Urutkan berdasarkan ranking, lalu kode sebagai fallback
+        $kriteria = KriteriaResource::collection(
+            Kriteria::orderByRaw('ranking IS NULL, ranking ASC')
+                ->orderBy('kode', 'asc')
+                ->get()
+        );
+
         $sumBobot = $kriteria->sum('bobot');
+
+        // Generate kode otomatis
         $lastKode = Kriteria::orderBy('kode', 'desc')->first();
         if ($lastKode) {
             $kode = "K" . str_pad((int) substr($lastKode->kode, 1) + 1, 5, '0', STR_PAD_LEFT);
         } else {
             $kode = "K00001";
         }
+
         return view('dashboard.kriteria.index', compact('title', 'kriteria', 'sumBobot', 'kode'));
     }
 
@@ -39,25 +50,28 @@ class KriteriaController extends Controller
      */
     public function store(KriteriaRequest $request)
     {
-        $validated = $request->validated();
+        try {
+            DB::beginTransaction();
 
-        $kriteria = Kriteria::create($validated);
-        $createPenilaian = true;
-        $alternatif = Alternatif::get('id');
-        if ($alternatif->first()) {
-            foreach ($alternatif as $item) {
-                $createPenilaian = Penilaian::create([
-                    'alternatif_id' => $item->id,
-                    'kriteria_id' => $kriteria->id,
-                    'sub_kriteria_id' => null,
-                ]);
-            }
-        }
+            $validated = $request->validated();
+            $newRanking = $validated['ranking'];
 
-        if ($createPenilaian) {
-            return to_route('kriteria')->with('success', 'Kriteria Berhasil Disimpan');
-        } else {
-            return to_route('kriteria')->with('error', 'Kriteria Gagal Disimpan');
+            // Adjust ranking untuk kriteria yang ada jika perlu
+            $this->adjustExistingRankings($newRanking);
+
+            // Buat kriteria baru
+            $kriteria = Kriteria::create($validated);
+
+            // Buat penilaian untuk semua alternatif yang ada
+            $this->createPenilaianForAlternatif($kriteria->id);
+
+            DB::commit();
+
+            return to_route('kriteria')->with('success', 'Kriteria berhasil disimpan dengan ranking ' . $newRanking);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return to_route('kriteria')->with('error', 'Kriteria gagal disimpan: ' . $e->getMessage());
         }
     }
 
@@ -74,13 +88,32 @@ class KriteriaController extends Controller
      */
     public function update(KriteriaRequest $request)
     {
-        $validated = $request->validated();
+        try {
+            DB::beginTransaction();
 
-        $perbarui = Kriteria::where('id', $request->id)->update($validated);
-        if ($perbarui) {
-            return to_route('kriteria')->with('success', 'Kriteria Berhasil Diperbarui');
-        } else {
-            return to_route('kriteria')->with('error', 'Kriteria Gagal Diperbarui');
+            $validated = $request->validated();
+            $kriteriaId = $request->id;
+            $newRanking = $validated['ranking'];
+
+            // Ambil kriteria yang akan diupdate
+            $kriteria = Kriteria::findOrFail($kriteriaId);
+            $oldRanking = $kriteria->ranking;
+
+            // Jika ranking berubah, adjust ranking kriteria lain
+            if ($oldRanking != $newRanking) {
+                $this->adjustRankingsForUpdate($kriteriaId, $oldRanking, $newRanking);
+            }
+
+            // Update kriteria
+            $kriteria->update($validated);
+
+            DB::commit();
+
+            return to_route('kriteria')->with('success', 'Kriteria berhasil diperbarui');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return to_route('kriteria')->with('error', 'Kriteria gagal diperbarui: ' . $e->getMessage());
         }
     }
 
@@ -89,48 +122,227 @@ class KriteriaController extends Controller
      */
     public function delete(Request $request)
     {
-        Penilaian::where('kriteria_id', $request->kriteria_id)->delete();
-        SubKriteria::where('kriteria_id', $request->kriteria_id)->delete();
-        NormalisasiBobot::where('kriteria_id', $request->kriteria_id)->delete();
-        NilaiUtility::where('kriteria_id', $request->kriteria_id)->delete();
-        NilaiAkhir::where('kriteria_id', $request->kriteria_id)->delete();
-        $hapus = Kriteria::where('id', $request->kriteria_id)->delete();
-        if ($hapus) {
-            return to_route('kriteria')->with('success', 'Kriteria Berhasil Dihapus');
-        } else {
-            return to_route('kriteria')->with('error', 'Kriteria Gagal Dihapus');
+        try {
+            DB::beginTransaction();
+
+            $kriteriaId = $request->kriteria_id;
+            $kriteria = Kriteria::findOrFail($kriteriaId);
+            $deletedRanking = $kriteria->ranking;
+
+            // Hapus relasi terkait
+            Penilaian::where('kriteria_id', $kriteriaId)->delete();
+            SubKriteria::where('kriteria_id', $kriteriaId)->delete();
+            NormalisasiBobot::where('kriteria_id', $kriteriaId)->delete();
+            NilaiUtility::where('kriteria_id', $kriteriaId)->delete();
+            NilaiAkhir::where('kriteria_id', $kriteriaId)->delete();
+
+            // Hapus kriteria
+            $kriteria->delete();
+
+            // Adjust ranking kriteria yang tersisa
+            if ($deletedRanking) {
+                $this->adjustRankingsAfterDelete($deletedRanking);
+            }
+
+            DB::commit();
+
+            return to_route('kriteria')->with('success', 'Kriteria berhasil dihapus');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return to_route('kriteria')->with('error', 'Kriteria gagal dihapus: ' . $e->getMessage());
         }
     }
 
+    /**
+     * Import kriteria dari Excel
+     */
     public function import(Request $request)
     {
         $request->validate([
             'import_data' => 'required|mimes:xls,xlsx'
         ]);
 
-        $file = $request->file('import_data');
-        Excel::import(new KriteriaImport, $file);
+        try {
+            DB::beginTransaction();
 
-        $kriteria = Kriteria::get('id');
-        $alternatif = Alternatif::get('id');
-        $createPenilaian = true;
-        if ($alternatif->first()) {
+            $file = $request->file('import_data');
+            Excel::import(new KriteriaImport, $file);
+
+            // Re-generate ranking untuk semua kriteria yang di-import
+            $this->regenerateAllRankings();
+
+            // Recreate penilaian untuk semua kombinasi kriteria-alternatif
+            $this->recreateAllPenilaian();
+
+            DB::commit();
+
+            return to_route('kriteria')->with('success', 'Kriteria berhasil diimpor');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return to_route('kriteria')->with('error', 'Import gagal: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Adjust ranking kriteria yang ada ketika menambah kriteria baru
+     */
+    private function adjustExistingRankings($newRanking)
+    {
+        // Geser ranking yang >= newRanking ke atas
+        Kriteria::where('ranking', '>=', $newRanking)
+            ->increment('ranking');
+    }
+
+    /**
+     * Adjust ranking ketika update kriteria
+     */
+    private function adjustRankingsForUpdate($kriteriaId, $oldRanking, $newRanking)
+    {
+        if ($oldRanking > $newRanking) {
+            // Pindah ke ranking yang lebih tinggi (angka lebih kecil)
+            // Geser ranking yang di antara newRanking dan oldRanking ke bawah
+            Kriteria::where('id', '!=', $kriteriaId)
+                ->whereBetween('ranking', [$newRanking, $oldRanking - 1])
+                ->increment('ranking');
+        } else {
+            // Pindah ke ranking yang lebih rendah (angka lebih besar)
+            // Geser ranking yang di antara oldRanking dan newRanking ke atas
+            Kriteria::where('id', '!=', $kriteriaId)
+                ->whereBetween('ranking', [$oldRanking + 1, $newRanking])
+                ->decrement('ranking');
+        }
+    }
+
+    /**
+     * Adjust ranking setelah delete kriteria
+     */
+    private function adjustRankingsAfterDelete($deletedRanking)
+    {
+        // Geser semua ranking yang > deletedRanking turun satu tingkat
+        Kriteria::where('ranking', '>', $deletedRanking)
+            ->decrement('ranking');
+    }
+
+    /**
+     * Re-generate ranking untuk semua kriteria (untuk import)
+     */
+    private function regenerateAllRankings()
+    {
+        $kriteria = Kriteria::whereNull('ranking')
+            ->orWhere('ranking', 0)
+            ->orderBy('bobot', 'desc') // Fallback berdasarkan bobot
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $nextRanking = Kriteria::max('ranking') + 1;
+
+        foreach ($kriteria as $item) {
+            $item->update(['ranking' => $nextRanking]);
+            $nextRanking++;
+        }
+    }
+
+    /**
+     * Buat penilaian untuk semua alternatif ketika kriteria baru ditambah
+     */
+    private function createPenilaianForAlternatif($kriteriaId)
+    {
+        $alternatif = Alternatif::all();
+
+        foreach ($alternatif as $item) {
+            Penilaian::firstOrCreate([
+                'alternatif_id' => $item->id,
+                'kriteria_id' => $kriteriaId,
+            ], [
+                'sub_kriteria_id' => null,
+            ]);
+        }
+    }
+
+    /**
+     * Recreate semua penilaian (untuk import)
+     */
+    private function recreateAllPenilaian()
+    {
+        $kriteria = Kriteria::all();
+        $alternatif = Alternatif::all();
+
+        if ($kriteria->isNotEmpty() && $alternatif->isNotEmpty()) {
+            // Hapus penilaian lama
             Penilaian::truncate();
-            foreach ($kriteria as $value) {
-                foreach ($alternatif as $item) {
-                    $createPenilaian = Penilaian::create([
-                        'alternatif_id' => $item->id,
-                        'kriteria_id' => $value->id,
+
+            // Buat penilaian baru untuk semua kombinasi
+            foreach ($kriteria as $krit) {
+                foreach ($alternatif as $alt) {
+                    Penilaian::create([
+                        'alternatif_id' => $alt->id,
+                        'kriteria_id' => $krit->id,
                         'sub_kriteria_id' => null,
                     ]);
                 }
             }
         }
+    }
 
-        if ($createPenilaian) {
-            return to_route('kriteria')->with('success', 'Kriteria Berhasil Disimpan');
-        } else {
-            return to_route('kriteria')->with('error', 'Kriteria Gagal Disimpan');
+    /**
+     * API endpoint untuk mendapatkan ranking yang tersedia
+     */
+    public function getAvailableRankings(Request $request)
+    {
+        $excludeId = $request->get('exclude_id'); // ID kriteria yang dikecualikan (untuk edit)
+
+        $usedRankings = Kriteria::when($excludeId, function ($query) use ($excludeId) {
+            return $query->where('id', '!=', $excludeId);
+        })
+            ->whereNotNull('ranking')
+            ->pluck('ranking')
+            ->toArray();
+
+        $totalKriteria = Kriteria::count();
+        $maxRanking = $excludeId ? $totalKriteria : $totalKriteria + 1;
+
+        $availableRankings = [];
+        for ($i = 1; $i <= $maxRanking; $i++) {
+            if (!in_array($i, $usedRankings)) {
+                $availableRankings[] = $i;
+            }
+        }
+
+        return response()->json([
+            'available_rankings' => $availableRankings,
+            'max_ranking' => $maxRanking,
+            'used_rankings' => $usedRankings
+        ]);
+    }
+
+    /**
+     * Reorder semua ranking kriteria
+     */
+    public function reorderRankings(Request $request)
+    {
+        $request->validate([
+            'rankings' => 'required|array',
+            'rankings.*.id' => 'required|exists:kriteria,id',
+            'rankings.*.ranking' => 'required|integer|min:1',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($request->rankings as $item) {
+                Kriteria::where('id', $item['id'])
+                    ->update(['ranking' => $item['ranking']]);
+            }
+
+            DB::commit();
+
+            return response()->json(['message' => 'Ranking berhasil diperbarui']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Gagal memperbarui ranking'], 500);
         }
     }
 }

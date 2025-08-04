@@ -25,22 +25,25 @@ class SMARTERController extends Controller
 
     public function perhitunganNormalisasiBobot()
     {
-        $kriteria = KriteriaResource::collection(Kriteria::orderBy('bobot', 'desc')->get()); // Urutkan berdasarkan bobot tertinggi untuk ranking
+        // Gunakan ranking manual, bukan bobot
+        $kriteria = Kriteria::orderBy('ranking', 'asc')->get();
 
         if ($kriteria->isEmpty()) {
             return to_route('normalisasi-bobot')->with('error', 'Data kriteria tidak tersedia');
         }
 
+        // Pastikan semua kriteria memiliki ranking
+        $unranked = $kriteria->whereNull('ranking');
+        if ($unranked->count() > 0) {
+            return to_route('normalisasi-bobot')->with('error', 'Harap set ranking untuk semua kriteria terlebih dahulu');
+        }
+
         NormalisasiBobot::truncate();
-        $createNormalisasi = false;
+        $K = count($kriteria);
 
-        // Implementasi ROC (Rank Order Centroid)
-        $K = count($kriteria); // Jumlah kriteria
+        foreach ($kriteria as $item) {
+            $rank = $item->ranking; // Gunakan ranking manual
 
-        foreach ($kriteria as $index => $item) {
-            $rank = $index + 1; // Ranking dimulai dari 1
-
-            // Hitung bobot ROC: w_k = (1/K) * Σ(1/i) untuk i = k hingga K
             $sum = 0;
             for ($i = $rank; $i <= $K; $i++) {
                 $sum += 1 / $i;
@@ -48,26 +51,13 @@ class SMARTERController extends Controller
 
             $bobotROC = (1 / $K) * $sum;
 
-            $createNormalisasi = NormalisasiBobot::create([
+            NormalisasiBobot::create([
                 'kriteria_id' => $item->id,
                 'normalisasi' => round($bobotROC, 4),
             ]);
         }
 
-        if ($createNormalisasi) {
-            return to_route('normalisasi-bobot')->with('success', 'Normalisasi Bobot SMARTER-ROC Berhasil Dilakukan');
-        } else {
-            return to_route('normalisasi-bobot')->with('error', 'Normalisasi Bobot SMARTER-ROC Gagal Dilakukan');
-        }
-    }
-
-    public function indexNilaiUtility()
-    {
-        $title = "Nilai Utility SMARTER";
-        $nilaiUtility = NilaiUtilityResource::collection(NilaiUtility::orderBy('alternatif_id', 'asc')->orderBy('kriteria_id', 'asc')->get());
-        $alternatif = AlternatifResource::collection(Alternatif::orderBy('kode', 'asc')->get());
-        $kriteria = KriteriaResource::collection(Kriteria::orderBy('kode', 'asc')->get());
-        return view('dashboard.nilai-utility.index', compact('title', 'nilaiUtility', 'alternatif', 'kriteria'));
+        return to_route('normalisasi-bobot')->with('success', 'Normalisasi Bobot SMARTER-ROC Berhasil Dilakukan');
     }
 
     public function perhitunganNilaiUtility()
