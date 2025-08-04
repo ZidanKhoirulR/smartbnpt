@@ -57,7 +57,7 @@ class KriteriaController extends Controller
             $newRanking = $validated['ranking'];
 
             // Adjust ranking untuk kriteria yang ada
-            $this->adjustRankingsForInsert($newRanking);
+            $this->adjustExistingRankings($newRanking);
 
             // Buat kriteria baru
             $kriteria = Kriteria::create($validated);
