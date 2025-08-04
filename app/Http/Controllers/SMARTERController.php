@@ -18,37 +18,46 @@ class SMARTERController extends Controller
 {
     public function indexNormalisasiBobot()
     {
-        $title = "Normalisasi Bobot SMARTER";
+        $title = "Normalisasi Bobot SMARTER - ROC";
         $normalisasiBobot = NormalisasiBobotResource::collection(NormalisasiBobot::with('kriteria')->orderBy('kriteria_id', 'asc')->get());
-        $sumBobot = Kriteria::sum('bobot');
-        return view('dashboard.normalisasi-bobot.index', compact('title', 'normalisasiBobot', 'sumBobot'));
+        return view('dashboard.normalisasi-bobot.index', compact('title', 'normalisasiBobot'));
     }
 
     public function perhitunganNormalisasiBobot()
     {
-        $kriteria = KriteriaResource::collection(Kriteria::orderBy('kode', 'asc')->get());
-        $sumBobot = $kriteria->sum('bobot');
+        $kriteria = KriteriaResource::collection(Kriteria::orderBy('bobot', 'desc')->get()); // Urutkan berdasarkan bobot tertinggi untuk ranking
 
-        if ($sumBobot == 0) {
-            return to_route('normalisasi-bobot')->with('error', 'Total bobot kriteria tidak boleh 0');
+        if ($kriteria->isEmpty()) {
+            return to_route('normalisasi-bobot')->with('error', 'Data kriteria tidak tersedia');
         }
 
         NormalisasiBobot::truncate();
         $createNormalisasi = false;
 
-        // SMARTER menggunakan normalisasi langsung tanpa pembagian
-        // Bobot sudah dalam bentuk persentase, langsung dibagi 100
-        foreach ($kriteria as $item) {
+        // Implementasi ROC (Rank Order Centroid)
+        $K = count($kriteria); // Jumlah kriteria
+
+        foreach ($kriteria as $index => $item) {
+            $rank = $index + 1; // Ranking dimulai dari 1
+
+            // Hitung bobot ROC: w_k = (1/K) * Σ(1/i) untuk i = k hingga K
+            $sum = 0;
+            for ($i = $rank; $i <= $K; $i++) {
+                $sum += 1 / $i;
+            }
+
+            $bobotROC = (1 / $K) * $sum;
+
             $createNormalisasi = NormalisasiBobot::create([
                 'kriteria_id' => $item->id,
-                'normalisasi' => round($item->bobot / 100, 4), // Bobot dalam persen dibagi 100
+                'normalisasi' => round($bobotROC, 4),
             ]);
         }
 
         if ($createNormalisasi) {
-            return to_route('normalisasi-bobot')->with('success', 'Normalisasi Bobot SMARTER Berhasil Dilakukan');
+            return to_route('normalisasi-bobot')->with('success', 'Normalisasi Bobot SMARTER-ROC Berhasil Dilakukan');
         } else {
-            return to_route('normalisasi-bobot')->with('error', 'Normalisasi Bobot SMARTER Gagal Dilakukan');
+            return to_route('normalisasi-bobot')->with('error', 'Normalisasi Bobot SMARTER-ROC Gagal Dilakukan');
         }
     }
 
@@ -82,9 +91,9 @@ class SMARTERController extends Controller
 
         $createUtility = false;
 
-        foreach ($alternatif as $item) {
-            foreach ($kriteria as $value) {
-                $kriteriaNilai = $nilaiMaxMin->where('kriteria_id', $value->id)->first();
+        foreach ($alternatif as $alt) {
+            foreach ($kriteria as $krit) {
+                $kriteriaNilai = $nilaiMaxMin->where('kriteria_id', $krit->id)->first();
 
                 if (!$kriteriaNilai) {
                     continue;
@@ -94,8 +103,8 @@ class SMARTERController extends Controller
                 $nilaiMin = $kriteriaNilai->nilaiMin;
                 $jenisKriteria = $kriteriaNilai->jenis_kriteria;
 
-                $penilaianData = Penilaian::where('kriteria_id', $value->id)
-                    ->where('alternatif_id', $item->id)
+                $penilaianData = Penilaian::where('kriteria_id', $krit->id)
+                    ->where('alternatif_id', $alt->id)
                     ->with('subKriteria')
                     ->first();
 
@@ -106,4 +115,156 @@ class SMARTERController extends Controller
                 $nilaiSubKriteria = $penilaianData->subKriteria->bobot;
                 $divisor = $nilaiMax - $nilaiMin;
 
-                // SMARTER:
+                // Perhitungan Utility SMARTER
+                if ($divisor == 0) {
+                    $utility = 1; // Jika semua nilai sama
+                } else {
+                    if ($jenisKriteria == 'benefit') {
+                        // Untuk kriteria benefit: semakin tinggi semakin baik
+                        $utility = ($nilaiSubKriteria - $nilaiMin) / $divisor;
+                    } else {
+                        // Untuk kriteria cost: semakin rendah semakin baik
+                        $utility = ($nilaiMax - $nilaiSubKriteria) / $divisor;
+                    }
+                }
+
+                $createUtility = NilaiUtility::create([
+                    'alternatif_id' => $alt->id,
+                    'kriteria_id' => $krit->id,
+                    'nilai' => round($utility, 4),
+                ]);
+            }
+        }
+
+        if ($createUtility) {
+            return to_route('nilai-utility')->with('success', 'Nilai Utility SMARTER Berhasil Dihitung');
+        } else {
+            return to_route('nilai-utility')->with('error', 'Nilai Utility SMARTER Gagal Dihitung');
+        }
+    }
+
+    public function indexNilaiAkhir()
+    {
+        $title = "Nilai Akhir SMARTER";
+        $nilaiAkhir = NilaiAkhirResource::collection(NilaiAkhir::orderBy('alternatif_id', 'asc')->orderBy('kriteria_id', 'asc')->get());
+        $alternatif = AlternatifResource::collection(Alternatif::orderBy('kode', 'asc')->get());
+        $kriteria = KriteriaResource::collection(Kriteria::orderBy('kode', 'asc')->get());
+        return view('dashboard.nilai-akhir.index', compact('title', 'nilaiAkhir', 'alternatif', 'kriteria'));
+    }
+
+    public function perhitunganNilaiAkhir()
+    {
+        $kriteria = KriteriaResource::collection(Kriteria::orderBy('kode', 'asc')->get());
+        $alternatif = AlternatifResource::collection(Alternatif::orderBy('kode', 'asc')->get());
+
+        if ($kriteria->isEmpty() || $alternatif->isEmpty()) {
+            return to_route('nilai-akhir')->with('error', 'Data kriteria atau alternatif tidak tersedia');
+        }
+
+        // Pastikan normalisasi bobot dan utility sudah ada
+        $normalisasiCount = NormalisasiBobot::count();
+        $utilityCount = NilaiUtility::count();
+
+        if ($normalisasiCount == 0) {
+            return to_route('nilai-akhir')->with('error', 'Silakan lakukan normalisasi bobot terlebih dahulu');
+        }
+
+        if ($utilityCount == 0) {
+            return to_route('nilai-akhir')->with('error', 'Silakan hitung nilai utility terlebih dahulu');
+        }
+
+        NilaiAkhir::truncate();
+        $createNilaiAkhir = false;
+
+        foreach ($alternatif as $alt) {
+            foreach ($kriteria as $krit) {
+                // Ambil bobot yang sudah dinormalisasi dengan ROC
+                $normalisasiBobot = NormalisasiBobot::where('kriteria_id', $krit->id)->first();
+
+                // Ambil nilai utility
+                $nilaiUtility = NilaiUtility::where('alternatif_id', $alt->id)
+                    ->where('kriteria_id', $krit->id)
+                    ->first();
+
+                if ($normalisasiBobot && $nilaiUtility) {
+                    // Nilai Akhir = Bobot ROC × Utility
+                    $nilaiAkhir = $normalisasiBobot->normalisasi * $nilaiUtility->nilai;
+
+                    $createNilaiAkhir = NilaiAkhir::create([
+                        'alternatif_id' => $alt->id,
+                        'kriteria_id' => $krit->id,
+                        'nilai' => round($nilaiAkhir, 4),
+                    ]);
+                }
+            }
+        }
+
+        if ($createNilaiAkhir) {
+            return to_route('nilai-akhir')->with('success', 'Nilai Akhir SMARTER Berhasil Dihitung');
+        } else {
+            return to_route('nilai-akhir')->with('error', 'Nilai Akhir SMARTER Gagal Dihitung');
+        }
+    }
+
+    // Method untuk melihat hasil perhitungan detail
+    public function hasilPerhitungan()
+    {
+        $title = "Hasil Perhitungan SMARTER-ROC";
+
+        // Data untuk tabel perhitungan ROC
+        $kriteria = Kriteria::orderBy('bobot', 'desc')->get();
+        $K = count($kriteria);
+        $hasilROC = [];
+
+        foreach ($kriteria as $index => $item) {
+            $rank = $index + 1;
+            $sum = 0;
+            $rumusPenjumlahan = [];
+
+            for ($i = $rank; $i <= $K; $i++) {
+                $sum += 1 / $i;
+                $rumusPenjumlahan[] = "1/{$i}";
+            }
+
+            $bobotROC = (1 / $K) * $sum;
+
+            $hasilROC[] = [
+                'kriteria' => $item->kriteria,
+                'rank' => $rank,
+                'rumus' => implode(' + ', $rumusPenjumlahan),
+                'penjumlahan' => round($sum, 3),
+                'bobot' => round($bobotROC, 4)
+            ];
+        }
+
+        // Data matriks ternormalisasi (utility)
+        $utilityData = NilaiUtility::with(['alternatif', 'kriteria'])
+            ->orderBy('alternatif_id')
+            ->orderBy('kriteria_id')
+            ->get()
+            ->groupBy('alternatif_id');
+
+        // Hasil akhir dengan ranking
+        $hasilAkhir = NilaiAkhir::query()
+            ->join('alternatif as a', 'a.id', '=', 'nilai_akhir.alternatif_id')
+            ->selectRaw("
+                a.kode, 
+                a.nik,
+                a.alternatif, 
+                SUM(nilai_akhir.nilai) as total_nilai,
+                ROW_NUMBER() OVER (ORDER BY SUM(nilai_akhir.nilai) DESC, a.created_at ASC) as ranking
+            ")
+            ->groupBy('a.kode', 'a.nik', 'a.alternatif', 'a.created_at')
+            ->orderBy('total_nilai', 'desc')
+            ->orderBy('a.created_at', 'asc')
+            ->get();
+
+        return view('dashboard.smarter.hasil-perhitungan', compact(
+            'title',
+            'hasilROC',
+            'utilityData',
+            'hasilAkhir',
+            'kriteria'
+        ));
+    }
+}
