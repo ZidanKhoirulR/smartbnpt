@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 02, 2025 at 04:29 PM
+-- Generation Time: Aug 04, 2025 at 12:52 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -30,6 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `alternatif` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `kode` varchar(6) NOT NULL,
+  `nik` varchar(16) NOT NULL,
   `alternatif` varchar(255) NOT NULL,
   `keterangan` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -40,10 +41,10 @@ CREATE TABLE `alternatif` (
 -- Dumping data for table `alternatif`
 --
 
-INSERT INTO `alternatif` (`id`, `kode`, `alternatif`, `keterangan`, `created_at`, `updated_at`) VALUES
-(6, 'A00001', 'Keluarga Pak Andi', NULL, '2025-07-30 04:11:21', '2025-07-30 04:19:34'),
-(7, 'A00002', 'Keluarga Pak Budi', NULL, '2025-07-30 04:11:36', '2025-07-30 04:19:48'),
-(8, 'A00003', 'Keluarga Bu Citra', NULL, '2025-07-30 04:11:55', '2025-07-30 04:20:07');
+INSERT INTO `alternatif` (`id`, `kode`, `nik`, `alternatif`, `keterangan`, `created_at`, `updated_at`) VALUES
+(6, 'A00001', '3201234567890006', 'Keluarga Pak Andi', NULL, '2025-07-30 04:11:21', '2025-08-02 08:46:14'),
+(7, 'A00002', '3201234567890007', 'Keluarga Pak Budi', NULL, '2025-07-30 04:11:36', '2025-07-30 04:19:48'),
+(8, 'A00003', '3201234567890008', 'Keluarga Bu Citra', NULL, '2025-07-30 04:11:55', '2025-07-30 04:20:07');
 
 -- --------------------------------------------------------
 
@@ -62,6 +63,8 @@ CREATE TABLE `cache` (
 --
 
 INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
+('admin@bpnt.go.id|127.0.0.1', 'i:1;', 1754165542),
+('admin@bpnt.go.id|127.0.0.1:timer', 'i:1754165542;', 1754165542),
 ('manda@gmail.com|127.0.0.1', 'i:1;', 1753898423),
 ('manda@gmail.com|127.0.0.1:timer', 'i:1753898423;', 1753898423);
 
@@ -149,7 +152,7 @@ CREATE TABLE `kriteria` (
 --
 
 INSERT INTO `kriteria` (`id`, `kode`, `kriteria`, `bobot`, `jenis_kriteria`, `created_at`, `updated_at`) VALUES
-(1, 'K00001', 'Pendapatan', 40.00, 'cost', '2025-07-27 04:21:07', '2025-07-30 21:08:16'),
+(1, 'K00001', 'Pendapatan', 40.00, 'cost', '2025-07-27 04:21:07', '2025-08-02 13:47:41'),
 (2, 'K00002', 'Jumlah Tanggungan', 30.00, 'benefit', '2025-07-27 04:21:07', '2025-07-30 04:04:31'),
 (3, 'K00003', 'Kondisi Rumah', 20.00, 'benefit', '2025-07-27 04:21:07', '2025-07-30 04:04:47'),
 (5, 'K00005', 'Status Kepemilikan Rumah', 10.00, 'benefit', '2025-07-27 04:21:07', '2025-07-30 04:05:34');
@@ -180,7 +183,7 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (7, '2025_01_20_160500_create_penilaians_table', 1),
 (8, '2025_01_22_125314_create_normalisasi_bobots_table', 1),
 (9, '2025_01_22_125339_create_nilai_utilities_table', 1),
-(10, '2025_01_22_125659_create_nilai_akhirs_table', 1);
+(11, '2025_01_22_125659_create_nilai_akhirs_table', 2);
 
 -- --------------------------------------------------------
 
@@ -192,28 +195,10 @@ CREATE TABLE `nilai_akhir` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `alternatif_id` bigint(20) UNSIGNED NOT NULL,
   `kriteria_id` bigint(20) UNSIGNED NOT NULL,
-  `nilai` decimal(10,4) NOT NULL,
+  `nilai` double NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `nilai_akhir`
---
-
-INSERT INTO `nilai_akhir` (`id`, `alternatif_id`, `kriteria_id`, `nilai`, `created_at`, `updated_at`) VALUES
-(1, 6, 1, 0.4000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(2, 6, 2, 3.0000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(3, 6, 3, 2.0000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(4, 6, 5, 0.5500, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(5, 7, 1, 4.0000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(6, 7, 2, 0.3000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(7, 7, 3, 0.2000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(8, 7, 5, 0.1000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(9, 8, 1, 2.2000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(10, 8, 2, 1.6500, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(11, 8, 3, 0.2000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(12, 8, 5, 1.0000, '2025-07-30 04:25:01', '2025-07-30 04:25:01');
 
 -- --------------------------------------------------------
 
@@ -337,8 +322,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('EPbjnKoeM6mrz07BhLtZ2Mm1oL9wjytcRvMVOphA', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiQXhtSWNPVHZSRWxRSGZWeGg1SFJCU2R0TGpxdjNMNk80OGFPcElDQyI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjM0OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvc3ViLWtyaXRlcmlhIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1753938474),
-('qiVug4Vcr1WzEdDbCMd8pnIL2Cm2eVc1YmYA20Dl', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoidnFZbnZDQ21MZ1hCWmFKWGNKRThBaDJMeXdWUFV6T1VtdmROcHMwaCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fX0=', 1754144838);
+('CnJVSu9MhDTkne7gPC86iYOasOn1pBlH8cUjzgPw', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiVnNCUkZtd2F2RVE1Vm9oMDNQWk9xcHV6MnFYNmdsMktNOG9sWVp5ZSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9kYXNoYm9hcmQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1754168175),
+('J91HxbEHloXXJuMgNXYPosOwVEmJKmVL3ZxUlALs', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiMlZKNWtSRVpGeHJ2WjA4ejI4aVpLaDdnSmZtWVFGZlI0Q2tmUjBvNSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9kYXNoYm9hcmQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1754167159);
 
 -- --------------------------------------------------------
 
@@ -399,7 +384,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Admin Linjamsos', 'admin@gmail.com', '2025-07-27 04:21:08', '$2y$12$HbFeH3EW/T2.yyBGhiBWLuwimmfY.exuQr9iLyhK8tx1y4rFcyyJ6', 'JLcuanDf56ibP9SdpCEOfGDZ3NfIaMJSDMnvPtil5126tbRRaU34xkJObrzl', '2025-07-27 04:21:09', '2025-07-27 04:21:09');
+(1, 'Admin Linjamsos', 'admin@gmail.com', '2025-07-27 04:21:08', '$2y$12$HbFeH3EW/T2.yyBGhiBWLuwimmfY.exuQr9iLyhK8tx1y4rFcyyJ6', '3mnpjCqNu0aNbTYYJSmpxSKtcYAybk4KZu6UvHGOHzs0lJuEDZhQsuAICTnm', '2025-07-27 04:21:09', '2025-07-27 04:21:09');
 
 --
 -- Indexes for dumped tables
@@ -410,7 +395,8 @@ INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `re
 --
 ALTER TABLE `alternatif`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `alternatif_kode_unique` (`kode`);
+  ADD UNIQUE KEY `alternatif_kode_unique` (`kode`),
+  ADD UNIQUE KEY `alternatif_nik_unique` (`nik`);
 
 --
 -- Indexes for table `cache`
@@ -549,13 +535,13 @@ ALTER TABLE `kriteria`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `nilai_akhir`
 --
 ALTER TABLE `nilai_akhir`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `nilai_utility`
