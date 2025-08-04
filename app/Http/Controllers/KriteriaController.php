@@ -56,8 +56,8 @@ class KriteriaController extends Controller
             $validated = $request->validated();
             $newRanking = $validated['ranking'];
 
-            // Adjust ranking untuk kriteria yang ada jika perlu
-            $this->adjustExistingRankings($newRanking);
+            // Adjust ranking untuk kriteria yang ada
+            $this->adjustRankingsForInsert($newRanking);
 
             // Buat kriteria baru
             $kriteria = Kriteria::create($validated);
@@ -220,9 +220,43 @@ class KriteriaController extends Controller
      */
     private function adjustRankingsAfterDelete($deletedRanking)
     {
+        if (is_null($deletedRanking)) {
+            return; // Tidak perlu adjust jika tidak ada ranking
+        }
+
         // Geser semua ranking yang > deletedRanking turun satu tingkat
         Kriteria::where('ranking', '>', $deletedRanking)
+            ->whereNotNull('ranking')
             ->decrement('ranking');
+    }
+
+    /**
+     * Method untuk reset dan cleanup ranking yang rusak
+     */
+    public function resetRankings()
+    {
+        try {
+            DB::beginTransaction();
+
+            // Ambil semua kriteria, urutkan berdasarkan ranking lama (jika ada) atau bobot
+            $kriteria = Kriteria::orderByRaw('ranking IS NULL, ranking ASC')
+                ->orderBy('bobot', 'desc')
+                ->orderBy('id', 'asc')
+                ->get();
+
+            // Re-assign ranking secara berurutan
+            foreach ($kriteria as $index => $item) {
+                $item->update(['ranking' => $index + 1]);
+            }
+
+            DB::commit();
+
+            return to_route('kriteria')->with('success', 'Ranking berhasil direset dan diurutkan ulang');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return to_route('kriteria')->with('error', 'Gagal reset ranking: ' . $e->getMessage());
+        }
     }
 
     /**

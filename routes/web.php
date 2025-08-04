@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::group([
         'prefix' => 'kriteria',
     ], function () {
+        Route::post('/reset-rankings', [KriteriaController::class, 'resetRankings'])->name('kriteria.reset-rankings');
         Route::get('/', [KriteriaController::class, 'index'])->name('kriteria');
         Route::post('/simpan', [KriteriaController::class, 'store'])->name('kriteria.store');
         Route::get('/ubah', [KriteriaController::class, 'edit'])->name('kriteria.edit');
