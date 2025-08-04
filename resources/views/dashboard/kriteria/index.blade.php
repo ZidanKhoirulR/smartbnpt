@@ -13,28 +13,57 @@
                 order: [],
                 pagingType: 'full_numbers',
             });
-        });
+        // Real-time validation for all forms
+                $(document).on('input', 'input[name="ranking"]', function() {
+                    validateRanking(this);
+                });
 
-        function create_button() {
-            $("input[name='id']").val("");
-            $("input[name='kriteria']").val("");
-            $("input[name='bobot']").val("");
-            $("input[name='ranking']").val("");
+                $(document).on('input', 'input[name="bobot"]', function() {
+                    validateBobot(this);
+                    updateWeightInfo();
+                });
+
+                $(document).on('input', 'input[name="kriteria"]', function() {
+                    validateKriteria(this);
+                });
+
+                // Auto-calculate weight info on modal open
+                $(document).on('change', '#create_button, #edit_button', function() {
+                    if ($(this).is(':checked')) {
+                        setTimeout(() => {
+                            updateWeightInfo();
+                        }, 100);
+                    }
+                });
+            });
+
+            function create_button() {
+                // Reset form
+                $("input[name='id']").val("");
+                $("input[name='kriteria']").val("");
+                $("input[name='bobot']").val("");
+                $("input[name='ranking']").val("");
                 $("input[name='kode']").val("{{ $kode }}");
 
                 // Reset radio buttons
                 $("input[name='jenis_kriteria']").prop('checked', false);
                 $("#benefit_create").prop("checked", true);
+
+                // Reset validation styling
+                resetValidation();
+
+                // Update weight info
+                updateWeightInfo();
+
+                // Auto focus on first input
+                setTimeout(() => {
+                    $("#create_button").closest('.modal').find("input[name='ranking']").focus();
+                }, 200);
             }
 
             function edit_button(kriteria_id) {
-                // Loading effect start
-                let loading = `<span class="loading loading-dots loading-md text-purple-600"></span>`;
-                $("#loading_edit1").html(loading);
-                $("#loading_edit2").html(loading);
-                $("#loading_edit3").html(loading);
-                $("#loading_edit4").html(loading);
-                $("#loading_edit5").html(loading);
+                // Show loading
+                showLoadingState();
 
                 $.ajax({
                     type: "get",
@@ -44,27 +73,35 @@
                         "kriteria_id": kriteria_id
                     },
                     success: function(data) {
-                        // console.log(data.data);
-
+                        // Populate form
                         $("input[name='id']").val(data.data.id);
                         $("input[name='kode']").val(data.data.kode);
                         $("input[name='kriteria']").val(data.data.kriteria);
                         $("input[name='bobot']").val(data.data.bobot);
                         $("input[name='ranking']").val(data.data.ranking || '');
 
+                        // Set radio button
                         if (data.data.jenis_kriteria == "benefit") {
                             $("#benefit_edit").prop("checked", true);
                         } else if (data.data.jenis_kriteria == "cost") {
                             $("#cost_edit").prop("checked", true);
                         }
 
-                        // Loading effect end
-                        loading = "";
-                        $("#loading_edit1").html(loading);
-                        $("#loading_edit2").html(loading);
-                        $("#loading_edit3").html(loading);
-                        $("#loading_edit4").html(loading);
-                        $("#loading_edit5").html(loading);
+                        // Hide loading
+                        hideLoadingState();
+
+                        // Reset validation and update weight info
+                        resetValidation();
+                        updateWeightInfo();
+
+                        // Validate current values
+                        validateRanking($("input[name='ranking']")[0]);
+                        validateBobot($("input[name='bobot']")[0]);
+                        validateKriteria($("input[name='kriteria']")[0]);
+                    },
+                    error: function() {
+                        hideLoadingState();
+                        showNotification('Gagal memuat data kriteria', 'error');
                     }
                 });
             }
@@ -81,6 +118,15 @@
                     cancelButtonText: 'Batal',
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // Show loading
+                        Swal.fire({
+                            title: 'Menghapus data...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
                         $.ajax({
                             type: "post",
                             url: "{{ route("kriteria.delete") }}",
@@ -100,9 +146,14 @@
                                     }
                                 });
                             },
-                            error: function(response) {
+                            error: function(xhr) {
+                                let message = 'Data gagal dihapus!';
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    message = xhr.responseJSON.message;
+                                }
                                 Swal.fire({
-                                    title: 'Data gagal dihapus!',
+                                    title: 'Gagal!',
+                                    text: message,
                                     icon: 'error',
                                     confirmButtonColor: '#6419E6',
                                     confirmButtonText: 'OK'
@@ -113,19 +164,278 @@
                 })
             }
 
-            // Validasi ranking secara real-time
+            // Enhanced validation functions
             function validateRanking(input) {
                 const value = parseInt(input.value);
-                const maxRanking = {{ $kriteria->count() + 1 }}; // +1 untuk kriteria baru
+                const isEdit = $(input).closest('.modal').find('#edit_button').length > 0;
+                const maxRanking = isEdit ? {{ $kriteria->count() }} : {{ $kriteria->count() + 1 }};
+                const $input = $(input);
+                const $formControl = $input.closest('.form-control');
 
-                if (value < 1) {
-                    input.setCustomValidity('Ranking minimal adalah 1');
-                } else if (value > maxRanking) {
-                    input.setCustomValidity(`Ranking maksimal adalah ${maxRanking}`);
-                } else {
-                    input.setCustomValidity('');
+                // Remove previous validation
+                $input.removeClass('input-error input-success border-red-500 border-green-500');
+                $formControl.find('.validation-message').remove();
+
+                if (!input.value.trim()) {
+                    showValidationError($input, 'Ranking wajib diisi');
+                    return false;
+                }
+
+                if (isNaN(value) || value < 1) {
+                    showValidationError($input, 'Ranking minimal adalah 1');
+                    return false;
+                }
+
+                if (value > maxRanking) {
+                    showValidationError($input, `Ranking maksimal adalah ${maxRanking}`);
+                    return false;
+                }
+
+                // Check for duplicate ranking (only for create mode)
+                if (!isEdit) {
+                    let isDuplicate = false;
+                    @foreach($kriteria as $k)
+                        if (value == {{ $k->ranking }}) {
+                            isDuplicate = true;
+                        }
+                    @endforeach
+
+                    if (isDuplicate) {
+                        showValidationError($input, 'Ranking sudah digunakan');
+                        return false;
+                    }
+                }
+
+                showValidationSuccess($input);
+                input.setCustomValidity('');
+                return true;
+            }
+
+            function validateBobot(input) {
+                const value = parseFloat(input.value);
+                const $input = $(input);
+                const $formControl = $input.closest('.form-control');
+
+                // Remove previous validation
+                $input.removeClass('input-error input-success border-red-500 border-green-500');
+                $formControl.find('.validation-message').remove();
+
+                if (!input.value.trim()) {
+                    showValidationError($input, 'Bobot wajib diisi');
+                    return false;
+                }
+
+                if (isNaN(value) || value < 0) {
+                    showValidationError($input, 'Bobot minimal adalah 0');
+                    return false;
+                }
+
+                if (value > 100) {
+                    showValidationError($input, 'Bobot maksimal adalah 100%');
+                    return false;
+                }
+
+                // Check total weight
+                const currentTotal = {{ $sumBobot }};
+                const isEdit = $(input).closest('.modal').find('#edit_button').length > 0;
+                let originalWeight = 0;
+
+                if (isEdit) {
+                    // Get original weight for edit mode
+                    originalWeight = parseFloat($("input[name='bobot']").data('original')) || 0;
+                }
+
+                const newTotal = currentTotal - originalWeight + value;
+
+                if (newTotal > 100) {
+                    const maxAllowed = 100 - currentTotal + originalWeight;
+                    showValidationError($input, `Bobot terlalu besar. Maksimal: ${maxAllowed.toFixed(2)}%`);
+                    return false;
+                }
+
+                showValidationSuccess($input);
+                return true;
+            }
+
+            function validateKriteria(input) {
+                const value = input.value.trim();
+                const $input = $(input);
+                const $formControl = $input.closest('.form-control');
+
+                // Remove previous validation
+                $input.removeClass('input-error input-success border-red-500 border-green-500');
+                $formControl.find('.validation-message').remove();
+
+                if (!value) {
+                    showValidationError($input, 'Nama kriteria wajib diisi');
+                    return false;
+                }
+
+                if (value.length < 3) {
+                    showValidationError($input, 'Nama kriteria minimal 3 karakter');
+                    return false;
+                }
+
+                if (value.length > 100) {
+                    showValidationError($input, 'Nama kriteria maksimal 100 karakter');
+                    return false;
+                }
+
+                showValidationSuccess($input);
+                return true;
+            }
+
+            // Validation helper functions
+            function showValidationError($input, message) {
+                $input.addClass('input-error border-red-500');
+                const $formControl = $input.closest('.form-control');
+
+                // Remove existing message
+                $formControl.find('.validation-message').remove();
+
+                // Add error message
+                const errorHtml = `
+                    <div class="label validation-message">
+                        <span class="label-text-alt text-sm text-red-500">
+                            <i class="ri-error-warning-line mr-1"></i>${message}
+                        </span>
+                    </div>
+                `;
+                $formControl.append(errorHtml);
+            }
+
+            function showValidationSuccess($input) {
+                $input.addClass('input-success border-green-500');
+                const $formControl = $input.closest('.form-control');
+                $formControl.find('.validation-message').remove();
+            }
+
+            function resetValidation() {
+                $('.input').removeClass('input-error input-success border-red-500 border-green-500');
+                $('.validation-message').remove();
+            }
+
+            // Weight information update
+            function updateWeightInfo() {
+                const currentBobot = parseFloat($('input[name="bobot"]').val()) || 0;
+                const totalBobot = {{ $sumBobot }};
+                const isEdit = $('input[name="id"]').val() !== '';
+
+                let originalBobot = 0;
+                if (isEdit) {
+                    originalBobot = parseFloat($('input[name="bobot"]').data('original')) || 0;
+                }
+
+                const remaining = 100 - totalBobot + originalBobot - currentBobot;
+                const used = totalBobot - originalBobot + currentBobot;
+
+                // Update weight info in modal
+                $('.weight-info').remove();
+                const $bobotControl = $('input[name="bobot"]').closest('.form-control');
+
+                let colorClass = 'text-blue-600';
+                let icon = 'ri-information-line';
+
+                if (remaining < 0) {
+                    colorClass = 'text-red-600';
+                    icon = 'ri-error-warning-line';
+                } else if (remaining === 0) {
+                    colorClass = 'text-green-600';
+                    icon = 'ri-checkbox-circle-line';
+                }
+
+                const weightInfoHtml = `
+                    <div class="label weight-info">
+                        <span class="label-text-alt text-xs ${colorClass}">
+                            <i class="${icon} mr-1"></i>
+                            Terpakai: ${used.toFixed(1)}% | Sisa: ${remaining.toFixed(1)}%
+                        </span>
+                    </div>
+                `;
+
+                $bobotControl.append(weightInfoHtml);
+            }
+
+            // Loading state functions
+            function showLoadingState() {
+                const loading = `<span class="loading loading-dots loading-md text-purple-600"></span>`;
+                for(let i = 1; i <= 5; i++) {
+                    $(`#loading_edit${i}`).html(loading);
                 }
             }
+
+            function hideLoadingState() {
+                for(let i = 1; i <= 5; i++) {
+                    $(`#loading_edit${i}`).html('');
+                }
+            }
+
+            // Enhanced notification
+            function showNotification(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `alert alert-${type} fixed top-4 right-4 w-auto z-50 shadow-lg`;
+                toast.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <i class="ri-${type === 'error' ? 'error-warning' : 'information'}-line"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+
+            // Form submission validation
+            $(document).on('submit', 'form', function(e) {
+                const form = this;
+                let isValid = true;
+
+                // Validate all required fields
+                $(form).find('input[required]').each(function() {
+                    if (this.name === 'ranking' && !validateRanking(this)) {
+                        isValid = false;
+                    }
+                    if (this.name === 'bobot' && !validateBobot(this)) {
+                        isValid = false;
+                    }
+                    if (this.name === 'kriteria' && !validateKriteria(this)) {
+                        isValid = false;
+                    }
+                });
+
+                // Check radio button
+                if (!$(form).find('input[name="jenis_kriteria"]:checked').length) {
+                    showNotification('Pilih jenis kriteria (Benefit atau Cost)', 'error');
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                    showNotification('Periksa kembali form input Anda', 'error');
+                    return false;
+                }
+
+                // Show loading on submit button
+                const $submitBtn = $(form).find('button[type="submit"]');
+                const originalText = $submitBtn.html();
+                $submitBtn.html('<span class="loading loading-spinner loading-sm"></span> Menyimpan...').prop('disabled', true);
+
+                // Restore button after 3 seconds (fallback)
+                setTimeout(() => {
+                    $submitBtn.html(originalText).prop('disabled', false);
+                }, 3000);
+            });
+
+            // Store original weight for edit mode
+            $(document).on('click', '[onclick*="edit_button"]', function() {
+                setTimeout(() => {
+                    const originalWeight = parseFloat($('input[name="bobot"]').val()) || 0;
+                    $('input[name="bobot"]').data('original', originalWeight);
+                }, 500);
+            });
         </script>
 @endsection
 
@@ -181,7 +491,6 @@
                                     <input type="number" min="1" max="{{ $kriteria->count() + 1 }}" step="1" name="ranking" 
                                            class="input input-bordered w-full text-primary-color" 
                                            value="{{ old("ranking") }}" 
-                                           oninput="validateRanking(this)"
                                            placeholder="1, 2, 3, ..." required />
                                     @error("ranking")
                                         <div class="label">
@@ -306,7 +615,6 @@
                                     </div>
                                     <input type="number" min="1" max="{{ $kriteria->count() }}" step="1" name="ranking" 
                                            class="input input-bordered w-full text-primary-color" 
-                                           oninput="validateRanking(this)"
                                            placeholder="1, 2, 3, ..." required />
                                     @error("ranking")
                                         <div class="label">
