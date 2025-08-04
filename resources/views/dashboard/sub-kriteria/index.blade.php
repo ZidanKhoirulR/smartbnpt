@@ -2,7 +2,7 @@
 
 @section("js")
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             @foreach ($kriteria as $item)
                 $('#myTable_{{ $item->id }}').DataTable({
                     responsive: {
@@ -15,7 +15,7 @@
                     pagingType: 'full_numbers',
                 });
             @endforeach
-        });
+            });
 
         function create_button() {
             $("input[name='id']").val("");
@@ -39,7 +39,7 @@
                     "_token": "{{ csrf_token() }}",
                     "sub_kriteria_id": sub_kriteria_id
                 },
-                success: function(data) {
+                success: function (data) {
                     // console.log(data);
 
                     $("input[name='id']").val(data.id);
@@ -76,7 +76,7 @@
                             "_token": "{{ csrf_token() }}",
                             "sub_kriteria_id": sub_kriteria_id
                         },
-                        success: function(response) {
+                        success: function (response) {
                             Swal.fire({
                                 title: 'Data berhasil dihapus!',
                                 icon: 'success',
@@ -88,7 +88,7 @@
                                 }
                             });
                         },
-                        error: function(response) {
+                        error: function (response) {
                             Swal.fire({
                                 title: 'Data gagal dihapus!',
                                 icon: 'error',
@@ -126,7 +126,8 @@
                                         <x-label-input-required>Kriteria</x-label-input-required>
                                     </span>
                                 </div>
-                                <select name="kriteria_id" class="select select-bordered w-full text-primary-color" required>
+                                <select name="kriteria_id" class="select select-bordered w-full text-primary-color"
+                                    required>
                                     <option disabled selected>Pilih Kriteria!</option>
                                     @foreach ($kriteria as $item)
                                         <option value="{{ $item->id }}">{{ $item->kriteria }}</option>
@@ -144,7 +145,9 @@
                                         <x-label-input-required>Sub Kriteria</x-label-input-required>
                                     </span>
                                 </div>
-                                <input type="text" name="sub_kriteria" class="input input-bordered w-full text-primary-color" value="{{ old("sub_kriteria") }}" required />
+                                <input type="text" name="sub_kriteria"
+                                    class="input input-bordered w-full text-primary-color" value="{{ old("sub_kriteria") }}"
+                                    required />
                                 @error("sub_kriteria")
                                     <div class="label">
                                         <span class="label-text-alt text-sm text-error">{{ $message }}</span>
@@ -157,7 +160,9 @@
                                         <x-label-input-required>Bobot</x-label-input-required>
                                     </span>
                                 </div>
-                                <input type="number" min="0" step="1" name="bobot" class="input input-bordered w-full text-primary-color" value="{{ old("bobot") }}" required />
+                                <input type="number" min="0" step="1" name="bobot"
+                                    class="input input-bordered w-full text-primary-color" value="{{ old("bobot") }}"
+                                    required />
                                 @error("bobot")
                                     <div class="label">
                                         <span class="label-text-alt text-sm text-error">{{ $message }}</span>
@@ -192,8 +197,11 @@
                                     </span>
                                     <span class="label-text-alt" id="loading_edit1"></span>
                                 </div>
-                                <input type="text" name="kriteria_id" class="input input-bordered w-full text-primary-color" required hidden />
-                                <input type="text" name="kriteria_nama" class="input input-bordered w-full cursor-default bg-slate-100 text-primary-color" required readonly />
+                                <input type="text" name="kriteria_id" class="input input-bordered w-full text-primary-color"
+                                    required hidden />
+                                <input type="text" name="kriteria_nama"
+                                    class="input input-bordered w-full cursor-default bg-slate-100 text-primary-color"
+                                    required readonly />
                                 @error("kriteria_id")
                                     <div class="label">
                                         <span class="label-text-alt text-sm text-error">{{ $message }}</span>
@@ -207,7 +215,8 @@
                                     </span>
                                     <span class="label-text-alt" id="loading_edit2"></span>
                                 </div>
-                                <input type="text" name="sub_kriteria" class="input input-bordered w-full text-primary-color" required />
+                                <input type="text" name="sub_kriteria"
+                                    class="input input-bordered w-full text-primary-color" required />
                                 @error("sub_kriteria")
                                     <div class="label">
                                         <span class="label-text-alt text-sm text-error">{{ $message }}</span>
@@ -221,7 +230,8 @@
                                     </span>
                                     <span class="label-text-alt" id="loading_edit3"></span>
                                 </div>
-                                <input type="number" min="0" step="1" name="bobot" class="input input-bordered w-full text-primary-color" required />
+                                <input type="number" min="0" step="1" name="bobot"
+                                    class="input input-bordered w-full text-primary-color" required />
                                 @error("bobot")
                                     <div class="label">
                                         <span class="label-text-alt text-sm text-error">{{ $message }}</span>
@@ -254,7 +264,8 @@
                                         <x-label-input-required>File Excel</x-label-input-required>
                                     </span>
                                 </div>
-                                <input type="file" name="import_data" class="file-input file-input-bordered w-full text-primary-color" required />
+                                <input type="file" name="import_data"
+                                    class="file-input file-input-bordered w-full text-primary-color" required />
                                 @error("import_data")
                                     <div class="label">
                                         <span class="label-text-alt text-sm text-error">{{ $message }}</span>
@@ -269,30 +280,42 @@
             {{-- Akhir Modal Import --}}
 
             {{-- Awal Tabel Sub Kriteria --}}
-            <div role="alert" class="alert mb-5 flex items-center justify-between border-0 bg-secondary-color shadow-xl dark:bg-secondary-color-dark dark:shadow-secondary-color-dark/20">
+            <div role="alert"
+                class="alert mb-5 flex items-center justify-between border-0 bg-secondary-color shadow-xl dark:bg-secondary-color-dark dark:shadow-secondary-color-dark/20">
                 <h6 class="font-bold text-primary-color dark:text-white">Tabel-Tabel {{ $title }}</h6>
                 <div>
-                    <label for="create_button" class="mb-0 inline-block cursor-pointer rounded-lg border border-solid border-success bg-white/70 px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-success shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2" onclick="return create_button()">
+                    <label for="create_button"
+                        class="mb-0 inline-block cursor-pointer rounded-lg border border-solid border-success bg-white/70 px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-success shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2"
+                        onclick="return create_button()">
                         <i class="ri-add-fill"></i>
                         Tambah
                     </label>
-                    <label for="import_button" class="mb-0 inline-block cursor-pointer rounded-lg border border-solid border-success bg-white/70 px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-success shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2" onclick="return import_button()">
+                    <label for="import_button"
+                        class="mb-0 inline-block cursor-pointer rounded-lg border border-solid border-success bg-white/70 px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-success shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2"
+                        onclick="return import_button()">
                         <i class="ri-file-excel-2-line"></i>
                         Impor
                     </label>
                 </div>
             </div>
-            <div class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
+            <div
+                class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
                 @foreach ($kriteria as $kri)
                     <div class="mb-5">
-                        <div class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
-                            <h6 class="font-semibold text-primary-color dark:text-primary-color-dark">Tabel {{ $title }} <span class="font-bold text-primary-color-dark dark:text-primary-color">{{ $kri->kriteria }}</span></h6>
+                        <div
+                            class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
+                            <h6 class="font-semibold text-primary-color dark:text-primary-color-dark">Tabel {{ $title }} <span
+                                    class="font-bold text-primary-color-dark dark:text-primary-color">{{ $kri->kriteria }}</span>
+                            </h6>
                         </div>
                         <div class="flex-auto px-0 pb-2 pt-0">
                             <div class="overflow-x-auto p-0 px-6 pb-6">
-                                <table id="{{ "myTable_" . $kri->id }}" class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top" style="width: 100%;">
+                                <table id="{{ "myTable_" . $kri->id }}"
+                                    class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top"
+                                    style="width: 100%;">
                                     <thead class="align-bottom">
-                                        <tr class="bg-primary-color text-xs font-bold uppercase text-white dark:bg-primary-color-dark dark:text-white">
+                                        <tr
+                                            class="bg-primary-color text-xs font-bold uppercase text-white dark:bg-primary-color-dark dark:text-white">
                                             <th class="rounded-tl">
                                                 Nama Sub Kriteria
                                             </th>
@@ -308,21 +331,25 @@
                                         @foreach ($subKriteria->where("kriteria_id", $kri->id) as $item)
                                             <tr class="border-b border-primary-color bg-transparent dark:border-primary-color-dark">
                                                 <td>
-                                                    <p class="text-left align-middle text-base font-semibold leading-tight text-primary-color dark:text-primary-color-dark">
+                                                    <p
+                                                        class="text-left align-middle text-base font-semibold leading-tight text-primary-color dark:text-primary-color-dark">
                                                         {{ $item->sub_kriteria }}
                                                     </p>
                                                 </td>
                                                 <td>
-                                                    <p class="text-center align-middle text-base font-semibold leading-tight text-primary-color dark:text-primary-color-dark">
+                                                    <p
+                                                        class="text-center align-middle text-base font-semibold leading-tight text-primary-color dark:text-primary-color-dark">
                                                         {{ $item->bobot }}
                                                     </p>
                                                 </td>
                                                 <td>
                                                     <div class="text-center align-middle">
-                                                        <label for="edit_button" class="btn btn-outline btn-warning btn-sm" onclick="return edit_button('{{ $item->id }}')">
+                                                        <label for="edit_button" class="btn btn-outline btn-warning btn-sm"
+                                                            onclick="return edit_button('{{ $item->id }}')">
                                                             <i class="ri-pencil-fill text-base"></i>
                                                         </label>
-                                                        <label for="delete_button" class="btn btn-outline btn-error btn-sm" onclick="return delete_button('{{ $item->id }}')">
+                                                        <label for="delete_button" class="btn btn-outline btn-error btn-sm"
+                                                            onclick="return delete_button('{{ $item->id }}')">
                                                             <i class="ri-delete-bin-line text-base"></i>
                                                         </label>
                                                     </div>
