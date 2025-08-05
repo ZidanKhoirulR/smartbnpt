@@ -51,7 +51,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [SubKriteriaController::class, 'index'])->name('sub-kriteria');
         Route::post('/simpan', [SubKriteriaController::class, 'store'])->name('sub-kriteria.store');
         Route::get('/ubah', [SubKriteriaController::class, 'edit'])->name('sub-kriteria.edit');
-        Route::post('/ubah', [SubKriteriaController::class, 'update'])->name('sub-kriteria.update');
+        Route::put('/ubah', [SubKriteriaController::class, 'update'])->name('sub-kriteria.update');
         Route::post('/hapus', [SubKriteriaController::class, 'delete'])->name('sub-kriteria.delete');
         Route::post('/impor', [SubKriteriaController::class, 'import'])->name('sub-kriteria.import');
         // Tambahan route untuk template download
@@ -79,21 +79,36 @@ Route::middleware('auth')->group(function () {
         Route::post('/impor', [PenilaianController::class, 'import'])->name('penilaian.import');
     });
 
+    // Updated SMARTER routes with ROC integration
     Route::group([
         'prefix' => 'smarter',
     ], function () {
+        // Route untuk halaman perhitungan utama
+        Route::get('/perhitungan', [SMARTERController::class, 'indexPerhitungan'])->name('perhitungan');
+
+        // Route untuk melakukan perhitungan SMARTER-ROC (updated)
+        Route::post('/perhitungan', [SMARTERController::class, 'perhitunganMetode'])->name('perhitungan.smart');
+        Route::post('/perhitungan/smarter', [SMARTERController::class, 'perhitunganSMARTER'])->name('perhitungan.smarter');
+
+        // Routes untuk normalisasi bobot ROC (updated)
         Route::get('/normalisasi-bobot', [SMARTERController::class, 'indexNormalisasiBobot'])->name('normalisasi-bobot');
         Route::post('/normalisasi-bobot', [SMARTERController::class, 'perhitunganNormalisasiBobot'])->name('normalisasi-bobot.perhitungan');
+        Route::post('/normalisasi-bobot/hitung', [SMARTERController::class, 'perhitunganNormalisasiBobot'])->name('normalisasi-bobot.hitung');
 
+        // Routes untuk nilai utility (updated)
         Route::get('/nilai-utility', [SMARTERController::class, 'indexNilaiUtility'])->name('nilai-utility');
         Route::post('/nilai-utility', [SMARTERController::class, 'perhitunganNilaiUtility'])->name('nilai-utility.perhitungan');
+        Route::post('/nilai-utility/hitung', [SMARTERController::class, 'perhitunganNilaiUtility'])->name('nilai-utility.hitung');
 
+        // Routes untuk nilai akhir (updated)
         Route::get('/nilai-akhir', [SMARTERController::class, 'indexNilaiAkhir'])->name('nilai-akhir');
         Route::post('/nilai-akhir', [SMARTERController::class, 'perhitunganNilaiAkhir'])->name('nilai-akhir.perhitungan');
+        Route::post('/nilai-akhir/hitung', [SMARTERController::class, 'perhitunganNilaiAkhir'])->name('nilai-akhir.hitung');
 
-        Route::get('/perhitungan', [SMARTERController::class, 'indexPerhitungan'])->name('perhitungan');
-        Route::post('/perhitungan', [SMARTERController::class, 'perhitunganMetode'])->name('perhitungan.smart');
+        // Route untuk hasil perhitungan detail (new)
+        Route::get('/hasil-perhitungan', [SMARTERController::class, 'hasilPerhitungan'])->name('hasil-perhitungan');
 
+        // Route untuk PDF hasil akhir
         Route::get('/pdf-hasil-akhir', [PDFController::class, 'pdf_hasil'])->name('pdf.hasilAkhir');
     });
 });

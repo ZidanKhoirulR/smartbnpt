@@ -16,6 +16,74 @@ use App\Models\Penilaian;
 
 class SMARTERController extends Controller
 {
+    /**
+     * Tampilan halaman perhitungan SMARTER-ROC
+     */
+    public function indexPerhitungan()
+    {
+        $title = "Perhitungan SMARTER-ROC";
+
+        // Data untuk normalisasi bobot ROC
+        $normalisasiBobot = NormalisasiBobotResource::collection(
+            NormalisasiBobot::with('kriteria')->orderBy('kriteria_id', 'asc')->get()
+        );
+
+        // Data kriteria dan alternatif
+        $kriteria = KriteriaResource::collection(Kriteria::orderBy('ranking', 'asc')->get());
+        $alternatif = AlternatifResource::collection(Alternatif::orderBy('kode', 'asc')->get());
+
+        // Data nilai utility
+        $nilaiUtility = NilaiUtilityResource::collection(
+            NilaiUtility::orderBy('alternatif_id', 'asc')->orderBy('kriteria_id', 'asc')->get()
+        );
+
+        // Data nilai akhir
+        $nilaiAkhir = NilaiAkhirResource::collection(
+            NilaiAkhir::orderBy('alternatif_id', 'asc')->orderBy('kriteria_id', 'asc')->get()
+        );
+
+        // Sum bobot kriteria untuk validasi
+        $sumBobotKriteria = $kriteria->sum('bobot');
+
+        return view('dashboard.perhitungan.index', compact(
+            'title',
+            'normalisasiBobot',
+            'kriteria',
+            'alternatif',
+            'nilaiUtility',
+            'nilaiAkhir',
+            'sumBobotKriteria'
+        ));
+    }
+
+    /**
+     * Perhitungan lengkap SMARTER-ROC
+     */
+    public function perhitunganSMARTER()
+    {
+        try {
+            // 1. Hitung normalisasi bobot ROC
+            $this->perhitunganNormalisasiBobot();
+
+            // 2. Hitung nilai utility
+            $this->perhitunganNilaiUtility();
+
+            // 3. Hitung nilai akhir
+            $this->perhitunganNilaiAkhir();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Perhitungan SMARTER-ROC berhasil dilakukan'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Perhitungan gagal: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function indexNormalisasiBobot()
     {
         $title = "Normalisasi Bobot SMARTER - ROC";
@@ -202,12 +270,12 @@ class SMARTERController extends Controller
         $title = "Hasil Perhitungan SMARTER-ROC";
 
         // Data untuk tabel perhitungan ROC
-        $kriteria = Kriteria::orderBy('bobot', 'desc')->get();
+        $kriteria = Kriteria::orderBy('ranking', 'asc')->get();
         $K = count($kriteria);
         $hasilROC = [];
 
-        foreach ($kriteria as $index => $item) {
-            $rank = $index + 1;
+        foreach ($kriteria as $item) {
+            $rank = $item->ranking ?? 1;
             $sum = 0;
             $rumusPenjumlahan = [];
 
