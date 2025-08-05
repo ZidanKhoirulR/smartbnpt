@@ -51,7 +51,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [SubKriteriaController::class, 'index'])->name('sub-kriteria');
         Route::post('/simpan', [SubKriteriaController::class, 'store'])->name('sub-kriteria.store');
         Route::get('/ubah', [SubKriteriaController::class, 'edit'])->name('sub-kriteria.edit');
-        Route::put('/ubah', [SubKriteriaController::class, 'update'])->name('sub-kriteria.update');
+        Route::post('/ubah', [SubKriteriaController::class, 'update'])->name('sub-kriteria.update');
         Route::post('/hapus', [SubKriteriaController::class, 'delete'])->name('sub-kriteria.delete');
         Route::post('/impor', [SubKriteriaController::class, 'import'])->name('sub-kriteria.import');
         // Tambahan route untuk template download
