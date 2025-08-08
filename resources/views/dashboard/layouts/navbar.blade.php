@@ -23,10 +23,6 @@
                 <div>
                     <div class="flex items-center space-x-2">
                         <span class="text-sm font-bold text-slate-800">Sistem Pendukung Keputusan</span>
-                        <div class="px-2 py-1 rounded-full text-xs font-semibold text-white"
-                            style="background: linear-gradient(135deg, #10b981, #059669);">
-                            ACTIVE
-                        </div>
                     </div>
                     <p class="text-xs font-medium" style="color: #8b5cf6;">
                         SMARTER-ROC Management Panel
@@ -62,50 +58,12 @@
 
             <!-- Enhanced User profile -->
             @if(auth()->check())
-                <div class="flex items-center space-x-3 px-5 py-3 rounded-2xl shadow-lg border-0 transition-all duration-200 hover:shadow-xl"
-                    style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); 
-                                    border: 1px solid rgba(99, 102, 241, 0.2);
-                                    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.1);">
-
-                    <!-- Enhanced Avatar -->
-                    <div class="relative">
-                        <div class="w-11 h-11 rounded-2xl flex items-center justify-center shadow-md"
-                            style="background: linear-gradient(135deg, #6366f1, #4f46e5);">
-                            <span class="text-white text-sm font-bold">
-                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                            </span>
-                        </div>
-                        <!-- Status indicator -->
-                        <div class="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-white"
-                            style="background: linear-gradient(135deg, #10b981, #059669);"></div>
-                    </div>
-
-                    <!-- Enhanced User Info -->
-                    <div class="hidden sm:block">
-                        <div class="flex items-center space-x-2">
-                            <p class="text-sm font-bold text-slate-800">{{ auth()->user()->name }}</p>
-                            <div class="px-2 py-0.5 rounded-full text-xs font-semibold text-white"
-                                style="background: linear-gradient(135deg, #8b5cf6, #a855f7);">
-                                ADMIN
-                            </div>
-                        </div>
-                        <p class="text-xs font-medium text-blue-600">System Administrator</p>
-                    </div>
-                </div>
+                <!-- User profile section removed -->
             @endif
 
             <!-- Enhanced Guest Login -->
             @guest
-                <a href="{{ route('login') }}"
-                    class="flex items-center space-x-3 px-5 py-3 rounded-2xl transition-all duration-200 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:scale-105 border-0 text-white"
-                    style="background: linear-gradient(135deg, #6366f1, #4f46e5); 
-                                  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                    </svg>
-                    <span>Sign In</span>
-                </a>
+                <!-- Sign in button removed -->
             @endguest
         </div>
     </div>
