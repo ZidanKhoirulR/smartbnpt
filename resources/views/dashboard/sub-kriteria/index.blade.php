@@ -32,7 +32,7 @@
             });
 
             // Auto-calculate weight info on modal open
-            $('body').on('change', '#create_sub_kriteria, #edit_sub_kriteria', function () {
+            $('#create_sub_kriteria, #edit_sub_kriteria').on('change', function () {
                 if ($(this).is(':checked')) {
                     setTimeout(() => {
                         updateWeightInfo();
@@ -66,24 +66,21 @@
                 type: "GET",
                 url: "{{ route('sub-kriteria.edit') }}",
                 data: {
-                    "id": id
+                    "sub_kriteria_id": id  // Fix parameter name
                 },
                 timeout: 10000, // 10 second timeout
                 success: function (response) {
                     console.log('Response:', response); // Debug log
 
-                    // Check if response has the expected structure
-                    let data = response.data ? response.data : response;
-
-                    // Populate form - pastikan selector tepat untuk modal edit
-                    $("#edit_sub_kriteria_form input[name='id']").val(data.id);
-                    $("#edit_sub_kriteria_form input[name='kriteria_id']").val(data.kriteria_id);
-                    $("#edit_sub_kriteria_form input[name='kriteria_nama']").val(data.kriteria ? data.kriteria.kriteria : data.kriteria_nama);
-                    $("#edit_sub_kriteria_form input[name='sub_kriteria']").val(data.sub_kriteria);
-                    $("#edit_sub_kriteria_form input[name='bobot']").val(data.bobot);
+                    // Populate form - fix selector untuk modal edit
+                    $("#edit_sub_kriteria_form input[name='id']").val(response.id);
+                    $("#edit_sub_kriteria_form input[name='kriteria_id']").val(response.kriteria_id);
+                    $("#edit_sub_kriteria_form input[name='kriteria_nama']").val(response.kriteria ? response.kriteria.kriteria : '');
+                    $("#edit_sub_kriteria_form input[name='sub_kriteria']").val(response.sub_kriteria);
+                    $("#edit_sub_kriteria_form input[name='bobot']").val(response.bobot);
 
                     // Simpan bobot asli untuk perhitungan weight info
-                    $("#edit_sub_kriteria_form input[name='bobot']").data('original', data.bobot);
+                    $("#edit_sub_kriteria_form input[name='bobot']").data('original', response.bobot);
 
                     // Hide loading
                     hideLoadingState();
@@ -138,7 +135,7 @@
                         url: "{{ route('sub-kriteria.delete') }}",
                         data: {
                             "_token": "{{ csrf_token() }}",
-                            "id": id
+                            "sub_kriteria_id": id  // Fix parameter name
                         },
                         success: function (response) {
                             Swal.fire({
@@ -274,10 +271,10 @@
                         @foreach($subKriteria->where('kriteria_id', $kri->id) as $sub)
                             total += {{ $sub->bobot }};
                         @endforeach
-                                                                        }
+                    }
                 @endif
             @endforeach
-                                return total;
+            return total;
         }
 
         function updateWeightInfo() {
@@ -332,13 +329,13 @@
             }
 
             const weightInfoHtml = `
-                                    <div class="label weight-info">
-                                        <span class="label-text-alt text-xs ${colorClass}">
-                                            <i class="${icon} mr-1"></i>
-                                            Terpakai: ${used.toFixed(1)}% | Sisa: ${remaining.toFixed(1)}%
-                                        </span>
-                                    </div>
-                                `;
+                <div class="label weight-info">
+                    <span class="label-text-alt text-xs ${colorClass}">
+                        <i class="${icon} mr-1"></i>
+                        Terpakai: ${used.toFixed(1)}% | Sisa: ${remaining.toFixed(1)}%
+                    </span>
+                </div>
+            `;
 
             $bobotControl.append(weightInfoHtml);
         }
@@ -353,12 +350,12 @@
 
             // Add error message
             const errorHtml = `
-                                    <div class="label validation-message">
-                                        <span class="label-text-alt text-sm text-red-500">
-                                            <i class="ri-error-warning-line mr-1"></i>${message}
-                                        </span>
-                                    </div>
-                                `;
+                <div class="label validation-message">
+                    <span class="label-text-alt text-sm text-red-500">
+                        <i class="ri-error-warning-line mr-1"></i>${message}
+                    </span>
+                </div>
+            `;
             $formControl.append(errorHtml);
         }
 
@@ -392,11 +389,11 @@
             const toast = document.createElement('div');
             toast.className = `alert alert-${type} fixed top-4 right-4 w-auto z-50 shadow-lg`;
             toast.innerHTML = `
-                                    <div class="flex items-center gap-2">
-                                        <i class="ri-${type === 'error' ? 'error-warning' : 'information'}-line"></i>
-                                        <span>${message}</span>
-                                    </div>
-                                `;
+                <div class="flex items-center gap-2">
+                    <i class="ri-${type === 'error' ? 'error-warning' : 'information'}-line"></i>
+                    <span>${message}</span>
+                </div>
+            `;
 
             document.body.appendChild(toast);
 
@@ -439,6 +436,7 @@
                 $submitBtn.html(originalText).prop('disabled', false);
             }, 3000);
         });
+
         // Import button function placeholder
         function import_button() {
             showNotification('Fitur import belum tersedia', 'info');
@@ -446,95 +444,96 @@
     </script>
 @endsection
 
-@section("css")<style>
-        .table-container {
-            border-collapse: separate;
-            border-spacing: 0;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
+@section("css")
+<style>
+    .table-container {
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
 
-        .table-container thead th:first-child {
-            border-top-left-radius: 12px;
-        }
+    .table-container thead th:first-child {
+        border-top-left-radius: 12px;
+    }
 
-        .table-container thead th:last-child {
-            border-top-right-radius: 12px;
-        }
+    .table-container thead th:last-child {
+        border-top-right-radius: 12px;
+    }
 
-        .table-container tbody tr:hover {
-            background-color: #f8fafc;
-            transform: scale(1.01);
-            transition: all 0.2s ease;
-        }
+    .table-container tbody tr:hover {
+        background-color: #f8fafc;
+        transform: scale(1.01);
+        transition: all 0.2s ease;
+    }
 
-        /* ALIGNMENT FIXES - Pastikan semua sel rata tengah dengan padding yang lebih kecil */
-        .table-container td,
-        .table-container th {
-            text-align: center !important;
-            vertical-align: middle !important;
-            min-height: 50px;
-            padding: 12px 8px !important;
-        }
+    /* ALIGNMENT FIXES - Pastikan semua sel rata tengah dengan padding yang lebih kecil */
+    .table-container td,
+    .table-container th {
+        text-align: center !important;
+        vertical-align: middle !important;
+        min-height: 50px;
+        padding: 12px 8px !important;
+    }
 
-        /* Semua kolom rata tengah */
-        .table-container td>div {
-            display: block !important;
-            width: 100%;
-            text-align: center !important;
-        }
+    /* Semua kolom rata tengah */
+    .table-container td>div {
+        display: block !important;
+        width: 100%;
+        text-align: center !important;
+    }
 
-        /* Pastikan paragraf dalam sel juga mengikuti alignment */
-        .table-container td p,
-        .table-container th p {
-            margin: 0 !important;
-            padding: 0 !important;
-            text-align: center !important;
-            width: 100%;
-        }
+    /* Pastikan paragraf dalam sel juga mengikuti alignment */
+    .table-container td p,
+    .table-container th p {
+        margin: 0 !important;
+        padding: 0 !important;
+        text-align: center !important;
+        width: 100%;
+    }
 
-        /* Pastikan span badge center */
-        .table-container td span {
-            display: inline-block;
-            text-align: center;
-        }
+    /* Pastikan span badge center */
+    .table-container td span {
+        display: inline-block;
+        text-align: center;
+    }
 
-        /* Pastikan button actions center */
-        .table-container td:last-child>div {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+    /* Pastikan button actions center */
+    .table-container td:last-child>div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
 
-        /* Pastikan semua header rata tengah dengan force dan padding konsisten */
-        .table-container thead th {
-            text-align: center !important;
-            vertical-align: middle !important;
-            padding: 12px 8px !important;
-        }
+    /* Pastikan semua header rata tengah dengan force dan padding konsisten */
+    .table-container thead th {
+        text-align: center !important;
+        vertical-align: middle !important;
+        padding: 12px 8px !important;
+    }
 
-        /* Pastikan semua teks dalam header rata tengah */
-        .table-container thead th * {
-            text-align: center !important;
-        }
+    /* Pastikan semua teks dalam header rata tengah */
+    .table-container thead th * {
+        text-align: center !important;
+    }
 
-        /* Footer alignment */
-        .table-container tfoot td {
-            vertical-align: middle !important;
-        }
+    /* Footer alignment */
+    .table-container tfoot td {
+        vertical-align: middle !important;
+    }
 
-        /* Total Bobot text alignment */
-        .table-container tfoot td[colspan] {
-            text-align: right !important;
-        }
+    /* Total Bobot text alignment */
+    .table-container tfoot td[colspan] {
+        text-align: right !important;
+    }
 
-        /* Nilai total bobot alignment */
-        .table-container tfoot td.total-value {
-            text-align: center !important;
-        }
-    </style>
+    /* Nilai total bobot alignment */
+    .table-container tfoot td.total-value {
+        text-align: center !important;
+    }
+</style>
 @endsection
 
 @section("container")
@@ -857,4 +856,4 @@
             @endforeach
         </div>
     </div>
-@endsection>
+@endsection
