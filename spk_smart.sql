@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 04, 2025 at 12:52 PM
+-- Generation Time: Aug 08, 2025 at 02:31 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -42,7 +42,7 @@ CREATE TABLE `alternatif` (
 --
 
 INSERT INTO `alternatif` (`id`, `kode`, `nik`, `alternatif`, `keterangan`, `created_at`, `updated_at`) VALUES
-(6, 'A00001', '3201234567890006', 'Keluarga Pak Andi', NULL, '2025-07-30 04:11:21', '2025-08-02 08:46:14'),
+(6, 'A00001', '3201234567890006', 'Keluarga Pak Andin', NULL, '2025-07-30 04:11:21', '2025-08-05 10:15:45'),
 (7, 'A00002', '3201234567890007', 'Keluarga Pak Budi', NULL, '2025-07-30 04:11:36', '2025-07-30 04:19:48'),
 (8, 'A00003', '3201234567890008', 'Keluarga Bu Citra', NULL, '2025-07-30 04:11:55', '2025-07-30 04:20:07');
 
@@ -57,16 +57,6 @@ CREATE TABLE `cache` (
   `value` mediumtext NOT NULL,
   `expiration` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `cache`
---
-
-INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
-('admin@bpnt.go.id|127.0.0.1', 'i:1;', 1754165542),
-('admin@bpnt.go.id|127.0.0.1:timer', 'i:1754165542;', 1754165542),
-('manda@gmail.com|127.0.0.1', 'i:1;', 1753898423),
-('manda@gmail.com|127.0.0.1:timer', 'i:1753898423;', 1753898423);
 
 -- --------------------------------------------------------
 
@@ -142,6 +132,7 @@ CREATE TABLE `kriteria` (
   `kode` varchar(10) NOT NULL,
   `kriteria` varchar(50) NOT NULL,
   `bobot` decimal(8,2) NOT NULL,
+  `ranking` int(11) DEFAULT NULL,
   `jenis_kriteria` enum('cost','benefit') NOT NULL DEFAULT 'benefit',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -151,11 +142,12 @@ CREATE TABLE `kriteria` (
 -- Dumping data for table `kriteria`
 --
 
-INSERT INTO `kriteria` (`id`, `kode`, `kriteria`, `bobot`, `jenis_kriteria`, `created_at`, `updated_at`) VALUES
-(1, 'K00001', 'Pendapatan', 40.00, 'cost', '2025-07-27 04:21:07', '2025-08-02 13:47:41'),
-(2, 'K00002', 'Jumlah Tanggungan', 30.00, 'benefit', '2025-07-27 04:21:07', '2025-07-30 04:04:31'),
-(3, 'K00003', 'Kondisi Rumah', 20.00, 'benefit', '2025-07-27 04:21:07', '2025-07-30 04:04:47'),
-(5, 'K00005', 'Status Kepemilikan Rumah', 10.00, 'benefit', '2025-07-27 04:21:07', '2025-07-30 04:05:34');
+INSERT INTO `kriteria` (`id`, `kode`, `kriteria`, `bobot`, `ranking`, `jenis_kriteria`, `created_at`, `updated_at`) VALUES
+(7, 'K00001', 'Pendapatan per Bulan', 30.00, 1, 'cost', '2025-08-04 11:11:39', '2025-08-04 11:17:56'),
+(8, 'K00002', 'Jumlah Tanggungan', 25.00, 2, 'benefit', '2025-08-04 11:12:09', '2025-08-04 11:17:38'),
+(9, 'K00003', 'Kondisi', 15.00, 4, 'cost', '2025-08-04 11:12:37', '2025-08-04 11:17:38'),
+(10, 'K00004', 'Kepemilikan Aset', 20.00, 3, 'cost', '2025-08-04 11:13:49', '2025-08-04 11:17:38'),
+(11, 'K00005', 'Pekerjaan', 10.00, 5, 'cost', '2025-08-04 11:16:52', '2025-08-04 11:17:38');
 
 -- --------------------------------------------------------
 
@@ -183,7 +175,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (7, '2025_01_20_160500_create_penilaians_table', 1),
 (8, '2025_01_22_125314_create_normalisasi_bobots_table', 1),
 (9, '2025_01_22_125339_create_nilai_utilities_table', 1),
-(11, '2025_01_22_125659_create_nilai_akhirs_table', 2);
+(11, '2025_01_22_125659_create_nilai_akhirs_table', 2),
+(12, '2025_08_02_144659_add_nik_to_alternatif_table', 3),
+(13, '2025_08_04_000001_add_ranking_to_kriteria_table', 3);
 
 -- --------------------------------------------------------
 
@@ -215,24 +209,6 @@ CREATE TABLE `nilai_utility` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `nilai_utility`
---
-
-INSERT INTO `nilai_utility` (`id`, `alternatif_id`, `kriteria_id`, `nilai`, `created_at`, `updated_at`) VALUES
-(1, 6, 1, 1.0000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(2, 6, 2, 10.0000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(3, 6, 3, 10.0000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(4, 6, 5, 5.5000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(5, 7, 1, 10.0000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(6, 7, 2, 1.0000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(7, 7, 3, 1.0000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(8, 7, 5, 1.0000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(9, 8, 1, 5.5000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(10, 8, 2, 5.5000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(11, 8, 3, 1.0000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(12, 8, 5, 10.0000, '2025-07-30 04:25:01', '2025-07-30 04:25:01');
-
 -- --------------------------------------------------------
 
 --
@@ -252,10 +228,11 @@ CREATE TABLE `normalisasi_bobot` (
 --
 
 INSERT INTO `normalisasi_bobot` (`id`, `kriteria_id`, `normalisasi`, `created_at`, `updated_at`) VALUES
-(1, 1, 0.4000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(2, 2, 0.3000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(3, 3, 0.2000, '2025-07-30 04:25:01', '2025-07-30 04:25:01'),
-(4, 5, 0.1000, '2025-07-30 04:25:01', '2025-07-30 04:25:01');
+(1, 7, 0.4567, '2025-08-05 08:26:06', '2025-08-05 08:26:06'),
+(2, 8, 0.2567, '2025-08-05 08:26:06', '2025-08-05 08:26:06'),
+(3, 10, 0.1567, '2025-08-05 08:26:06', '2025-08-05 08:26:06'),
+(4, 9, 0.0900, '2025-08-05 08:26:06', '2025-08-05 08:26:06'),
+(5, 11, 0.0400, '2025-08-05 08:26:06', '2025-08-05 08:26:06');
 
 -- --------------------------------------------------------
 
@@ -289,18 +266,21 @@ CREATE TABLE `penilaian` (
 --
 
 INSERT INTO `penilaian` (`id`, `alternatif_id`, `kriteria_id`, `sub_kriteria_id`, `created_at`, `updated_at`) VALUES
-(26, 6, 1, 4, '2025-07-30 04:11:21', '2025-07-30 04:22:29'),
-(27, 6, 2, 8, '2025-07-30 04:11:21', '2025-07-30 04:22:29'),
-(28, 6, 3, 14, '2025-07-30 04:11:21', '2025-07-30 04:22:29'),
-(29, 6, 5, 22, '2025-07-30 04:11:21', '2025-07-30 04:22:29'),
-(30, 7, 1, 5, '2025-07-30 04:11:36', '2025-07-30 04:24:27'),
-(31, 7, 2, 10, '2025-07-30 04:11:36', '2025-07-30 04:24:27'),
-(32, 7, 3, 15, '2025-07-30 04:11:36', '2025-07-30 04:24:27'),
-(33, 7, 5, 25, '2025-07-30 04:11:36', '2025-07-30 04:24:27'),
-(34, 8, 1, 1, '2025-07-30 04:11:55', '2025-07-30 04:15:57'),
-(35, 8, 2, 9, '2025-07-30 04:11:55', '2025-07-30 04:15:57'),
-(36, 8, 3, 15, '2025-07-30 04:11:55', '2025-07-30 04:15:57'),
-(37, 8, 5, 24, '2025-07-30 04:11:55', '2025-07-30 04:15:57');
+(41, 6, 7, NULL, '2025-08-04 11:11:39', '2025-08-04 11:11:39'),
+(42, 7, 7, NULL, '2025-08-04 11:11:39', '2025-08-04 11:11:39'),
+(43, 8, 7, NULL, '2025-08-04 11:11:39', '2025-08-04 11:11:39'),
+(44, 6, 8, NULL, '2025-08-04 11:12:09', '2025-08-04 11:12:09'),
+(45, 7, 8, NULL, '2025-08-04 11:12:09', '2025-08-04 11:12:09'),
+(46, 8, 8, NULL, '2025-08-04 11:12:09', '2025-08-04 11:12:09'),
+(47, 6, 9, NULL, '2025-08-04 11:12:37', '2025-08-04 11:12:37'),
+(48, 7, 9, NULL, '2025-08-04 11:12:37', '2025-08-04 11:12:37'),
+(49, 8, 9, NULL, '2025-08-04 11:12:37', '2025-08-04 11:12:37'),
+(50, 6, 10, NULL, '2025-08-04 11:13:49', '2025-08-04 11:13:49'),
+(51, 7, 10, NULL, '2025-08-04 11:13:49', '2025-08-04 11:13:49'),
+(52, 8, 10, NULL, '2025-08-04 11:13:49', '2025-08-04 11:13:49'),
+(53, 6, 11, NULL, '2025-08-04 11:16:52', '2025-08-04 11:16:52'),
+(54, 7, 11, NULL, '2025-08-04 11:16:52', '2025-08-04 11:16:52'),
+(55, 8, 11, NULL, '2025-08-04 11:16:52', '2025-08-04 11:16:52');
 
 -- --------------------------------------------------------
 
@@ -322,8 +302,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('CnJVSu9MhDTkne7gPC86iYOasOn1pBlH8cUjzgPw', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiVnNCUkZtd2F2RVE1Vm9oMDNQWk9xcHV6MnFYNmdsMktNOG9sWVp5ZSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9kYXNoYm9hcmQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1754168175),
-('J91HxbEHloXXJuMgNXYPosOwVEmJKmVL3ZxUlALs', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiMlZKNWtSRVpGeHJ2WjA4ejI4aVpLaDdnSmZtWVFGZlI0Q2tmUjBvNSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9kYXNoYm9hcmQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1754167159);
+('yjjFucXzXCyIadbjyLmb1dWfNlMJwQnHsYfJdCZu', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiQXdNUnlBbGR6SWR0c2czemJ4dXFkM2VvV0hqaDRwY3VOa0VUZUJQMiI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjMwOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAva3JpdGVyaWEiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1754656238);
 
 -- --------------------------------------------------------
 
@@ -345,22 +324,11 @@ CREATE TABLE `sub_kriteria` (
 --
 
 INSERT INTO `sub_kriteria` (`id`, `sub_kriteria`, `bobot`, `kriteria_id`, `created_at`, `updated_at`) VALUES
-(1, 'Rp 1.000.000 - Rp 1.500.000', 3.00, 1, '2025-07-27 04:21:07', '2025-07-29 23:44:45'),
-(2, '> Rp 2.000.000', 1.00, 1, '2025-07-27 04:21:07', '2025-07-29 23:45:49'),
-(3, '< Rp 500.000', 5.00, 1, '2025-07-27 04:21:07', '2025-07-29 23:46:16'),
-(4, 'Rp 500.000 - Rp 1.000.000', 4.00, 1, '2025-07-27 04:21:07', '2025-07-29 23:44:12'),
-(5, 'Rp 1.500.000 - Rp 2.000.000', 2.00, 1, '2025-07-27 04:21:07', '2025-07-29 23:45:10'),
-(6, '1-2 orang', 1.00, 2, '2025-07-27 04:21:07', '2025-07-29 23:46:36'),
-(7, '3-4 orang', 2.00, 2, '2025-07-27 04:21:07', '2025-07-29 23:47:05'),
-(8, '> 8 orang', 5.00, 2, '2025-07-27 04:21:07', '2025-07-29 23:47:56'),
-(9, '7-8 orang', 4.00, 2, '2025-07-27 04:21:07', '2025-07-29 23:47:40'),
-(10, '5-6 orang', 3.00, 2, '2025-07-27 04:21:07', '2025-07-29 23:47:25'),
-(11, 'Sangat Layak', 1.00, 3, '2025-07-27 04:21:07', '2025-07-29 23:48:20'),
-(14, 'Tidak Layak', 5.00, 3, '2025-07-27 04:21:07', '2025-07-29 23:49:35'),
-(15, 'Cukup Layak', 3.00, 3, '2025-07-27 04:21:07', '2025-07-29 23:48:53'),
-(22, 'Kontrak', 3.00, 5, '2025-07-27 04:21:07', '2025-07-30 04:08:01'),
-(24, 'Menumpang', 5.00, 5, '2025-07-27 04:21:07', '2025-07-30 04:07:49'),
-(25, 'Milik Sendiri', 1.00, 5, '2025-07-27 04:21:07', '2025-07-30 04:08:13');
+(26, '500.000', 20.00, 7, '2025-08-04 14:09:55', '2025-08-04 14:09:55'),
+(27, '>8 orang', 50.00, 8, '2025-08-04 14:11:21', '2025-08-04 14:11:21'),
+(28, 'Rp 500.000 - Rp 1.000.000', 20.00, 7, '2025-08-04 14:38:01', '2025-08-04 14:38:01'),
+(29, '2.000.000', 20.00, 7, '2025-08-05 09:30:34', '2025-08-05 09:30:34'),
+(30, '5-9 orang', 30.00, 8, '2025-08-05 09:53:51', '2025-08-05 09:53:51');
 
 -- --------------------------------------------------------
 
@@ -384,7 +352,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Admin Linjamsos', 'admin@gmail.com', '2025-07-27 04:21:08', '$2y$12$HbFeH3EW/T2.yyBGhiBWLuwimmfY.exuQr9iLyhK8tx1y4rFcyyJ6', '3mnpjCqNu0aNbTYYJSmpxSKtcYAybk4KZu6UvHGOHzs0lJuEDZhQsuAICTnm', '2025-07-27 04:21:09', '2025-07-27 04:21:09');
+(1, 'Admin Linjamsos', 'admin@gmail.com', '2025-07-27 04:21:08', '$2y$12$HbFeH3EW/T2.yyBGhiBWLuwimmfY.exuQr9iLyhK8tx1y4rFcyyJ6', '6ngcdh1mw3a2yWfJdDIyR8rsF71rYnePj49D5ADFjiccToDVSnxn7iJRMI5l', '2025-07-27 04:21:09', '2025-07-27 04:21:09');
 
 --
 -- Indexes for dumped tables
@@ -435,7 +403,8 @@ ALTER TABLE `job_batches`
 --
 ALTER TABLE `kriteria`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `kriteria_kode_unique` (`kode`);
+  ADD UNIQUE KEY `kriteria_kode_unique` (`kode`),
+  ADD KEY `kriteria_ranking_index` (`ranking`);
 
 --
 -- Indexes for table `migrations`
@@ -529,13 +498,13 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `kriteria`
 --
 ALTER TABLE `kriteria`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `nilai_akhir`
@@ -547,25 +516,25 @@ ALTER TABLE `nilai_akhir`
 -- AUTO_INCREMENT for table `nilai_utility`
 --
 ALTER TABLE `nilai_utility`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `normalisasi_bobot`
 --
 ALTER TABLE `normalisasi_bobot`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `penilaian`
 --
 ALTER TABLE `penilaian`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `sub_kriteria`
 --
 ALTER TABLE `sub_kriteria`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `users`
