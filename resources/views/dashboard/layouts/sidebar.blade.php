@@ -222,7 +222,22 @@
                     onmouseover="{{ $isPerhitunganActive ? '' : 'this.style.backgroundColor=\"rgba(55, 65, 81, 0.5)\"; this.style.color=\"#f472b6\"; this.style.transform=\"scale(1.01)\";' }}"
                     onmouseout="{{ $isPerhitunganActive ? '' : 'this.style.backgroundColor=\"transparent\"; this.style.color=\"rgba(209, 213, 219, 1)\"; this.style.transform=\"scale(1)\";' }}">
 
-                    <!-- Hasil Akhir -->
+                    <div class="flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-200"
+                        style="{{ $isPerhitunganActive ? 'background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px);' : 'background: rgba(225, 29, 72, 0.15); color: #f472b6;' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <span class="font-semibold"
+                        style="font-family: 'Inter', sans-serif; letter-spacing: 0.02em;">Perhitungan</span>
+                    @if($isPerhitunganActive)
+                        <div class="ml-auto w-2 h-2 bg-white rounded-full"
+                            style="box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);"></div>
+                    @endif
+                </a>
+            </li>
+            <!-- Hasil Akhir -->
             <li>
                 @php
                     $isHasilAkhirActive = Request::is('hasil-akhir*') || Request::routeIs('hasil-akhir*') || str_contains(Request::path(), 'hasil-akhir') || str_contains(Request::url(), 'hasil-akhir');
@@ -267,45 +282,43 @@
 
             <!-- Logout -->
             <li>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit"
-                        class="w-full group relative flex items-center space-x-3 px-4 py-4 rounded-xl transition-all duration-200"
-                        style="color: rgba(209, 213, 219, 1);"
-                        onmouseover="this.style.backgroundColor='rgba(239, 68, 68, 0.1)'; this.style.color='#f87171';"
-                        onmouseout="this.style.backgroundColor='transparent'; this.style.color='rgba(209, 213, 219, 1)';">
+                <a class="group relative flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer"
+                    style="color: rgba(209, 213, 219, 1); margin-top: -4px;"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
 
-                        <div class="flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-200"
-                            style="background: rgba(239, 68, 68, 0.15); color: #f87171;">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                            </svg>
-                        </div>
-                        <span class="font-semibold text-left"
-                            style="font-family: 'Inter', sans-serif; letter-spacing: 0.02em;">Logout</span>
-                    </button>
+                    <div class="flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-200"
+                        style="background: rgba(239, 68, 68, 0.15); color: #f87171;">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                    </div>
+                    <span class="font-semibold"
+                        style="font-family: 'Inter', sans-serif; letter-spacing: 0.02em;">Logout</span>
+                </a>
+                <form id="logout-form" method="POST" action="{{ route('logout') }}" style="display: none;">
+                    @csrf
                 </form>
             </li>
-        </ul>
-    </div>
 
-    <!-- Footer -->
-    <div class="px-6 py-4 border-t" style="border-color: rgba(75, 85, 99, 0.5);">
-        <div class="flex items-center justify-center space-x-3 text-xs">
-            <div class="flex items-center space-x-2">
-                <div class="relative">
-                    <div class="w-2 h-2 rounded-full" style="background-color: #10b981;"></div>
-                    <div class="absolute inset-0 w-2 h-2 rounded-full animate-ping opacity-75"
-                        style="background-color: #10b981;"></div>
+            <!-- Footer -->
+            <div class="px-6 py-3 border-t" style="border-color: rgba(75, 85, 99, 0.5);">
+                <div class="flex items-center justify-center space-x-3 text-xs">
+                    <div class="flex items-center space-x-2">
+                        <div class="relative">
+                            <div class="w-2 h-2 rounded-full" style="background-color: #10b981;"></div>
+                            <div class="absolute inset-0 w-2 h-2 rounded-full animate-ping opacity-75"
+                                style="background-color: #10b981;"></div>
+                        </div>
+                        <span class="font-semibold"
+                            style="color: rgba(209, 213, 219, 1); font-family: 'Inter', sans-serif;">System
+                            Online</span>
+                    </div>
                 </div>
-                <span class="font-semibold"
-                    style="color: rgba(209, 213, 219, 1); font-family: 'Inter', sans-serif;">System Online</span>
+                <div class="mt-2 text-center">
+                    <p class="text-xs" style="color: rgba(107, 114, 128, 1); font-family: 'Inter', sans-serif;">Version
+                        2.1.0
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class="mt-2 text-center">
-            <p class="text-xs" style="color: rgba(107, 114, 128, 1); font-family: 'Inter', sans-serif;">Version 2.1.0
-            </p>
-        </div>
-    </div>
 </aside>
