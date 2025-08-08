@@ -274,10 +274,10 @@
                         @foreach($subKriteria->where('kriteria_id', $kri->id) as $sub)
                             total += {{ $sub->bobot }};
                         @endforeach
-                                    }
+                                                }
                 @endif
             @endforeach
-                    return total;
+                        return total;
         }
 
         function updateWeightInfo() {
@@ -332,13 +332,13 @@
             }
 
             const weightInfoHtml = `
-                        <div class="label weight-info">
-                            <span class="label-text-alt text-xs ${colorClass}">
-                                <i class="${icon} mr-1"></i>
-                                Terpakai: ${used.toFixed(1)}% | Sisa: ${remaining.toFixed(1)}%
-                            </span>
-                        </div>
-                    `;
+                            <div class="label weight-info">
+                                <span class="label-text-alt text-xs ${colorClass}">
+                                    <i class="${icon} mr-1"></i>
+                                    Terpakai: ${used.toFixed(1)}% | Sisa: ${remaining.toFixed(1)}%
+                                </span>
+                            </div>
+                        `;
 
             $bobotControl.append(weightInfoHtml);
         }
@@ -353,12 +353,12 @@
 
             // Add error message
             const errorHtml = `
-                        <div class="label validation-message">
-                            <span class="label-text-alt text-sm text-red-500">
-                                <i class="ri-error-warning-line mr-1"></i>${message}
-                            </span>
-                        </div>
-                    `;
+                            <div class="label validation-message">
+                                <span class="label-text-alt text-sm text-red-500">
+                                    <i class="ri-error-warning-line mr-1"></i>${message}
+                                </span>
+                            </div>
+                        `;
             $formControl.append(errorHtml);
         }
 
@@ -392,11 +392,11 @@
             const toast = document.createElement('div');
             toast.className = `alert alert-${type} fixed top-4 right-4 w-auto z-50 shadow-lg`;
             toast.innerHTML = `
-                        <div class="flex items-center gap-2">
-                            <i class="ri-${type === 'error' ? 'error-warning' : 'information'}-line"></i>
-                            <span>${message}</span>
-                        </div>
-                    `;
+                            <div class="flex items-center gap-2">
+                                <i class="ri-${type === 'error' ? 'error-warning' : 'information'}-line"></i>
+                                <span>${message}</span>
+                            </div>
+                        `;
 
             document.body.appendChild(toast);
 
@@ -439,19 +439,111 @@
                 $submitBtn.html(originalText).prop('disabled', false);
             }, 3000);
         });
-    // Import button function placeholder
-                function import_button() {
-                    showNotification('Fitur import belum tersedia', 'info');
-                }
-            </script>
+        // Import button function placeholder
+        function import_button() {
+            showNotification('Fitur import belum tersedia', 'info');
+        }
+    </script>
+@endsection
+
+@section("css")<style>
+        .table-container {
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-container thead th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        .table-container thead th:last-child {
+            border-top-right-radius: 12px;
+        }
+
+        .table-container tbody tr:hover {
+            background-color: #f8fafc;
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+        }
+
+        /* ALIGNMENT FIXES - Pastikan semua sel rata tengah dengan padding yang lebih kecil */
+        .table-container td,
+        .table-container th {
+            text-align: center !important;
+            vertical-align: middle !important;
+            min-height: 50px;
+            padding: 12px 8px !important;
+        }
+
+        /* Semua kolom rata tengah */
+        .table-container td>div {
+            display: block !important;
+            width: 100%;
+            text-align: center !important;
+        }
+
+        /* Pastikan paragraf dalam sel juga mengikuti alignment */
+        .table-container td p,
+        .table-container th p {
+            margin: 0 !important;
+            padding: 0 !important;
+            text-align: center !important;
+            width: 100%;
+        }
+
+        /* Pastikan span badge center */
+        .table-container td span {
+            display: inline-block;
+            text-align: center;
+        }
+
+        /* Pastikan button actions center */
+        .table-container td:last-child>div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* Pastikan semua header rata tengah dengan force dan padding konsisten */
+        .table-container thead th {
+            text-align: center !important;
+            vertical-align: middle !important;
+            padding: 12px 8px !important;
+        }
+
+        /* Pastikan semua teks dalam header rata tengah */
+        .table-container thead th * {
+            text-align: center !important;
+        }
+
+        /* Footer alignment */
+        .table-container tfoot td {
+            vertical-align: middle !important;
+        }
+
+        /* Total Bobot text alignment */
+        .table-container tfoot td[colspan] {
+            text-align: right !important;
+        }
+
+        /* Nilai total bobot alignment */
+        .table-container tfoot td.total-value {
+            text-align: center !important;
+        }
+    </style>
 @endsection
 
 @section("container")
     <div class="-mx-3 flex flex-wrap">
         <div class="w-full max-w-full flex-none px-3">
             {{-- Alert untuk sub kriteria --}}
-            <div class="mb-4 rounded-lg bg-blue-50 p-4 text-sm text-blue-800 dark:bg-gray-800 dark:text-blue-400" role="alert">
-                <span class="font-medium">Info Sub Kriteria:</span> 
+            <div class="mb-4 rounded-lg p-4 text-sm text-white" role="alert"
+                style="background: linear-gradient(135deg, #3b82f6, #6366f1); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);">
+                <span class="font-medium">Info Sub Kriteria:</span>
                 Sub kriteria digunakan untuk memberikan nilai detail pada setiap kriteria utama. 
                 Pastikan bobot sub kriteria sesuai dengan tingkat kepentingannya dan total bobot per kriteria tidak melebihi 100%.
             </div>
@@ -532,7 +624,9 @@
                                 @enderror
                             </label>
 
-                            <button type="submit" class="btn btn-success mt-4 w-full text-white">
+                            <button type="submit"
+                                class="mt-4 w-full text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 hover:opacity-90"
+                                style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);">
                                 <i class="ri-save-line"></i>
                                 Simpan Sub Kriteria
                             </button>
@@ -607,7 +701,9 @@
                                 @enderror
                             </label>
 
-                            <button type="submit" class="btn btn-warning mt-4 w-full text-white">
+                            <button type="submit" 
+                                class="mt-4 w-full text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 hover:opacity-90"
+                                style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);">
                                 <i class="ri-refresh-line"></i>
                                 Perbarui Sub Kriteria
                             </button>
@@ -647,7 +743,9 @@
                                     </div>
                                 @enderror
                             </label>
-                            <button type="submit" class="btn btn-success mt-3 w-full text-white">
+                            <button type="submit"
+                                class="mt-4 w-full text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 hover:opacity-90"
+                                style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);">
                                 <i class="ri-upload-line"></i>
                                 Simpan Data Import
                             </button>
@@ -665,11 +763,17 @@
                             Tabel {{ $title }} - {{ $kri->kriteria }}
                         </h6>
                         <div class="w-1/2 max-w-full flex-none px-3 text-right">
-                            <label for="create_sub_kriteria" class="mb-0 inline-block cursor-pointer rounded-lg border border-solid border-success bg-transparent px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-success shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2" onclick="return create_button()">
+                            <label for="create_sub_kriteria"
+                                class="mb-0 inline-block cursor-pointer rounded-lg px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-white shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2"
+                                onclick="return create_button()"
+                                style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
                                 <i class="ri-add-fill"></i>
                                 Tambah
                             </label>
-                            <label for="import_button" class="mb-0 inline-block cursor-pointer rounded-lg border border-solid border-success bg-transparent px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-success shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2" onclick="return import_button()">
+                            <label for="import_button"
+                                class="mb-0 inline-block cursor-pointer rounded-lg px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-white shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2"
+                                onclick="return import_button()"
+                                style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
                                 <i class="ri-file-excel-2-line"></i>
                                 Impor
                             </label>
@@ -677,55 +781,66 @@
                     </div>
                     <div class="flex-auto px-0 pb-2 pt-0">
                         <div class="overflow-x-auto p-0 px-6 pb-6">
-                            <table id="myTable_{{ $kri->id }}" class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top" style="width: 100%;">
+                            <table id="myTable_{{ $kri->id }}" 
+                                class="table-container nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top text-center"
+                                style="width: 100%;">
                                 <thead class="align-bottom">
-                                    <tr class="bg-primary-color text-xs font-bold uppercase text-white dark:bg-primary-color-dark dark:text-white">
-                                        <th class="rounded-tl">No.</th>
-                                        <th>Nama Sub Kriteria</th>
-                                        <th>Bobot (%)</th>
-                                        <th class="rounded-tr">Aksi</th>
+                                    <tr class="text-xs font-bold uppercase text-white text-center"
+                                        style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);">
+                                        <th class="rounded-tl text-center py-4 px-3 border-r border-gray-600">No.</th>
+                                        <th class="text-center py-4 px-3 border-r border-gray-600">Nama Sub Kriteria</th>
+                                        <th class="text-center py-4 px-3 border-r border-gray-600">Bobot (%)</th>
+                                        <th class="rounded-tr text-center py-4 px-3">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($subKriteria->where('kriteria_id', $kri->id) as $key => $item)
-                                        <tr class="border-b border-primary-color bg-transparent dark:border-primary-color-dark">
-                                            <td>
-                                                <p class="text-center align-middle text-base font-semibold leading-tight text-primary-color dark:text-primary-color-dark">
-                                                    {{ $key + 1 }}.
-                                                </p>
+                                        <tr class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200">
+                                            <!-- No. -->
+                                            <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
+                                                {{ $key + 1 }}.
                                             </td>
-                                            <td>
-                                                <p class="text-left align-middle text-base font-semibold leading-tight text-primary-color dark:text-primary-color-dark">
-                                                    {{ $item->sub_kriteria }}
-                                                </p>
+
+                                            <!-- Nama Sub Kriteria -->
+                                            <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
+                                                {{ $item->sub_kriteria }}
                                             </td>
-                                            <td>
-                                                <p class="text-center align-middle text-base font-semibold leading-tight text-primary-color dark:text-primary-color-dark">
-                                                    {{ $item->bobot }}%
-                                                </p>
+
+                                            <!-- Bobot -->
+                                            <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
+                                                {{ $item->bobot }}%
                                             </td>
-                                            <td>
-                                                <div class="text-center align-middle">
-                                                    <label for="edit_sub_kriteria" class="btn btn-outline btn-warning btn-sm" onclick="return edit_button('{{ $item->id }}')">
-                                                        <i class="ri-pencil-line text-base"></i>
-                                                    </label>
-                                                    <label for="delete_button" class="btn btn-outline btn-error btn-sm" onclick="return delete_button('{{ $item->id }}')">
-                                                        <i class="ri-delete-bin-line text-base"></i>
-                                                    </label>
-                                                </div>
+
+                                            <!-- Aksi -->
+                                            <td class="py-4 px-3 align-middle text-center">
+                                                <label for="edit_sub_kriteria"
+                                                    class="px-3 py-2 rounded-lg text-white font-semibold cursor-pointer transition-all duration-200 hover:opacity-90 text-sm inline-flex items-center mr-2"
+                                                    onclick="return edit_button('{{ $item->id }}')"
+                                                    style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
+                                                    <i class="ri-pencil-line text-base"></i>
+                                                </label>
+                                                <label for="delete_button"
+                                                    class="px-3 py-2 rounded-lg text-white font-semibold cursor-pointer transition-all duration-200 hover:opacity-90 text-sm inline-flex items-center"
+                                                    onclick="return delete_button('{{ $item->id }}')"
+                                                    style="background: linear-gradient(135deg, #e11d48, #be185d); box-shadow: 0 4px 15px rgba(225, 29, 72, 0.3);">
+                                                    <i class="ri-delete-bin-line text-base"></i>
+                                                </label>
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                                 <tfoot>
-                                    <tr class="bg-gray-50">
-                                        <td colspan="2" class="text-right align-middle text-base font-semibold leading-tight text-primary-color dark:text-primary-color-dark">
+                                    <tr class="border-t-2 border-gray-300"
+                                        style="background: linear-gradient(135deg, #f8fafc, #e2e8f0);">
+                                        <td colspan="2"
+                                            class="text-right py-4 px-3 text-base font-semibold text-gray-800 border-r border-gray-200">
                                             Total Bobot:
                                         </td>
-                                        <td class="text-center align-middle text-base font-bold leading-tight text-primary-color dark:text-primary-color-dark">
+                                        <td class="total-value text-center py-4 px-3 text-base font-bold text-white border-r border-gray-200"
+                                            style="background: linear-gradient(135deg, #059669, #047857);">
                                             {{ $subKriteria->where('kriteria_id', $kri->id)->sum('bobot') }}%
                                         </td>
-                                        <td></td>
+                                        <td class="py-4 px-3"></td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -735,4 +850,4 @@
             @endforeach
         </div>
     </div>
-@endsection
+@endsection>
