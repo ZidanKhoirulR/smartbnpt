@@ -274,10 +274,10 @@
                         @foreach($subKriteria->where('kriteria_id', $kri->id) as $sub)
                             total += {{ $sub->bobot }};
                         @endforeach
-                                                }
+                                                                        }
                 @endif
             @endforeach
-                        return total;
+                                return total;
         }
 
         function updateWeightInfo() {
@@ -332,13 +332,13 @@
             }
 
             const weightInfoHtml = `
-                            <div class="label weight-info">
-                                <span class="label-text-alt text-xs ${colorClass}">
-                                    <i class="${icon} mr-1"></i>
-                                    Terpakai: ${used.toFixed(1)}% | Sisa: ${remaining.toFixed(1)}%
-                                </span>
-                            </div>
-                        `;
+                                    <div class="label weight-info">
+                                        <span class="label-text-alt text-xs ${colorClass}">
+                                            <i class="${icon} mr-1"></i>
+                                            Terpakai: ${used.toFixed(1)}% | Sisa: ${remaining.toFixed(1)}%
+                                        </span>
+                                    </div>
+                                `;
 
             $bobotControl.append(weightInfoHtml);
         }
@@ -353,12 +353,12 @@
 
             // Add error message
             const errorHtml = `
-                            <div class="label validation-message">
-                                <span class="label-text-alt text-sm text-red-500">
-                                    <i class="ri-error-warning-line mr-1"></i>${message}
-                                </span>
-                            </div>
-                        `;
+                                    <div class="label validation-message">
+                                        <span class="label-text-alt text-sm text-red-500">
+                                            <i class="ri-error-warning-line mr-1"></i>${message}
+                                        </span>
+                                    </div>
+                                `;
             $formControl.append(errorHtml);
         }
 
@@ -392,11 +392,11 @@
             const toast = document.createElement('div');
             toast.className = `alert alert-${type} fixed top-4 right-4 w-auto z-50 shadow-lg`;
             toast.innerHTML = `
-                            <div class="flex items-center gap-2">
-                                <i class="ri-${type === 'error' ? 'error-warning' : 'information'}-line"></i>
-                                <span>${message}</span>
-                            </div>
-                        `;
+                                    <div class="flex items-center gap-2">
+                                        <i class="ri-${type === 'error' ? 'error-warning' : 'information'}-line"></i>
+                                        <span>${message}</span>
+                                    </div>
+                                `;
 
             document.body.appendChild(toast);
 
@@ -544,8 +544,9 @@
             <div class="mb-4 rounded-lg p-4 text-sm text-white" role="alert"
                 style="background: linear-gradient(135deg, #3b82f6, #6366f1); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);">
                 <span class="font-medium">Info Sub Kriteria:</span>
-                Sub kriteria digunakan untuk memberikan nilai detail pada setiap kriteria utama. 
-                Pastikan bobot sub kriteria sesuai dengan tingkat kepentingannya dan total bobot per kriteria tidak melebihi 100%.
+                Sub kriteria digunakan untuk memberikan nilai detail pada setiap kriteria utama.
+                Pastikan bobot sub kriteria sesuai dengan tingkat kepentingannya dan total bobot per kriteria tidak melebihi
+                100%.
             </div>
 
             {{-- Awal Modal Create --}}
@@ -559,7 +560,8 @@
                         </label>
                     </div>
                     <div>
-                        <form id="create_sub_kriteria_form" action="{{ route('sub-kriteria.store') }}" method="POST" enctype="multipart/form-data">
+                        <form id="create_sub_kriteria_form" action="{{ route('sub-kriteria.store') }}" method="POST"
+                            enctype="multipart/form-data">
                             @csrf
                             <input type="hidden" name="id">
 
@@ -571,7 +573,8 @@
                                             <x-label-input-required>Kriteria</x-label-input-required>
                                         </span>
                                     </div>
-                                    <select name="kriteria_id" class="select select-bordered w-full text-primary-color" required>
+                                    <select name="kriteria_id" class="select select-bordered w-full text-primary-color"
+                                        required>
                                         <option value="" disabled selected>Pilih Kriteria!</option>
                                         @foreach ($kriteria as $item)
                                             <option value="{{ $item->id }}" {{ old('kriteria_id') == $item->id ? 'selected' : '' }}>
@@ -592,12 +595,12 @@
                                         <span class="label-text font-semibold">
                                             <x-label-input-required>Bobot (%)</x-label-input-required>
                                         </span>
-                                        <span class="label-text-alt text-xs text-gray-500">Nilai numerik untuk perhitungan</span>
+                                        <span class="label-text-alt text-xs text-gray-500">Nilai numerik untuk
+                                            perhitungan</span>
                                     </div>
-                                    <input type="number" min="0" max="100" step="0.01" name="bobot" 
-                                           class="input input-bordered w-full text-primary-color" 
-                                           value="{{ old('bobot') }}" 
-                                           placeholder="0-100" required />
+                                    <input type="number" min="0" max="100" step="0.01" name="bobot"
+                                        class="input input-bordered w-full text-primary-color" value="{{ old('bobot') }}"
+                                        placeholder="0-100" required />
                                     @error('bobot')
                                         <div class="label">
                                             <span class="label-text-alt text-sm text-error">{{ $message }}</span>
@@ -613,10 +616,9 @@
                                         <x-label-input-required>Sub Kriteria</x-label-input-required>
                                     </span>
                                 </div>
-                                <input type="text" name="sub_kriteria" 
-                                       class="input input-bordered w-full text-primary-color" 
-                                       value="{{ old('sub_kriteria') }}" 
-                                       placeholder="Contoh: Sangat Baik, Baik, Cukup" required />
+                                <input type="text" name="sub_kriteria"
+                                    class="input input-bordered w-full text-primary-color" value="{{ old('sub_kriteria') }}"
+                                    placeholder="Contoh: Sangat Baik, Baik, Cukup" required />
                                 @error('sub_kriteria')
                                     <div class="label">
                                         <span class="label-text-alt text-sm text-error">{{ $message }}</span>
@@ -647,7 +649,8 @@
                         </label>
                     </div>
                     <div>
-                        <form id="edit_sub_kriteria_form" action="{{ route('sub-kriteria.update') }}" method="POST" enctype="multipart/form-data">
+                        <form id="edit_sub_kriteria_form" action="{{ route('sub-kriteria.update') }}" method="POST"
+                            enctype="multipart/form-data">
                             @csrf
                             <input type="hidden" name="id">
                             <input type="hidden" name="kriteria_id">
@@ -661,9 +664,9 @@
                                         </span>
                                         <span class="label-text-alt" id="loading_edit1"></span>
                                     </div>
-                                    <input type="text" name="kriteria_nama" 
-                                           class="input input-bordered w-full cursor-default bg-slate-100 text-primary-color" 
-                                           readonly />
+                                    <input type="text" name="kriteria_nama"
+                                        class="input input-bordered w-full cursor-default bg-slate-100 text-primary-color"
+                                        readonly />
                                 </label>
 
                                 {{-- Bobot --}}
@@ -674,8 +677,8 @@
                                         </span>
                                         <span class="label-text-alt" id="loading_edit2"></span>
                                     </div>
-                                    <input type="number" min="0" max="100" step="0.01" name="bobot" 
-                                           class="input input-bordered w-full text-primary-color" required />
+                                    <input type="number" min="0" max="100" step="0.01" name="bobot"
+                                        class="input input-bordered w-full text-primary-color" required />
                                     @error('bobot')
                                         <div class="label">
                                             <span class="label-text-alt text-sm text-error">{{ $message }}</span>
@@ -692,8 +695,8 @@
                                     </span>
                                     <span class="label-text-alt" id="loading_edit3"></span>
                                 </div>
-                                <input type="text" name="sub_kriteria" 
-                                       class="input input-bordered w-full text-primary-color" required />
+                                <input type="text" name="sub_kriteria"
+                                    class="input input-bordered w-full text-primary-color" required />
                                 @error('sub_kriteria')
                                     <div class="label">
                                         <span class="label-text-alt text-sm text-error">{{ $message }}</span>
@@ -701,7 +704,7 @@
                                 @enderror
                             </label>
 
-                            <button type="submit" 
+                            <button type="submit"
                                 class="mt-4 w-full text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 hover:opacity-90"
                                 style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);">
                                 <i class="ri-refresh-line"></i>
@@ -725,7 +728,7 @@
                     </div>
                     <div>
                         <div class="mb-4 rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800" role="alert">
-                            <span class="font-medium">Format Excel:</span> 
+                            <span class="font-medium">Format Excel:</span>
                             Kolom yang diperlukan: kriteria_id, sub_kriteria, bobot
                         </div>
                         <form action="{{ route('sub-kriteria.import') }}" method="POST" enctype="multipart/form-data">
@@ -736,7 +739,8 @@
                                         <x-label-input-required>File Excel</x-label-input-required>
                                     </span>
                                 </div>
-                                <input type="file" name="import_data" accept=".xlsx,.xls" class="file-input file-input-bordered w-full text-primary-color" required />
+                                <input type="file" name="import_data" accept=".xlsx,.xls"
+                                    class="file-input file-input-bordered w-full text-primary-color" required />
                                 @error("import_data")
                                     <div class="label">
                                         <span class="label-text-alt text-sm text-error">{{ $message }}</span>
@@ -757,8 +761,10 @@
 
             {{-- Tabel Sub Kriteria --}}
             @foreach ($kriteria as $kri)
-                <div class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
-                    <div class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
+                <div
+                    class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
+                    <div
+                        class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
                         <h6 class="font-bold text-primary-color dark:text-primary-color-dark">
                             Tabel {{ $title }} - {{ $kri->kriteria }}
                         </h6>
@@ -781,7 +787,7 @@
                     </div>
                     <div class="flex-auto px-0 pb-2 pt-0">
                         <div class="overflow-x-auto p-0 px-6 pb-6">
-                            <table id="myTable_{{ $kri->id }}" 
+                            <table id="myTable_{{ $kri->id }}"
                                 class="table-container nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top text-center"
                                 style="width: 100%;">
                                 <thead class="align-bottom">
@@ -795,7 +801,8 @@
                                 </thead>
                                 <tbody>
                                     @foreach ($subKriteria->where('kriteria_id', $kri->id) as $key => $item)
-                                        <tr class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200">
+                                        <tr
+                                            class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200">
                                             <!-- No. -->
                                             <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
                                                 {{ $key + 1 }}.

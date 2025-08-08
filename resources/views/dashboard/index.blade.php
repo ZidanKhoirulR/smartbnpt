@@ -3,215 +3,215 @@
 @section("js")
     <script>
         let alternatif = [];
-        let nilaiAkhir = [];
-        @foreach ($nilaiAkhir as $item)
-            alternatif.push(' {{ $item->alternatif->alternatif }} ');
-            nilaiAkhir.push(' {{ round($item->nilai, 3) }} ');
-        @endforeach
+            let nilaiAkhir = [];
+            @foreach ($nilaiAkhir as $item)
+                alternatif.push(' {{ $item->alternatif->alternatif }} ');
+                nilaiAkhir.push(' {{ round($item->nilai, 3) }} ');
+            @endforeach
 
-        let currentChart = null;
+            let currentChart = null;
 
-        // Line Chart Configuration
-        let lineChartConfig = {
-            chart: {
-                height: 300,
-                type: "line",
-                stacked: true
-            },
-            dataLabels: {
-                enabled: false
-            },
-            series: [{
-                name: 'Nilai SMARTER',
-                data: nilaiAkhir
-            }],
-            stroke: {
-                curve: 'smooth',
-                width: 4,
-            },
-            marker: {
-                size: 10,
-            },
-            colors: ["#3b82f6"],
-            xaxis: {
-                categories: alternatif,
-                axisTicks: {
-                    show: true
+            // Line Chart Configuration
+            let lineChartConfig = {
+                chart: {
+                    height: 300,
+                    type: "line",
+                    stacked: true
                 },
-                axisBorder: {
-                    show: true,
-                    color: "#6366f1"
+                dataLabels: {
+                    enabled: false
                 },
-                labels: {
-                    style: {
-                        colors: "#6366f1"
-                    }
+                series: [{
+                    name: 'Nilai SMARTER',
+                    data: nilaiAkhir
+                }],
+                stroke: {
+                    curve: 'smooth',
+                    width: 4,
                 },
-                title: {
-                    text: "Alternatif",
-                    style: {
-                        color: "#3b82f6"
-                    }
-                }
-            },
-            yaxis: [{
-                axisTicks: {
-                    show: true
+                marker: {
+                    size: 10,
                 },
-                axisBorder: {
-                    show: true,
-                    color: "#6366f1"
-                },
-                labels: {
-                    style: {
-                        colors: "#6366f1"
-                    }
-                },
-                title: {
-                    text: "Nilai",
-                    style: {
-                        color: "#3b82f6"
-                    }
-                }
-            }],
-            tooltip: {
-                enabled: true,
-                shared: false,
-                followCursor: false,
-                x: {
-                    show: false,
-                },
-                y: {
-                    formatter: undefined,
+                colors: ["#3b82f6"],
+                xaxis: {
+                    categories: alternatif,
+                    axisTicks: {
+                        show: true
+                    },
+                    axisBorder: {
+                        show: true,
+                        color: "#6366f1"
+                    },
+                    labels: {
+                        style: {
+                            colors: "#6366f1"
+                        }
+                    },
                     title: {
-                        formatter: (seriesName) => "",
+                        text: "Alternatif",
+                        style: {
+                            color: "#3b82f6"
+                        }
+                    }
+                },
+                yaxis: [{
+                    axisTicks: {
+                        show: true
+                    },
+                    axisBorder: {
+                        show: true,
+                        color: "#6366f1"
+                    },
+                    labels: {
+                        style: {
+                            colors: "#6366f1"
+                        }
+                    },
+                    title: {
+                        text: "Nilai",
+                        style: {
+                            color: "#3b82f6"
+                        }
+                    }
+                }],
+                tooltip: {
+                    enabled: true,
+                    shared: false,
+                    followCursor: false,
+                    x: {
+                        show: false,
+                    },
+                    y: {
+                        formatter: undefined,
+                        title: {
+                            formatter: (seriesName) => "",
+                        },
                     },
                 },
-            },
-        };
+            };
 
-        // Bar Chart Configuration
-        let barChartConfig = {
-            chart: {
-                height: 300,
-                type: "bar"
-            },
-            dataLabels: {
-                enabled: true,
-                style: {
-                    fontSize: '12px',
-                    colors: ['#fff']
-                }
-            },
-            series: [{
-                name: 'Nilai SMARTER',
-                data: nilaiAkhir
-            }],
-            colors: ["#3b82f6"],
-            plotOptions: {
-                bar: {
-                    borderRadius: 8,
-                    horizontal: false,
-                }
-            },
-            xaxis: {
-                categories: alternatif,
-                axisTicks: {
-                    show: true
+            // Bar Chart Configuration
+            let barChartConfig = {
+                chart: {
+                    height: 300,
+                    type: "bar"
                 },
-                axisBorder: {
-                    show: true,
-                    color: "#6366f1"
-                },
-                labels: {
+                dataLabels: {
+                    enabled: true,
                     style: {
-                        colors: "#6366f1"
+                        fontSize: '12px',
+                        colors: ['#fff']
                     }
                 },
-                title: {
-                    text: "Alternatif",
-                    style: {
-                        color: "#3b82f6"
-                    }
-                }
-            },
-            yaxis: [{
-                axisTicks: {
-                    show: true
-                },
-                axisBorder: {
-                    show: true,
-                    color: "#6366f1"
-                },
-                labels: {
-                    style: {
-                        colors: "#6366f1"
+                series: [{
+                    name: 'Nilai SMARTER',
+                    data: nilaiAkhir
+                }],
+                colors: ["#3b82f6"],
+                plotOptions: {
+                    bar: {
+                        borderRadius: 8,
+                        horizontal: false,
                     }
                 },
-                title: {
-                    text: "Nilai",
-                    style: {
-                        color: "#3b82f6"
+                xaxis: {
+                    categories: alternatif,
+                    axisTicks: {
+                        show: true
+                    },
+                    axisBorder: {
+                        show: true,
+                        color: "#6366f1"
+                    },
+                    labels: {
+                        style: {
+                            colors: "#6366f1"
+                        }
+                    },
+                    title: {
+                        text: "Alternatif",
+                        style: {
+                            color: "#3b82f6"
+                        }
                     }
-                }
-            }],
-            tooltip: {
-                enabled: true,
-                y: {
-                    formatter: function (val) {
-                        return val.toFixed(3);
+                },
+                yaxis: [{
+                    axisTicks: {
+                        show: true
+                    },
+                    axisBorder: {
+                        show: true,
+                        color: "#6366f1"
+                    },
+                    labels: {
+                        style: {
+                            colors: "#6366f1"
+                        }
+                    },
+                    title: {
+                        text: "Nilai",
+                        style: {
+                            color: "#3b82f6"
+                        }
                     }
-                }
-            },
-        };
+                }],
+                tooltip: {
+                    enabled: true,
+                    y: {
+                        formatter: function (val) {
+                            return val.toFixed(3);
+                        }
+                    }
+                },
+            };
 
-        // Initialize chart
-        function initChart() {
-            currentChart = new ApexCharts(document.querySelector("#chart-perankingan"), lineChartConfig);
-            currentChart.render();
-        }
-
-        // Switch to Line Chart
-        function switchToLineChart() {
-            if (currentChart) {
-                currentChart.destroy();
+            // Initialize chart
+            function initChart() {
+                currentChart = new ApexCharts(document.querySelector("#chart-perankingan"), lineChartConfig);
+                currentChart.render();
             }
-            currentChart = new ApexCharts(document.querySelector("#chart-perankingan"), lineChartConfig);
-            currentChart.render();
 
-            // Update button states
-            document.getElementById('lineBtn').style.background = 'rgba(59, 130, 246, 0.1)';
-            document.getElementById('lineBtn').style.color = '#3b82f6';
-            document.getElementById('lineBtn').style.border = '1px solid rgba(59, 130, 246, 0.2)';
+            // Switch to Line Chart
+            function switchToLineChart() {
+                if (currentChart) {
+                    currentChart.destroy();
+                }
+                currentChart = new ApexCharts(document.querySelector("#chart-perankingan"), lineChartConfig);
+                currentChart.render();
 
-            document.getElementById('barBtn').style.background = 'rgba(107, 114, 128, 0.1)';
-            document.getElementById('barBtn').style.color = '#6b7280';
-            document.getElementById('barBtn').style.border = '1px solid rgba(107, 114, 128, 0.2)';
-        }
+                // Update button states
+                document.getElementById('lineBtn').style.background = 'rgba(59, 130, 246, 0.1)';
+                document.getElementById('lineBtn').style.color = '#3b82f6';
+                document.getElementById('lineBtn').style.border = '1px solid rgba(59, 130, 246, 0.2)';
 
-        // Switch to Bar Chart
-        function switchToBarChart() {
-            if (currentChart) {
-                currentChart.destroy();
+                document.getElementById('barBtn').style.background = 'rgba(107, 114, 128, 0.1)';
+                document.getElementById('barBtn').style.color = '#6b7280';
+                document.getElementById('barBtn').style.border = '1px solid rgba(107, 114, 128, 0.2)';
             }
-            currentChart = new ApexCharts(document.querySelector("#chart-perankingan"), barChartConfig);
-            currentChart.render();
 
-            // Update button states
-            document.getElementById('barBtn').style.background = 'rgba(59, 130, 246, 0.1)';
-            document.getElementById('barBtn').style.color = '#3b82f6';
-            document.getElementById('barBtn').style.border = '1px solid rgba(59, 130, 246, 0.2)';
+            // Switch to Bar Chart
+            function switchToBarChart() {
+                if (currentChart) {
+                    currentChart.destroy();
+                }
+                currentChart = new ApexCharts(document.querySelector("#chart-perankingan"), barChartConfig);
+                currentChart.render();
 
-            document.getElementById('lineBtn').style.background = 'rgba(107, 114, 128, 0.1)';
-            document.getElementById('lineBtn').style.color = '#6b7280';
-            document.getElementById('lineBtn').style.border = '1px solid rgba(107, 114, 128, 0.2)';
-        }
+                // Update button states
+                document.getElementById('barBtn').style.background = 'rgba(59, 130, 246, 0.1)';
+                document.getElementById('barBtn').style.color = '#3b82f6';
+                document.getElementById('barBtn').style.border = '1px solid rgba(59, 130, 246, 0.2)';
 
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', function () {
-            initChart();
-        });
-    </script>
+                document.getElementById('lineBtn').style.background = 'rgba(107, 114, 128, 0.1)';
+                document.getElementById('lineBtn').style.color = '#6b7280';
+                document.getElementById('lineBtn').style.border = '1px solid rgba(107, 114, 128, 0.2)';
+            }
+
+            // Initialize when page loads
+            document.addEventListener('DOMContentLoaded', function () {
+                initChart();
+            });
+        </script>
 @endsection
 
 @section("container")
