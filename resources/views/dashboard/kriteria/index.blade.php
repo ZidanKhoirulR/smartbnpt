@@ -79,7 +79,10 @@
                     $("input[name='kode']").val(data.data.kode);
                     $("input[name='kriteria']").val(data.data.kriteria);
                     $("input[name='bobot']").val(data.data.bobot);
-                    $("input[name='ranking']").val(data.data.ranking || '');
+
+                    // Set ranking - langsung tampilkan ranking yang ada tanpa fallback
+                    $("#ranking_display").text(data.data.ranking);
+                    $("#ranking_hidden").val(data.data.ranking);
 
                     // Set radio button
                     if (data.data.jenis_kriteria == "benefit") {
@@ -96,7 +99,6 @@
                     updateWeightInfo();
 
                     // Validate current values
-                    validateRanking($("input[name='ranking']")[0]);
                     validateBobot($("input[name='bobot']")[0]);
                     validateKriteria($("input[name='kriteria']")[0]);
                 },
@@ -107,111 +109,58 @@
             });
         }
 
-        function delete_button(kriteria_id) {
-            Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: "Data yang dihapus tidak dapat dipulihkan kembali!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#6419E6',
-                cancelButtonColor: '#F87272',
-                confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Show loading
-                    Swal.fire({
-                        title: 'Menghapus data...',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
+        // Update validasi form submission - hapus validasi ranking untuk mode edit
+        $(document).on('submit', 'form', function (e) {
+            const form = this;
+            let isValid = true;
+            const isEditMode = $(form).find("input[name='id']").val() !== '';
 
-                    $.ajax({
-                        type: "post",
-                        url: "{{ route("kriteria.delete") }}",
-                        data: {
-                            "_token": "{{ csrf_token() }}",
-                            "kriteria_id": kriteria_id
-                        },
-                        success: function (response) {
-                            Swal.fire({
-                                title: 'Data berhasil dihapus!',
-                                icon: 'success',
-                                confirmButtonColor: '#6419E6',
-                                confirmButtonText: 'OK'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    location.reload();
-                                }
-                            });
-                        },
-                        error: function (xhr) {
-                            let message = 'Data gagal dihapus!';
-                            if (xhr.responseJSON && xhr.responseJSON.message) {
-                                message = xhr.responseJSON.message;
-                            }
-                            Swal.fire({
-                                title: 'Gagal!',
-                                text: message,
-                                icon: 'error',
-                                confirmButtonColor: '#6419E6',
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    });
+            // Validate all required fields
+            $(form).find('input[required]').each(function () {
+                // Hanya validasi ranking jika bukan mode edit
+                if (this.name === 'ranking' && !isEditMode && !validateRanking(this)) {
+                    isValid = false;
                 }
-            })
-        }
-
-        // Enhanced validation functions
-        function validateRanking(input) {
-            const value = parseInt(input.value);
-            const isEdit = $(input).closest('.modal').find('#edit_button').length > 0;
-            const maxRanking = isEdit ? {{ $kriteria->count() }} : {{ $kriteria->count() + 1 }};
-            const $input = $(input);
-            const $formControl = $input.closest('.form-control');
-
-            // Remove previous validation
-            $input.removeClass('input-error input-success border-red-500 border-green-500');
-            $formControl.find('.validation-message').remove();
-
-            if (!input.value.trim()) {
-                showValidationError($input, 'Ranking wajib diisi');
-                return false;
-            }
-
-            if (isNaN(value) || value < 1) {
-                showValidationError($input, 'Ranking minimal adalah 1');
-                return false;
-            }
-
-            if (value > maxRanking) {
-                showValidationError($input, `Ranking maksimal adalah ${maxRanking}`);
-                return false;
-            }
-
-            // Check for duplicate ranking (only for create mode)
-            if (!isEdit) {
-                let isDuplicate = false;
-                @foreach($kriteria as $k)
-                    if (value == {{ $k->ranking }}) {
-                        isDuplicate = true;
-                    }
-                @endforeach
-
-                                                                                                                                                if (isDuplicate) {
-                    showValidationError($input, 'Ranking sudah digunakan');
-                    return false;
+                if (this.name === 'bobot' && !validateBobot(this)) {
+                    isValid = false;
                 }
+                if (this.name === 'kriteria' && !validateKriteria(this)) {
+                    isValid = false;
+                }
+            });
+
+            // Check radio button
+            if (!$(form).find('input[name="jenis_kriteria"]:checked').length) {
+                showNotification('Pilih jenis kriteria (Benefit atau Cost)', 'error');
+                isValid = false;
             }
 
-            showValidationSuccess($input);
-            input.setCustomValidity('');
-            return true;
-        }
+            if (!isValid) {
+                e.preventDefault();
+                showNotification('Periksa kembali form input Anda', 'error');
+                return false;
+            }
 
+            // Show loading on submit button
+            const $submitBtn = $(form).find('button[type="submit"]');
+            const originalText = $submitBtn.html();
+            $submitBtn.html('<span class="loading loading-spinner loading-sm"></span> Menyimpan...').prop('disabled', true);
+
+            // Restore button after 3 seconds (fallback)
+            setTimeout(() => {
+                $submitBtn.html(originalText).prop('disabled', false);
+            }, 3000);
+        });
+
+        // Update event listener untuk real-time validation - hanya untuk create mode
+        $(document).on('input', 'input[name="ranking"]', function () {
+            const isEditMode = $(this).closest('form').find("input[name='id']").val() !== '';
+            if (!isEditMode) {
+                validateRanking(this);
+            }
+        });
+
+        // Update fungsi validateBobot untuk mode edit
         function validateBobot(input) {
             const value = parseFloat(input.value);
             const $input = $(input);
@@ -238,12 +187,12 @@
 
             // Check total weight
             const currentTotal = {{ $sumBobot }};
-            const isEdit = $(input).closest('.modal').find('#edit_button').length > 0;
+            const isEditMode = $(input).closest('form').find("input[name='id']").val() !== '';
             let originalWeight = 0;
 
-            if (isEdit) {
+            if (isEditMode) {
                 // Get original weight for edit mode
-                originalWeight = parseFloat($("input[name='bobot']").data('original')) || 0;
+                originalWeight = parseFloat($input.data('original')) || 0;
             }
 
             const newTotal = currentTotal - originalWeight + value;
@@ -258,72 +207,14 @@
             return true;
         }
 
-        function validateKriteria(input) {
-            const value = input.value.trim();
-            const $input = $(input);
-            const $formControl = $input.closest('.form-control');
-
-            // Remove previous validation
-            $input.removeClass('input-error input-success border-red-500 border-green-500');
-            $formControl.find('.validation-message').remove();
-
-            if (!value) {
-                showValidationError($input, 'Nama kriteria wajib diisi');
-                return false;
-            }
-
-            if (value.length < 3) {
-                showValidationError($input, 'Nama kriteria minimal 3 karakter');
-                return false;
-            }
-
-            if (value.length > 100) {
-                showValidationError($input, 'Nama kriteria maksimal 100 karakter');
-                return false;
-            }
-
-            showValidationSuccess($input);
-            return true;
-        }
-
-        // Validation helper functions
-        function showValidationError($input, message) {
-            $input.addClass('input-error border-red-500');
-            const $formControl = $input.closest('.form-control');
-
-            // Remove existing message
-            $formControl.find('.validation-message').remove();
-
-            // Add error message
-            const errorHtml = `
-                                                                                                                                                <div class="label validation-message">
-                                                                                                                                                    <span class="label-text-alt text-sm text-red-500">
-                                                                                                                                                        <i class="ri-error-warning-line mr-1"></i>${message}
-                                                                                                                                                    </span>
-                                                                                                                                                </div>
-                                                                                                                                            `;
-            $formControl.append(errorHtml);
-        }
-
-        function showValidationSuccess($input) {
-            $input.addClass('input-success border-green-500');
-            const $formControl = $input.closest('.form-control');
-            $formControl.find('.validation-message').remove();
-        }
-
-        function resetValidation() {
-            $('.input').removeClass('input-error input-success border-red-500 border-green-500');
-            $('.validation-message').remove();
-        }
-
-        // Weight information update
+        // Update fungsi updateWeightInfo untuk mode edit
         function updateWeightInfo() {
             const currentBobot = parseFloat($('input[name="bobot"]').val()) || 0;
             const totalBobot = {{ $sumBobot }};
-            const isEdit = $('input[name="id"]').val() !== '';
+            const isEditMode = $('input[name="id"]').val() !== '';
 
             let originalBobot = 0;
-            if (isEdit) {
+            if (isEditMode) {
                 originalBobot = parseFloat($('input[name="bobot"]').data('original')) || 0;
             }
 
@@ -346,13 +237,13 @@
             }
 
             const weightInfoHtml = `
-                                                                                                                                                <div class="label weight-info">
-                                                                                                                                                    <span class="label-text-alt text-xs ${colorClass}">
-                                                                                                                                                        <i class="${icon} mr-1"></i>
-                                                                                                                                                        Terpakai: ${used.toFixed(1)}% | Sisa: ${remaining.toFixed(1)}%
-                                                                                                                                                    </span>
-                                                                                                                                                </div>
-                                                                                                                                            `;
+                                                        <div class="label weight-info">
+                                                            <span class="label-text-alt text-xs ${colorClass}">
+                                                                <i class="${icon} mr-1"></i>
+                                                                Terpakai: ${used.toFixed(1)}% | Sisa: ${remaining.toFixed(1)}%
+                                                            </span>
+                                                        </div>
+                                                    `;
 
             $bobotControl.append(weightInfoHtml);
         }
@@ -376,11 +267,11 @@
             const toast = document.createElement('div');
             toast.className = `alert alert-${type} fixed top-4 right-4 w-auto z-50 shadow-lg`;
             toast.innerHTML = `
-                                                                                                                                                <div class="flex items-center gap-2">
-                                                                                                                                                    <i class="ri-${type === 'error' ? 'error-warning' : 'information'}-line"></i>
-                                                                                                                                                    <span>${message}</span>
-                                                                                                                                                </div>
-                                                                                                                                            `;
+                                                                                                                                                                                                <div class="flex items-center gap-2">
+                                                                                                                                                                                                    <i class="ri-${type === 'error' ? 'error-warning' : 'information'}-line"></i>
+                                                                                                                                                                                                    <span>${message}</span>
+                                                                                                                                                                                                </div>
+                                                                                                                                                                                            `;
 
             document.body.appendChild(toast);
 
@@ -604,11 +495,11 @@
             {{-- Awal Modal Create --}}
             <input type="checkbox" id="create_button" class="modal-toggle" />
             <div class="modal" role="dialog">
-                <div class="modal-box max-w-2xl">
-                    <div class="mb-3 flex justify-between">
-                        <h3 class="text-lg font-bold">Tambah {{ $title }}</h3>
+                <div class="modal-box w-80 max-w-xs">
+                    <div class="mb-2 flex justify-between items-center">
+                        <h3 class="text-sm font-bold">Tambah {{ $title }}</h3>
                         <label for="create_button" class="cursor-pointer">
-                            <i class="ri-close-large-fill"></i>
+                            <i class="ri-close-large-fill text-sm"></i>
                         </label>
                     </div>
                     <div>
@@ -616,116 +507,89 @@
                             @csrf
                             <input type="text" name="id" hidden>
 
-                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                {{-- Kode --}}
-                                <label class="form-control w-full">
-                                    <div class="label">
-                                        <span class="label-text font-semibold">
-                                            <x-label-input-required>Kode</x-label-input-required>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="kode"
-                                        class="input input-bordered w-full cursor-default bg-slate-100 text-primary-color"
-                                        value="{{ old("kode") }}" required readonly />
-                                    @error("kode")
-                                        <div class="label">
-                                            <span class="label-text-alt text-sm text-error">{{ $message }}</span>
+                            <div class="space-y-1">
+                                {{-- Kode dan Ranking dalam satu baris --}}
+                                <div class="grid grid-cols-2 gap-2">
+                                    {{-- Kode --}}
+                                    <label class="form-control w-full">
+                                        <div class="label py-0.5">
+                                            <span class="label-text text-xs font-semibold">
+                                                <x-label-input-required>Kode</x-label-input-required>
+                                            </span>
                                         </div>
-                                    @enderror
-                                </label>
+                                        <input type="text" name="kode"
+                                            class="input input-bordered input-xs w-full cursor-default bg-slate-100 text-primary-color text-xs"
+                                            value="{{ old("kode") }}" required readonly />
+                                    </label>
 
-                                {{-- Ranking Kepentingan --}}
-                                <label class="form-control w-full">
-                                    <div class="label">
-                                        <span class="label-text font-semibold">
-                                            <x-label-input-required>Ranking Kepentingan</x-label-input-required>
-                                        </span>
-                                        <span class="label-text-alt text-xs text-gray-500">1 = Paling Penting</span>
-                                    </div>
-                                    <input type="number" min="1" max="{{ $kriteria->count() + 1 }}" step="1" name="ranking"
-                                        class="input input-bordered w-full text-primary-color" value="{{ old("ranking") }}"
-                                        placeholder="1, 2, 3, ..." required />
-                                    @error("ranking")
-                                        <div class="label">
-                                            <span class="label-text-alt text-sm text-error">{{ $message }}</span>
+                                    {{-- Ranking Kepentingan --}}
+                                    <label class="form-control w-full">
+                                        <div class="label py-0.5">
+                                            <span class="label-text text-xs font-semibold">
+                                                <x-label-input-required>Ranking</x-label-input-required>
+                                            </span>
                                         </div>
-                                    @enderror
-                                </label>
-                            </div>
-
-                            {{-- Kriteria --}}
-                            <label class="form-control w-full">
-                                <div class="label">
-                                    <span class="label-text font-semibold">
-                                        <x-label-input-required>Nama Kriteria</x-label-input-required>
-                                    </span>
+                                        <input type="number" min="1" max="{{ $kriteria->count() + 1 }}" step="1"
+                                            name="ranking"
+                                            class="input input-bordered input-xs w-full text-primary-color text-xs"
+                                            value="{{ old("ranking") }}" placeholder="1, 2, 3..." required />
+                                    </label>
                                 </div>
-                                <input type="text" name="kriteria" class="input input-bordered w-full text-primary-color"
-                                    value="{{ old("kriteria") }}" placeholder="Contoh: Pendapatan per Bulan" required />
-                                @error("kriteria")
-                                    <div class="label">
-                                        <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                                    </div>
-                                @enderror
-                            </label>
 
-                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                {{-- Bobot --}}
+                                {{-- Kriteria --}}
                                 <label class="form-control w-full">
-                                    <div class="label">
-                                        <span class="label-text font-semibold">
-                                            <x-label-input-required>Bobot (%)</x-label-input-required>
+                                    <div class="label py-0.5">
+                                        <span class="label-text text-xs font-semibold">
+                                            <x-label-input-required>Nama Kriteria</x-label-input-required>
                                         </span>
-                                        <span class="label-text-alt text-xs text-gray-500">Untuk analisis tambahan</span>
                                     </div>
-                                    <input type="number" min="0" max="100" step="0.01" name="bobot"
-                                        class="input input-bordered w-full text-primary-color" value="{{ old("bobot") }}"
-                                        placeholder="0-100" required />
-                                    @error("bobot")
-                                        <div class="label">
-                                            <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                                        </div>
-                                    @enderror
+                                    <input type="text" name="kriteria"
+                                        class="input input-bordered input-xs w-full text-primary-color text-xs"
+                                        value="{{ old("kriteria") }}" placeholder="Pendapatan per Bulan" required />
                                 </label>
 
-                                {{-- Jenis Kriteria --}}
-                                <label class="form-control w-full">
-                                    <div class="label">
-                                        <span class="label-text font-semibold">
-                                            <x-label-input-required>Jenis Kriteria</x-label-input-required>
-                                        </span>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <div class="form-control">
-                                            <label class="label cursor-pointer justify-start gap-2">
-                                                <input type="radio" value="cost" name="jenis_kriteria"
-                                                    class="radio-primary radio" />
-                                                <span class="label-text">Cost</span>
-                                            </label>
-                                            <p class="text-xs text-gray-500">Semakin kecil semakin baik</p>
+                                {{-- Bobot dan Jenis dalam satu baris --}}
+                                <div class="grid grid-cols-2 gap-2">
+                                    {{-- Bobot --}}
+                                    <label class="form-control w-full">
+                                        <div class="label py-0.5">
+                                            <span class="label-text text-xs font-semibold">
+                                                <x-label-input-required>Bobot (%)</x-label-input-required>
+                                            </span>
                                         </div>
-                                        <div class="form-control">
-                                            <label class="label cursor-pointer justify-start gap-2">
+                                        <input type="number" min="0" max="100" step="0.01" name="bobot"
+                                            class="input input-bordered input-xs w-full text-primary-color text-xs"
+                                            value="{{ old("bobot") }}" placeholder="0-100" required />
+                                    </label>
+
+                                    {{-- Jenis Kriteria --}}
+                                    <label class="form-control w-full">
+                                        <div class="label py-0.5">
+                                            <span class="label-text text-xs font-semibold">
+                                                <x-label-input-required>Jenis</x-label-input-required>
+                                            </span>
+                                        </div>
+                                        <div class="flex gap-1">
+                                            <label class="label cursor-pointer p-1 flex-1">
                                                 <input type="radio" value="benefit" name="jenis_kriteria"
-                                                    id="benefit_create" class="radio-primary radio" checked />
-                                                <span class="label-text">Benefit</span>
+                                                    id="benefit_create" class="radio-primary radio radio-xs" checked />
+                                                <span class="label-text text-xs ml-1">Benefit</span>
                                             </label>
-                                            <p class="text-xs text-gray-500">Semakin besar semakin baik</p>
+                                            <label class="label cursor-pointer p-1 flex-1">
+                                                <input type="radio" value="cost" name="jenis_kriteria"
+                                                    class="radio-primary radio radio-xs" />
+                                                <span class="label-text text-xs ml-1">Cost</span>
+                                            </label>
                                         </div>
-                                    </div>
-                                    @error("jenis_kriteria")
-                                        <div class="label">
-                                            <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                                        </div>
-                                    @enderror
-                                </label>
+                                    </label>
+                                </div>
                             </div>
 
                             <button type="submit"
-                                class="mt-4 w-full text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 hover:opacity-90"
-                                style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);">
+                                class="mt-2 w-full text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 hover:opacity-90"
+                                style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
                                 <i class="ri-save-line"></i>
-                                Simpan Kriteria
+                                Simpan
                             </button>
                         </form>
                     </div>
@@ -736,11 +600,11 @@
             {{-- Awal Modal Edit --}}
             <input type="checkbox" id="edit_button" class="modal-toggle" />
             <div class="modal" role="dialog">
-                <div class="modal-box max-w-2xl">
-                    <div class="mb-3 flex justify-between">
-                        <h3 class="text-lg font-bold">Ubah {{ $title }}</h3>
+                <div class="modal-box w-80 max-w-xs">
+                    <div class="mb-2 flex justify-between items-center">
+                        <h3 class="text-sm font-bold">Ubah {{ $title }}</h3>
                         <label for="edit_button" class="cursor-pointer">
-                            <i class="ri-close-large-fill"></i>
+                            <i class="ri-close-large-fill text-sm"></i>
                         </label>
                     </div>
                     <div>
@@ -748,116 +612,100 @@
                             @csrf
                             <input type="text" name="id" hidden>
 
-                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                {{-- Kode --}}
-                                <label class="form-control w-full">
-                                    <div class="label">
-                                        <span class="label-text font-semibold">
-                                            <x-label-input-required>Kode</x-label-input-required>
-                                        </span>
-                                        <span class="label-text-alt" id="loading_edit1"></span>
-                                    </div>
-                                    <input type="text" name="kode"
-                                        class="input input-bordered w-full cursor-default bg-slate-100 text-primary-color"
-                                        required readonly />
-                                    @error("kode")
-                                        <div class="label">
-                                            <span class="label-text-alt text-sm text-error">{{ $message }}</span>
+                            <div class="space-y-1">
+                                {{-- Kode dan Ranking dalam satu baris --}}
+                                <div class="grid grid-cols-2 gap-2">
+                                    {{-- Kode --}}
+                                    <label class="form-control w-full">
+                                        <div class="label py-0.5">
+                                            <span class="label-text text-xs font-semibold">
+                                                <x-label-input-required>Kode</x-label-input-required>
+                                            </span>
+                                            <span class="label-text-alt" id="loading_edit1"></span>
                                         </div>
-                                    @enderror
-                                </label>
+                                        <input type="text" name="kode"
+                                            class="input input-bordered input-xs w-full cursor-default bg-slate-100 text-primary-color text-xs"
+                                            required readonly />
+                                    </label>
 
-                                {{-- Ranking Kepentingan --}}
-                                <label class="form-control w-full">
-                                    <div class="label">
-                                        <span class="label-text font-semibold">
-                                            <x-label-input-required>Ranking Kepentingan</x-label-input-required>
-                                        </span>
-                                        <span class="label-text-alt" id="loading_edit5"></span>
-                                    </div>
-                                    <input type="number" min="1" max="{{ $kriteria->count() }}" step="1" name="ranking"
-                                        class="input input-bordered w-full text-primary-color" placeholder="1, 2, 3, ..."
-                                        required />
-                                    @error("ranking")
-                                        <div class="label">
-                                            <span class="label-text-alt text-sm text-error">{{ $message }}</span>
+                                    {{-- Ranking (Display Only) --}}
+                                    <label class="form-control w-full">
+                                        <div class="label py-0.5">
+                                            <span class="label-text text-xs font-semibold">Ranking</span>
                                         </div>
-                                    @enderror
-                                </label>
-                            </div>
-
-                            {{-- Kriteria --}}
-                            <label class="form-control w-full">
-                                <div class="label">
-                                    <span class="label-text font-semibold">
-                                        <x-label-input-required>Nama Kriteria</x-label-input-required>
-                                    </span>
-                                    <span class="label-text-alt" id="loading_edit2"></span>
+                                        <div
+                                            class="input input-bordered input-xs w-full cursor-default bg-slate-100 text-primary-color flex items-center justify-center text-xs">
+                                            <span id="ranking_display"
+                                                class="px-1.5 py-0.5 rounded-full text-xs font-semibold text-white"
+                                                style="background: linear-gradient(135deg, #3b82f6, #6366f1);"></span>
+                                        </div>
+                                        <input type="hidden" name="ranking" id="ranking_hidden">
+                                    </label>
                                 </div>
-                                <input type="text" name="kriteria" class="input input-bordered w-full text-primary-color"
-                                    required />
-                                @error("kriteria")
-                                    <div class="label">
-                                        <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                                    </div>
-                                @enderror
-                            </label>
 
-                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                {{-- Bobot --}}
+                                {{-- Kriteria --}}
                                 <label class="form-control w-full">
-                                    <div class="label">
-                                        <span class="label-text font-semibold">
-                                            <x-label-input-required>Bobot (%)</x-label-input-required>
+                                    <div class="label py-0.5">
+                                        <span class="label-text text-xs font-semibold">
+                                            <x-label-input-required>Nama Kriteria</x-label-input-required>
                                         </span>
-                                        <span class="label-text-alt" id="loading_edit3"></span>
+                                        <span class="label-text-alt" id="loading_edit2"></span>
                                     </div>
-                                    <input type="number" min="0" max="100" step="0.01" name="bobot"
-                                        class="input input-bordered w-full text-primary-color" required />
-                                    @error("bobot")
-                                        <div class="label">
-                                            <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                                        </div>
-                                    @enderror
+                                    <input type="text" name="kriteria"
+                                        class="input input-bordered input-xs w-full text-primary-color text-xs"
+                                        placeholder="Pendapatan per Bulan" required />
                                 </label>
 
-                                {{-- Jenis Kriteria --}}
-                                <label class="form-control w-full">
-                                    <div class="label">
-                                        <span class="label-text font-semibold">
-                                            <x-label-input-required>Jenis Kriteria</x-label-input-required>
-                                        </span>
-                                        <span class="label-text-alt" id="loading_edit4"></span>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <div class="form-control">
-                                            <label class="label cursor-pointer justify-start gap-2">
-                                                <input type="radio" value="cost" name="jenis_kriteria" id="cost_edit"
-                                                    class="radio-primary radio" />
-                                                <span class="label-text">COST</span>
-                                            </label>
-                                            <p class="text-xs text-gray-500">Semakin kecil semakin baik</p>
+                                {{-- Bobot dan Jenis dalam satu baris --}}
+                                <div class="grid grid-cols-2 gap-2">
+                                    {{-- Bobot --}}
+                                    <label class="form-control w-full">
+                                        <div class="label py-0.5">
+                                            <span class="label-text text-xs font-semibold">
+                                                <x-label-input-required>Bobot (%)</x-label-input-required>
+                                            </span>
+                                            <span class="label-text-alt" id="loading_edit3"></span>
                                         </div>
-                                        <div class="form-control">
-                                            <label class="label cursor-pointer justify-start gap-2">
+                                        <input type="number" min="0" max="100" step="0.01" name="bobot"
+                                            class="input input-bordered input-xs w-full text-primary-color text-xs"
+                                            placeholder="0-100" required />
+                                    </label>
+
+                                    {{-- Jenis Kriteria --}}
+                                    <label class="form-control w-full">
+                                        <div class="label py-0.5">
+                                            <span class="label-text text-xs font-semibold">
+                                                <x-label-input-required>Jenis</x-label-input-required>
+                                            </span>
+                                            <span class="label-text-alt" id="loading_edit4"></span>
+                                        </div>
+                                        <div class="flex gap-1">
+                                            <label class="label cursor-pointer p-1 flex-1">
                                                 <input type="radio" value="benefit" name="jenis_kriteria" id="benefit_edit"
-                                                    class="radio-primary radio" />
-                                                <span class="label-text">BENEFIT</span>
+                                                    class="radio-primary radio radio-xs" />
+                                                <span class="label-text text-xs ml-1">Benefit</span>
                                             </label>
-                                            <p class="text-xs text-gray-500">Semakin besar semakin baik</p>
+                                            <label class="label cursor-pointer p-1 flex-1">
+                                                <input type="radio" value="cost" name="jenis_kriteria" id="cost_edit"
+                                                    class="radio-primary radio radio-xs" />
+                                                <span class="label-text text-xs ml-1">Cost</span>
+                                            </label>
                                         </div>
-                                    </div>
-                                    @error("jenis_kriteria")
-                                        <div class="label">
-                                            <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                                        </div>
-                                    @enderror
-                                </label>
+                                    </label>
+                                </div>
+
+                                {{-- Info tambahan untuk edit --}}
+                                <div class="text-xs text-gray-400 mt-1">
+                                    <i class="ri-information-line mr-1"></i>
+                                    Untuk mengubah ranking, hapus dan buat ulang kriteria
+                                </div>
                             </div>
 
-                            <button type="submit" class="btn btn-warning mt-4 w-full text-white">
+                            <button type="submit"
+                                class="mt-2 w-full text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 hover:opacity-90"
+                                style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
                                 <i class="ri-refresh-line"></i>
-                                Perbarui Kriteria
+                                Perbarui
                             </button>
                         </form>
                     </div>
