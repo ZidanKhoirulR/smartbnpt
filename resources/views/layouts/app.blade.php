@@ -14,6 +14,9 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- ROC Calculator Script -->
+    <script src="{{ asset('js/roc-calculator.js') }}"></script>
 </head>
 
 <body class="font-sans antialiased">
@@ -31,6 +34,8 @@
 
         <!-- Page Content -->
         <main>
+            {{ $slot }}
+        </main>
     </div>
 </body>
 

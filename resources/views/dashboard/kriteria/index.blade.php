@@ -19,22 +19,8 @@
                 validateRanking(this);
             });
 
-            $(document).on('input', 'input[name="bobot"]', function () {
-                validateBobot(this);
-                updateWeightInfo();
-            });
-
             $(document).on('input', 'input[name="kriteria"]', function () {
                 validateKriteria(this);
-            });
-
-            // Auto-calculate weight info on modal open
-            $(document).on('change', '#create_button, #edit_button', function () {
-                if ($(this).is(':checked')) {
-                    setTimeout(() => {
-                        updateWeightInfo();
-                    }, 100);
-                }
             });
         });
 
@@ -42,7 +28,6 @@
             // Reset form
             $("input[name='id']").val("");
             $("input[name='kriteria']").val("");
-            $("input[name='bobot']").val("");
             $("input[name='ranking']").val("");
             $("input[name='kode']").val("{{ $kode }}");
 
@@ -52,9 +37,6 @@
 
             // Reset validation styling
             resetValidation();
-
-            // Update weight info
-            updateWeightInfo();
 
             // Auto focus on first input
             setTimeout(() => {
@@ -67,44 +49,73 @@
             showLoadingState();
 
             $.ajax({
-                type: "get",
+                type: "GET",
                 url: "{{ route("kriteria.edit") }}",
                 data: {
                     "_token": "{{ csrf_token() }}",
                     "kriteria_id": kriteria_id
                 },
-                success: function (data) {
-                    // Populate form
-                    $("input[name='id']").val(data.data.id);
-                    $("input[name='kode']").val(data.data.kode);
-                    $("input[name='kriteria']").val(data.data.kriteria);
-                    $("input[name='bobot']").val(data.data.bobot);
+                dataType: 'json',
+                success: function (response) {
+                    console.log('Response:', response); // Debug log
 
-                    // Set ranking - langsung tampilkan ranking yang ada tanpa fallback
-                    $("#ranking_display").text(data.data.ranking);
-                    $("#ranking_hidden").val(data.data.ranking);
+                    // Check if response has the expected structure
+                    if (response && response.data) {
+                        // Populate form
+                        $("input[name='id']").val(response.data.id);
+                        $("input[name='kode']").val(response.data.kode);
+                        $("input[name='kriteria']").val(response.data.kriteria);
 
-                    // Set radio button
-                    if (data.data.jenis_kriteria == "benefit") {
-                        $("#benefit_edit").prop("checked", true);
-                    } else if (data.data.jenis_kriteria == "cost") {
-                        $("#cost_edit").prop("checked", true);
+                        // Set ranking - langsung tampilkan ranking yang ada tanpa fallback
+                        $("#ranking_display").text(response.data.ranking);
+                        $("#ranking_hidden").val(response.data.ranking);
+
+                        // Set radio button - reset first
+                        $("input[name='jenis_kriteria']").prop('checked', false);
+
+                        if (response.data.jenis_kriteria == "benefit") {
+                            $("#benefit_edit").prop("checked", true);
+                        } else if (response.data.jenis_kriteria == "cost") {
+                            $("#cost_edit").prop("checked", true);
+                        }
+
+                        // Hide loading
+                        hideLoadingState();
+
+                        // Reset validation
+                        resetValidation();
+
+                        // Validate current values
+                        validateKriteria($("input[name='kriteria']")[0]);
+
+                        showNotification('Data kriteria berhasil dimuat', 'success');
+                    } else {
+                        hideLoadingState();
+                        showNotification('Format response tidak sesuai', 'error');
+                        console.error('Invalid response format:', response);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('AJAX Error:', {
+                        status: status,
+                        error: error,
+                        responseText: xhr.responseText,
+                        statusCode: xhr.status
+                    });
+
+                    hideLoadingState();
+
+                    // More specific error messages
+                    let errorMessage = 'Gagal memuat data kriteria';
+                    if (xhr.status === 404) {
+                        errorMessage = 'Data kriteria tidak ditemukan';
+                    } else if (xhr.status === 500) {
+                        errorMessage = 'Terjadi kesalahan server';
+                    } else if (xhr.status === 403) {
+                        errorMessage = 'Tidak memiliki akses';
                     }
 
-                    // Hide loading
-                    hideLoadingState();
-
-                    // Reset validation and update weight info
-                    resetValidation();
-                    updateWeightInfo();
-
-                    // Validate current values
-                    validateBobot($("input[name='bobot']")[0]);
-                    validateKriteria($("input[name='kriteria']")[0]);
-                },
-                error: function () {
-                    hideLoadingState();
-                    showNotification('Gagal memuat data kriteria', 'error');
+                    showNotification(errorMessage, 'error');
                 }
             });
         }
@@ -119,9 +130,6 @@
             $(form).find('input[required]').each(function () {
                 // Hanya validasi ranking jika bukan mode edit
                 if (this.name === 'ranking' && !isEditMode && !validateRanking(this)) {
-                    isValid = false;
-                }
-                if (this.name === 'bobot' && !validateBobot(this)) {
                     isValid = false;
                 }
                 if (this.name === 'kriteria' && !validateKriteria(this)) {
@@ -160,9 +168,9 @@
             }
         });
 
-        // Update fungsi validateBobot untuk mode edit
-        function validateBobot(input) {
-            const value = parseFloat(input.value);
+        // Validation functions
+        function validateRanking(input) {
+            const value = parseInt(input.value);
             const $input = $(input);
             const $formControl = $input.closest('.form-control');
 
@@ -171,35 +179,18 @@
             $formControl.find('.validation-message').remove();
 
             if (!input.value.trim()) {
-                showValidationError($input, 'Bobot wajib diisi');
+                showValidationError($input, 'Ranking wajib diisi');
                 return false;
             }
 
-            if (isNaN(value) || value < 0) {
-                showValidationError($input, 'Bobot minimal adalah 0');
+            if (isNaN(value) || value < 1) {
+                showValidationError($input, 'Ranking minimal adalah 1');
                 return false;
             }
 
-            if (value > 100) {
-                showValidationError($input, 'Bobot maksimal adalah 100%');
-                return false;
-            }
-
-            // Check total weight
-            const currentTotal = {{ $sumBobot }};
-            const isEditMode = $(input).closest('form').find("input[name='id']").val() !== '';
-            let originalWeight = 0;
-
-            if (isEditMode) {
-                // Get original weight for edit mode
-                originalWeight = parseFloat($input.data('original')) || 0;
-            }
-
-            const newTotal = currentTotal - originalWeight + value;
-
-            if (newTotal > 100) {
-                const maxAllowed = 100 - currentTotal + originalWeight;
-                showValidationError($input, `Bobot terlalu besar. Maksimal: ${maxAllowed.toFixed(2)}%`);
+            const maxRanking = {{ $kriteria->count() + 1 }};
+            if (value > maxRanking) {
+                showValidationError($input, `Ranking maksimal adalah ${maxRanking}`);
                 return false;
             }
 
@@ -207,127 +198,93 @@
             return true;
         }
 
-        // Update fungsi updateWeightInfo untuk mode edit
-        function updateWeightInfo() {
-            const currentBobot = parseFloat($('input[name="bobot"]').val()) || 0;
-            const totalBobot = {{ $sumBobot }};
-            const isEditMode = $('input[name="id"]').val() !== '';
+        function validateKriteria(input) {
+            const $input = $(input);
+            const $formControl = $input.closest('.form-control');
 
-            let originalBobot = 0;
-            if (isEditMode) {
-                originalBobot = parseFloat($('input[name="bobot"]').data('original')) || 0;
+            // Remove previous validation
+            $input.removeClass('input-error input-success border-red-500 border-green-500');
+            $formControl.find('.validation-message').remove();
+
+            if (!input.value.trim()) {
+                showValidationError($input, 'Nama kriteria wajib diisi');
+                return false;
             }
 
-            const remaining = 100 - totalBobot + originalBobot - currentBobot;
-            const used = totalBobot - originalBobot + currentBobot;
-
-            // Update weight info in modal
-            $('.weight-info').remove();
-            const $bobotControl = $('input[name="bobot"]').closest('.form-control');
-
-            let colorClass = 'text-blue-600';
-            let icon = 'ri-information-line';
-
-            if (remaining < 0) {
-                colorClass = 'text-red-600';
-                icon = 'ri-error-warning-line';
-            } else if (remaining === 0) {
-                colorClass = 'text-green-600';
-                icon = 'ri-checkbox-circle-line';
+            if (input.value.trim().length < 3) {
+                showValidationError($input, 'Nama kriteria minimal 3 karakter');
+                return false;
             }
 
-            const weightInfoHtml = `
-                                                        <div class="label weight-info">
-                                                            <span class="label-text-alt text-xs ${colorClass}">
-                                                                <i class="${icon} mr-1"></i>
-                                                                Terpakai: ${used.toFixed(1)}% | Sisa: ${remaining.toFixed(1)}%
-                                                            </span>
-                                                        </div>
-                                                    `;
+            showValidationSuccess($input);
+            return true;
+        }
 
-            $bobotControl.append(weightInfoHtml);
+        function showValidationError($input, message) {
+            $input.addClass('input-error border-red-500');
+            const $formControl = $input.closest('.form-control');
+            $formControl.append(`<div class="validation-message text-red-500 text-xs mt-1">${message}</div>`);
+        }
+
+        function showValidationSuccess($input) {
+            $input.addClass('input-success border-green-500');
+        }
+
+        function resetValidation() {
+            $('input').removeClass('input-error input-success border-red-500 border-green-500');
+            $('.validation-message').remove();
         }
 
         // Loading state functions
         function showLoadingState() {
             const loading = `<span class="loading loading-dots loading-md text-purple-600"></span>`;
-            for (let i = 1; i <= 5; i++) {
+            for (let i = 1; i <= 3; i++) {
                 $(`#loading_edit${i}`).html(loading);
             }
         }
 
         function hideLoadingState() {
-            for (let i = 1; i <= 5; i++) {
+            for (let i = 1; i <= 3; i++) {
                 $(`#loading_edit${i}`).html('');
             }
         }
 
-        // Enhanced notification
+        // Enhanced notification with auto-dismiss and better styling
         function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            document.querySelectorAll('.toast-notification').forEach(toast => toast.remove());
+
             const toast = document.createElement('div');
-            toast.className = `alert alert-${type} fixed top-4 right-4 w-auto z-50 shadow-lg`;
+            toast.className = `toast-notification alert alert-${type} fixed top-4 right-4 w-auto max-w-sm z-50 shadow-lg animate-pulse`;
+
+            const iconMap = {
+                'success': 'ri-checkbox-circle-line',
+                'error': 'ri-error-warning-line',
+                'warning': 'ri-alert-line',
+                'info': 'ri-information-line'
+            };
+
             toast.innerHTML = `
-                                                                                                                                                                                                <div class="flex items-center gap-2">
-                                                                                                                                                                                                    <i class="ri-${type === 'error' ? 'error-warning' : 'information'}-line"></i>
-                                                                                                                                                                                                    <span>${message}</span>
-                                                                                                                                                                                                </div>
-                                                                                                                                                                                            `;
+                    <div class="flex items-center gap-2">
+                        <i class="${iconMap[type] || iconMap.info}"></i>
+                        <span class="text-sm">${message}</span>
+                        <button class="btn btn-ghost btn-xs ml-2" onclick="this.parentElement.parentElement.remove()">
+                            <i class="ri-close-line"></i>
+                        </button>
+                    </div>
+                `;
 
             document.body.appendChild(toast);
 
+            // Auto-dismiss after 5 seconds
             setTimeout(() => {
-                toast.remove();
-            }, 3000);
+                if (toast.parentNode) {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(100%)';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 5000);
         }
-
-        // Form submission validation
-        $(document).on('submit', 'form', function (e) {
-            const form = this;
-            let isValid = true;
-
-            // Validate all required fields
-            $(form).find('input[required]').each(function () {
-                if (this.name === 'ranking' && !validateRanking(this)) {
-                    isValid = false;
-                }
-                if (this.name === 'bobot' && !validateBobot(this)) {
-                    isValid = false;
-                }
-                if (this.name === 'kriteria' && !validateKriteria(this)) {
-                    isValid = false;
-                }
-            });
-
-            // Check radio button
-            if (!$(form).find('input[name="jenis_kriteria"]:checked').length) {
-                showNotification('Pilih jenis kriteria (Benefit atau Cost)', 'error');
-                isValid = false;
-            }
-
-            if (!isValid) {
-                e.preventDefault();
-                showNotification('Periksa kembali form input Anda', 'error');
-                return false;
-            }
-
-            // Show loading on submit button
-            const $submitBtn = $(form).find('button[type="submit"]');
-            const originalText = $submitBtn.html();
-            $submitBtn.html('<span class="loading loading-spinner loading-sm"></span> Menyimpan...').prop('disabled', true);
-
-            // Restore button after 3 seconds (fallback)
-            setTimeout(() => {
-                $submitBtn.html(originalText).prop('disabled', false);
-            }, 3000);
-        });
-
-        // Store original weight for edit mode
-        $(document).on('click', '[onclick*="edit_button"]', function () {
-            setTimeout(() => {
-                const originalWeight = parseFloat($('input[name="bobot"]').val()) || 0;
-                $('input[name="bobot"]').data('original', originalWeight);
-            }, 500);
-        });
     </script>
     @section("css")
         <style>
@@ -360,7 +317,6 @@
                 vertical-align: middle !important;
                 min-height: 50px;
                 padding: 12px 8px !important;
-                /* Padding diperkecil */
             }
 
             /* Semua kolom termasuk Nama Kriteria rata tengah */
@@ -411,7 +367,6 @@
                 text-align: center !important;
                 vertical-align: middle !important;
                 padding: 12px 8px !important;
-                /* Padding yang sama dengan td */
             }
 
             /* Pastikan semua teks dalam header rata tengah */
@@ -419,64 +374,43 @@
                 text-align: center !important;
             }
 
-            /* Konsistensi lebar kolom - diperkecil */
+            /* Konsistensi lebar kolom - disesuaikan tanpa kolom bobot */
             #myTable th:nth-child(1),
             #myTable td:nth-child(1) {
-                width: 6%;
+                width: 8%;
             }
 
             /* No */
             #myTable th:nth-child(2),
             #myTable td:nth-child(2) {
-                width: 10%;
+                width: 12%;
             }
 
             /* Kode */
             #myTable th:nth-child(3),
             #myTable td:nth-child(3) {
-                width: 10%;
+                width: 12%;
             }
 
             /* Ranking */
             #myTable th:nth-child(4),
             #myTable td:nth-child(4) {
-                width: 40%;
+                width: 50%;
             }
 
             /* Nama Kriteria */
             #myTable th:nth-child(5),
             #myTable td:nth-child(5) {
-                width: 10%;
-            }
-
-            /* Bobot */
-            #myTable th:nth-child(6),
-            #myTable td:nth-child(6) {
-                width: 10%;
+                width: 12%;
             }
 
             /* Jenis */
-            #myTable th:nth-child(7),
-            #myTable td:nth-child(7) {
-                width: 14%;
+            #myTable th:nth-child(6),
+            #myTable td:nth-child(6) {
+                width: 6%;
             }
 
             /* Aksi */
-
-            /* Footer alignment */
-            #myTable tfoot td {
-                vertical-align: middle !important;
-            }
-
-            /* Total Bobot text alignment */
-            #myTable tfoot td[colspan="4"] {
-                text-align: right !important;
-            }
-
-            /* Nilai total bobot alignment */
-            #myTable tfoot td:nth-child(2) {
-                text-align: center !important;
-            }
         </style>
     @endsection
 @endsection
@@ -548,41 +482,26 @@
                                         value="{{ old("kriteria") }}" placeholder="Pendapatan per Bulan" required />
                                 </label>
 
-                                {{-- Bobot dan Jenis dalam satu baris --}}
-                                <div class="grid grid-cols-2 gap-2">
-                                    {{-- Bobot --}}
-                                    <label class="form-control w-full">
-                                        <div class="label py-0.5">
-                                            <span class="label-text text-xs font-semibold">
-                                                <x-label-input-required>Bobot (%)</x-label-input-required>
-                                            </span>
-                                        </div>
-                                        <input type="number" min="0" max="100" step="0.01" name="bobot"
-                                            class="input input-bordered input-xs w-full text-primary-color text-xs"
-                                            value="{{ old("bobot") }}" placeholder="0-100" required />
-                                    </label>
-
-                                    {{-- Jenis Kriteria --}}
-                                    <label class="form-control w-full">
-                                        <div class="label py-0.5">
-                                            <span class="label-text text-xs font-semibold">
-                                                <x-label-input-required>Jenis</x-label-input-required>
-                                            </span>
-                                        </div>
-                                        <div class="flex gap-1">
-                                            <label class="label cursor-pointer p-1 flex-1">
-                                                <input type="radio" value="benefit" name="jenis_kriteria"
-                                                    id="benefit_create" class="radio-primary radio radio-xs" checked />
-                                                <span class="label-text text-xs ml-1">Benefit</span>
-                                            </label>
-                                            <label class="label cursor-pointer p-1 flex-1">
-                                                <input type="radio" value="cost" name="jenis_kriteria"
-                                                    class="radio-primary radio radio-xs" />
-                                                <span class="label-text text-xs ml-1">Cost</span>
-                                            </label>
-                                        </div>
-                                    </label>
-                                </div>
+                                {{-- Jenis Kriteria --}}
+                                <label class="form-control w-full">
+                                    <div class="label py-0.5">
+                                        <span class="label-text text-xs font-semibold">
+                                            <x-label-input-required>Jenis Kriteria</x-label-input-required>
+                                        </span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <label class="label cursor-pointer p-1 flex-1">
+                                            <input type="radio" value="benefit" name="jenis_kriteria" id="benefit_create"
+                                                class="radio-primary radio radio-xs" checked />
+                                            <span class="label-text text-xs ml-1">Benefit</span>
+                                        </label>
+                                        <label class="label cursor-pointer p-1 flex-1">
+                                            <input type="radio" value="cost" name="jenis_kriteria"
+                                                class="radio-primary radio radio-xs" />
+                                            <span class="label-text text-xs ml-1">Cost</span>
+                                        </label>
+                                    </div>
+                                </label>
                             </div>
 
                             <button type="submit"
@@ -656,43 +575,27 @@
                                         placeholder="Pendapatan per Bulan" required />
                                 </label>
 
-                                {{-- Bobot dan Jenis dalam satu baris --}}
-                                <div class="grid grid-cols-2 gap-2">
-                                    {{-- Bobot --}}
-                                    <label class="form-control w-full">
-                                        <div class="label py-0.5">
-                                            <span class="label-text text-xs font-semibold">
-                                                <x-label-input-required>Bobot (%)</x-label-input-required>
-                                            </span>
-                                            <span class="label-text-alt" id="loading_edit3"></span>
-                                        </div>
-                                        <input type="number" min="0" max="100" step="0.01" name="bobot"
-                                            class="input input-bordered input-xs w-full text-primary-color text-xs"
-                                            placeholder="0-100" required />
-                                    </label>
-
-                                    {{-- Jenis Kriteria --}}
-                                    <label class="form-control w-full">
-                                        <div class="label py-0.5">
-                                            <span class="label-text text-xs font-semibold">
-                                                <x-label-input-required>Jenis</x-label-input-required>
-                                            </span>
-                                            <span class="label-text-alt" id="loading_edit4"></span>
-                                        </div>
-                                        <div class="flex gap-1">
-                                            <label class="label cursor-pointer p-1 flex-1">
-                                                <input type="radio" value="benefit" name="jenis_kriteria" id="benefit_edit"
-                                                    class="radio-primary radio radio-xs" />
-                                                <span class="label-text text-xs ml-1">Benefit</span>
-                                            </label>
-                                            <label class="label cursor-pointer p-1 flex-1">
-                                                <input type="radio" value="cost" name="jenis_kriteria" id="cost_edit"
-                                                    class="radio-primary radio radio-xs" />
-                                                <span class="label-text text-xs ml-1">Cost</span>
-                                            </label>
-                                        </div>
-                                    </label>
-                                </div>
+                                {{-- Jenis Kriteria --}}
+                                <label class="form-control w-full">
+                                    <div class="label py-0.5">
+                                        <span class="label-text text-xs font-semibold">
+                                            <x-label-input-required>Jenis Kriteria</x-label-input-required>
+                                        </span>
+                                        <span class="label-text-alt" id="loading_edit3"></span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <label class="label cursor-pointer p-1 flex-1">
+                                            <input type="radio" value="benefit" name="jenis_kriteria" id="benefit_edit"
+                                                class="radio-primary radio radio-xs" />
+                                            <span class="label-text text-xs ml-1">Benefit</span>
+                                        </label>
+                                        <label class="label cursor-pointer p-1 flex-1">
+                                            <input type="radio" value="cost" name="jenis_kriteria" id="cost_edit"
+                                                class="radio-primary radio radio-xs" />
+                                            <span class="label-text text-xs ml-1">Cost</span>
+                                        </label>
+                                    </div>
+                                </label>
 
                                 {{-- Info tambahan untuk edit --}}
                                 <div class="text-xs text-gray-400 mt-1">
@@ -713,49 +616,6 @@
             </div>
             {{-- Akhir Modal Edit --}}
 
-            {{-- Awal Modal Import --}}
-            <input type="checkbox" id="import_button" class="modal-toggle" />
-            <div class="modal" role="dialog">
-                <div class="modal-box">
-                    <div class="mb-3 flex justify-between">
-                        <h3 class="text-lg font-bold">Impor {{ $title }}</h3>
-                        <label for="import_button" class="cursor-pointer">
-                            <i class="ri-close-large-fill"></i>
-                        </label>
-                    </div>
-                    <div>
-                        <div class="mb-4 rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800" role="alert">
-                            <span class="font-medium">Format Excel:</span>
-                            Kolom yang diperlukan: kriteria, bobot, jenis_kriteria, ranking
-                        </div>
-                        <form action="{{ route("kriteria.import") }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <label class="form-control w-full">
-                                <div class="label">
-                                    <span class="label-text font-semibold">
-                                        <x-label-input-required>File Excel</x-label-input-required>
-                                    </span>
-                                </div>
-                                <input type="file" name="import_data" accept=".xlsx,.xls"
-                                    class="file-input file-input-bordered w-full text-primary-color" required />
-                                @error("import_data")
-                                    <div class="label">
-                                        <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                                    </div>
-                                @enderror
-                            </label>
-                            <button type="submit"
-                                class="mt-4 w-full text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 hover:opacity-90"
-                                style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);">
-                                <i class="ri-upload-line"></i>
-                                Simpan Data Import
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            {{-- Akhir Modal Import --}}
-
             {{-- Awal Tabel Kriteria --}}
             <div
                 class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
@@ -769,13 +629,6 @@
                             style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
                             <i class="ri-add-fill"></i>
                             Tambah
-                        </label>
-                        <label for="import_button"
-                            class="mb-0 inline-block cursor-pointer rounded-lg px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-white shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2"
-                            onclick="return create_button()"
-                            style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
-                            <i class="ri-file-excel-2-line"></i>
-                            Impor
                         </label>
                     </div>
                 </div>
@@ -791,7 +644,6 @@
                                     <th class="text-center py-4 px-3 border-r border-gray-600">Kode</th>
                                     <th class="text-center py-4 px-3 border-r border-gray-600">Ranking</th>
                                     <th class="text-center py-4 px-3 border-r border-gray-600">Nama Kriteria</th>
-                                    <th class="text-center py-4 px-3 border-r border-gray-600">Bobot (%)</th>
                                     <th class="text-center py-4 px-3 border-r border-gray-600">Jenis</th>
                                     <th class="rounded-tr text-center py-4 px-3">Aksi</th>
                                 </tr>
@@ -823,11 +675,6 @@
                                             {{ $item->kriteria }}
                                         </td>
 
-                                        <!-- Bobot -->
-                                        <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
-                                            {{ $item->bobot }}%
-                                        </td>
-
                                         <!-- Jenis -->
                                         <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
                                             @if($item->jenis_kriteria == 'benefit')
@@ -857,20 +704,6 @@
                                     </tr>
                                 @endforeach
                             </tbody>
-                            <tfoot>
-                                <tr class="border-t-2 border-gray-300"
-                                    style="background: linear-gradient(135deg, #f8fafc, #e2e8f0);">
-                                    <td colspan="4"
-                                        class="text-right py-4 px-3 text-base font-semibold text-gray-800 border-r border-gray-200">
-                                        Total Bobot:
-                                    </td>
-                                    <td class="text-center py-4 px-3 text-base font-bold text-white border-r border-gray-200"
-                                        style="background: linear-gradient(135deg, #059669, #047857);">
-                                        {{ $sumBobot }}%
-                                    </td>
-                                    <td colspan="2" class="py-4 px-3"></td>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>

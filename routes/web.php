@@ -9,8 +9,69 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SMARTERController;
 use App\Http\Controllers\SubKriteriaController;
 use App\Http\Controllers\WelcomeController;
+use App\Helpers\SMARTERHelper;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+
+// API Routes untuk SMARTER-ROC
+Route::prefix('api/smarter')->group(function () {
+
+    // Get available rankings untuk form kriteria
+    Route::get('available-rankings', [KriteriaController::class, 'getAvailableRankings'])
+        ->name('api.smarter.available-rankings');
+
+    // Preview bobot ROC berdasarkan ranking
+    Route::get('roc-weight-preview', [KriteriaController::class, 'getROCWeightPreview'])
+        ->name('api.smarter.roc-weight-preview');
+
+    // Reorder rankings kriteria
+    Route::post('reorder-rankings', [KriteriaController::class, 'reorderRankings'])
+        ->name('api.smarter.reorder-rankings');
+
+    // Reset semua rankings kriteria
+    Route::post('reset-rankings', [KriteriaController::class, 'resetRankings'])
+        ->name('api.smarter.reset-rankings');
+
+    // Recalculate semua bobot ROC
+    Route::post('recalculate-roc', function () {
+        $result = SMARTERHelper::recalculateAllROCWeights();
+        return response()->json($result);
+    })->name('api.smarter.recalculate-roc');
+
+    // Validasi data SMARTER
+    Route::get('validate', function () {
+        $validation = SMARTERHelper::validasiData();
+        return response()->json($validation);
+    })->name('api.smarter.validate');
+
+    // Generate laporan lengkap
+    Route::get('laporan-lengkap', function () {
+        $laporan = SMARTERHelper::generateLaporanLengkap();
+        return response()->json($laporan);
+    })->name('api.smarter.laporan-lengkap');
+
+});
+
+// Web Routes untuk CRUD dengan middleware auth
+Route::middleware(['auth'])->group(function () {
+
+    // Additional web routes untuk kriteria management
+    Route::post('kriteria/reset-rankings', [KriteriaController::class, 'resetRankings'])
+        ->name('kriteria.reset-rankings');
+
+    Route::post('kriteria/recalculate-weights', function () {
+        $result = SMARTERHelper::recalculateAllROCWeights();
+
+        if ($result['success']) {
+            return redirect()->route('kriteria')
+                ->with('success', $result['message'] . " ({$result['total_updated']} kriteria diupdate)");
+        } else {
+            return redirect()->route('kriteria')
+                ->with('error', $result['message']);
+        }
+    })->name('kriteria.recalculate-weights');
+
+});
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 Route::post('/search-nik', [WelcomeController::class, 'searchNik'])->name('search.nik');
