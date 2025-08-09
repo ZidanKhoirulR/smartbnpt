@@ -264,65 +264,127 @@ class SMARTERController extends Controller
         }
     }
 
-    // Method untuk melihat hasil perhitungan detail
+    /**
+     * Method untuk melihat hasil perhitungan detail - FIXED
+     */
     public function hasilPerhitungan()
     {
-        $title = "Hasil Perhitungan SMARTER-ROC";
+        try {
+            $title = "Hasil Perhitungan SMARTER-ROC";
 
-        // Data untuk tabel perhitungan ROC
-        $kriteria = Kriteria::orderBy('ranking', 'asc')->get();
-        $K = count($kriteria);
-        $hasilROC = [];
+            // 1. Data Normalisasi Bobot ROC
+            $normalisasiBobot = NormalisasiBobot::with('kriteria')
+                ->orderBy('kriteria_id', 'asc')
+                ->get();
 
-        foreach ($kriteria as $item) {
-            $rank = $item->ranking ?? 1;
-            $sum = 0;
-            $rumusPenjumlahan = [];
+            // 2. Data Kriteria
+            $kriteria = Kriteria::orderBy('ranking', 'asc')->get();
 
-            for ($i = $rank; $i <= $K; $i++) {
-                $sum += 1 / $i;
-                $rumusPenjumlahan[] = "1/{$i}";
+            // 3. Data Alternatif
+            $alternatif = Alternatif::orderBy('kode', 'asc')->get();
+
+            // 4. Data Nilai Utility
+            $nilaiUtility = NilaiUtility::with(['alternatif', 'kriteria'])
+                ->orderBy('alternatif_id', 'asc')
+                ->orderBy('kriteria_id', 'asc')
+                ->get();
+
+            // 5. Data Nilai Akhir
+            $nilaiAkhir = NilaiAkhir::with(['alternatif', 'kriteria'])
+                ->orderBy('alternatif_id', 'asc')
+                ->orderBy('kriteria_id', 'asc')
+                ->get();
+
+            // 6. Hasil Akhir dengan Ranking
+            $hasilAkhir = NilaiAkhir::query()
+                ->join('alternatif as a', 'a.id', '=', 'nilai_akhir.alternatif_id')
+                ->selectRaw("
+                    a.id,
+                    a.kode, 
+                    a.nik,
+                    a.alternatif, 
+                    SUM(nilai_akhir.nilai) as total_nilai,
+                    ROW_NUMBER() OVER (ORDER BY SUM(nilai_akhir.nilai) DESC, a.created_at ASC) as ranking
+                ")
+                ->groupBy('a.id', 'a.kode', 'a.nik', 'a.alternatif', 'a.created_at')
+                ->orderBy('total_nilai', 'desc')
+                ->orderBy('a.created_at', 'asc')
+                ->get();
+
+            // 7. Data untuk tabel perhitungan ROC (untuk detail)
+            $K = count($kriteria);
+            $hasilROC = [];
+
+            foreach ($kriteria as $item) {
+                $rank = $item->ranking ?? 1;
+                $sum = 0;
+                $rumusPenjumlahan = [];
+
+                for ($i = $rank; $i <= $K; $i++) {
+                    $sum += 1 / $i;
+                    $rumusPenjumlahan[] = "1/{$i}";
+                }
+
+                $bobotROC = (1 / $K) * $sum;
+
+                $hasilROC[] = [
+                    'kriteria' => $item->kriteria,
+                    'rank' => $rank,
+                    'rumus' => implode(' + ', $rumusPenjumlahan),
+                    'penjumlahan' => round($sum, 3),
+                    'bobot' => round($bobotROC, 4)
+                ];
             }
 
-            $bobotROC = (1 / $K) * $sum;
+            // 8. Data matriks ternormalisasi (utility) - grouped by alternatif
+            $utilityData = $nilaiUtility->groupBy('alternatif_id');
 
-            $hasilROC[] = [
-                'kriteria' => $item->kriteria,
-                'rank' => $rank,
-                'rumus' => implode(' + ', $rumusPenjumlahan),
-                'penjumlahan' => round($sum, 3),
-                'bobot' => round($bobotROC, 4)
-            ];
+            // 9. Validasi data
+            if ($normalisasiBobot->isEmpty()) {
+                return redirect()->route('perhitungan')
+                    ->with('error', 'Data normalisasi bobot belum tersedia. Silakan lakukan perhitungan terlebih dahulu.');
+            }
+
+            if ($hasilAkhir->isEmpty()) {
+                return redirect()->route('perhitungan')
+                    ->with('error', 'Data hasil perhitungan belum tersedia. Silakan lakukan perhitungan terlebih dahulu.');
+            }
+
+            // 10. Return view dengan semua data yang diperlukan
+            return view('dashboard.smarter.hasil-perhitungan', compact(
+                'title',
+                'normalisasiBobot',
+                'kriteria',
+                'alternatif',
+                'nilaiUtility',
+                'nilaiAkhir',
+                'hasilAkhir',
+                'hasilROC',
+                'utilityData'
+            ));
+
+        } catch (\Exception $e) {
+            // Jika ada error, redirect ke perhitungan dengan pesan error
+            return redirect()->route('perhitungan')
+                ->with('error', 'Terjadi kesalahan saat mengambil data hasil perhitungan: ' . $e->getMessage());
         }
+    }
 
-        // Data matriks ternormalisasi (utility)
-        $utilityData = NilaiUtility::with(['alternatif', 'kriteria'])
-            ->orderBy('alternatif_id')
-            ->orderBy('kriteria_id')
-            ->get()
-            ->groupBy('alternatif_id');
+    /**
+     * Method tambahan untuk mendukung view index perhitungan
+     */
+    public function indexUtilityNilai()
+    {
+        $title = "Nilai Utility SMARTER";
+        $nilaiUtility = NilaiUtilityResource::collection(
+            NilaiUtility::with(['alternatif', 'kriteria'])
+                ->orderBy('alternatif_id', 'asc')
+                ->orderBy('kriteria_id', 'asc')
+                ->get()
+        );
+        $alternatif = AlternatifResource::collection(Alternatif::orderBy('kode', 'asc')->get());
+        $kriteria = KriteriaResource::collection(Kriteria::orderBy('ranking', 'asc')->get());
 
-        // Hasil akhir dengan ranking
-        $hasilAkhir = NilaiAkhir::query()
-            ->join('alternatif as a', 'a.id', '=', 'nilai_akhir.alternatif_id')
-            ->selectRaw("
-                a.kode, 
-                a.nik,
-                a.alternatif, 
-                SUM(nilai_akhir.nilai) as total_nilai,
-                ROW_NUMBER() OVER (ORDER BY SUM(nilai_akhir.nilai) DESC, a.created_at ASC) as ranking
-            ")
-            ->groupBy('a.kode', 'a.nik', 'a.alternatif', 'a.created_at')
-            ->orderBy('total_nilai', 'desc')
-            ->orderBy('a.created_at', 'asc')
-            ->get();
-
-        return view('dashboard.smarter.hasil-perhitungan', compact(
-            'title',
-            'hasilROC',
-            'utilityData',
-            'hasilAkhir',
-            'kriteria'
-        ));
+        return view('dashboard.nilai-utility.index', compact('title', 'nilaiUtility', 'alternatif', 'kriteria'));
     }
 }
