@@ -136,16 +136,6 @@
                 </div>
             </div>
 
-            <!-- Desktop Menu -->
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="/" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Beranda</a>
-                <a href="/login" class="text-blue-600 font-semibold">Login</a>
-                <button onclick="checkResult()"
-                    class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Cek Hasil</button>
-                <a href="/#tentang" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Tentang
-                    Kami</a>
-            </div>
-
             <!-- Mobile Menu Button -->
             <button class="md:hidden text-gray-700" onclick="toggleMobileMenu()">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

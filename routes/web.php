@@ -16,6 +16,15 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 // Welcome page - hanya informational
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
+// PUBLIC Routes - Dapat diakses tanpa login
+Route::prefix('public')->group(function () {
+    // Hasil akhir untuk user umum (tidak perlu login)
+    Route::get('/hasil-akhir', [WelcomeController::class, 'hasilAkhir'])->name('public.hasil-akhir');
+
+    // PDF untuk user umum
+    Route::get('/pdf-hasil-akhir', [PDFController::class, 'pdf_hasil_public'])->name('public.pdf.hasil');
+});
+
 // Auth routes
 require __DIR__ . '/auth.php';
 

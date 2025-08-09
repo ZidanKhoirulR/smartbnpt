@@ -40,7 +40,7 @@ class KriteriaRequest extends FormRequest
                 'max:255',
                 Rule::unique('kriteria')->ignore($kriteriaId)
             ],
-            'bobot' => 'required|numeric|min:0|max:100',
+            // HAPUS VALIDASI BOBOT KARENA MENGGUNAKAN METODE ROC
             'jenis_kriteria' => 'required|in:benefit,cost',
         ];
 
@@ -82,8 +82,6 @@ class KriteriaRequest extends FormRequest
             'ranking.unique' => 'Ranking sudah digunakan kriteria lain',
             'kode.unique' => 'Kode kriteria sudah digunakan',
             'kriteria.unique' => 'Nama kriteria sudah digunakan',
-            'bobot.min' => 'Bobot minimal adalah 0',
-            'bobot.max' => 'Bobot maksimal adalah 100',
             'jenis_kriteria.required' => 'Jenis kriteria harus dipilih',
             'jenis_kriteria.in' => 'Jenis kriteria harus benefit atau cost',
         ];
@@ -103,12 +101,7 @@ class KriteriaRequest extends FormRequest
             ]);
         }
 
-        // Auto-cast bobot ke float
-        if ($this->has('bobot')) {
-            $this->merge([
-                'bobot' => (float) $this->bobot,
-            ]);
-        }
+        // HAPUS AUTO-CAST BOBOT KARENA TIDAK DIGUNAKAN LAGI
     }
 
     /**

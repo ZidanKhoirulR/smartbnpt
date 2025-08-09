@@ -379,14 +379,14 @@
             };
 
             toast.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <i class="${iconMap[type] || iconMap.info}"></i>
-                        <span class="text-sm">${message}</span>
-                        <button class="btn btn-ghost btn-xs ml-2" onclick="this.parentElement.parentElement.remove()">
-                            <i class="ri-close-line"></i>
-                        </button>
-                    </div>
-                `;
+                                                    <div class="flex items-center gap-2">
+                                                        <i class="${iconMap[type] || iconMap.info}"></i>
+                                                        <span class="text-sm">${message}</span>
+                                                        <button class="btn btn-ghost btn-xs ml-2" onclick="this.parentElement.parentElement.remove()">
+                                                            <i class="ri-close-line"></i>
+                                                        </button>
+                                                    </div>
+                                                `;
 
             document.body.appendChild(toast);
 
@@ -485,42 +485,44 @@
             padding: 12px 8px !important;
         }
 
-        /* Pastikan semua teks dalam header rata tengah */
-        #myTable thead th * {
-            text-align: center !important;
-        }
+        /* UPDATE BAGIAN CSS DI INDEX.BLADE.PHP - SECTION CSS */
 
-        /* Konsistensi lebar kolom - disesuaikan tanpa kolom bobot */
+        /* Konsistensi lebar kolom - kembali ke layout tanpa kolom bobot */
         #myTable th:nth-child(1),
         #myTable td:nth-child(1) {
             width: 8%;
         }
 
         /* No */
+
         #myTable th:nth-child(2),
         #myTable td:nth-child(2) {
             width: 12%;
         }
 
         /* Kode */
+
         #myTable th:nth-child(3),
         #myTable td:nth-child(3) {
             width: 12%;
         }
 
         /* Ranking */
+
         #myTable th:nth-child(4),
         #myTable td:nth-child(4) {
             width: 50%;
         }
 
         /* Nama Kriteria */
+
         #myTable th:nth-child(5),
         #myTable td:nth-child(5) {
             width: 12%;
         }
 
         /* Jenis */
+
         #myTable th:nth-child(6),
         #myTable td:nth-child(6) {
             width: 6%;

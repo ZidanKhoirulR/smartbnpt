@@ -12,6 +12,49 @@ use Barryvdh\DomPDF\Facade\PDF;
 
 class PDFController extends Controller
 {
+    /**
+     *Generate PDF hasil akhir untuk user umum (public access)
+     */
+    public function pdf_hasil_public()
+    {
+        // Validasi data terlebih dahulu
+        $validation = SMARTERHelper::validasiData();
+
+        if (!$validation['valid']) {
+            return redirect()->route('public.hasil-akhir')
+                ->with('error', 'Data belum lengkap untuk mengexport PDF.');
+        }
+
+        try {
+            // Ambil data hasil akhir
+            $nilaiAkhir = SMARTERHelper::hitungNilaiAkhir();
+
+            if (empty($nilaiAkhir)) {
+                return redirect()->route('public.hasil-akhir')
+                    ->with('error', 'Belum ada hasil perhitungan yang tersedia.');
+            }
+
+            // Load view PDF dengan data
+            $pdf = PDF::loadView('pdf.hasil-akhir-public', [
+                'title' => 'Hasil Akhir Penerimaan BPNT',
+                'nilaiAkhir' => $nilaiAkhir,
+                'tanggal' => now()->format('d F Y')
+            ]);
+
+            // Set paper size dan orientasi
+            $pdf->setPaper('A4', 'portrait');
+
+            // Download PDF dengan nama file yang sesuai
+            $fileName = 'Hasil_Akhir_BPNT_' . now()->format('Y-m-d') . '.pdf';
+
+            return $pdf->download($fileName);
+
+        } catch (\Exception $e) {
+            return redirect()->route('public.hasil-akhir')
+                ->with('error', 'Terjadi kesalahan dalam mengexport PDF.');
+        }
+    }
+
     public function pdf_hasil()
     {
         $judul = 'Laporan Hasil Akhir';

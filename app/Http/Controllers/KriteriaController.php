@@ -36,7 +36,8 @@ class KriteriaController extends Controller
                 ->get()
         );
 
-        $sumBobot = $kriteria->sum('bobot');
+        // HAPUS PERHITUNGAN SUM BOBOT KARENA MENGGUNAKAN ROC
+        // $sumBobot = $kriteria->sum('bobot');
 
         // Generate kode otomatis
         $lastKode = Kriteria::orderBy('kode', 'desc')->first();
@@ -46,7 +47,8 @@ class KriteriaController extends Controller
             $kode = "K00001";
         }
 
-        return view('dashboard.kriteria.index', compact('title', 'kriteria', 'sumBobot', 'kode'));
+        // HAPUS $sumBobot DARI COMPACT
+        return view('dashboard.kriteria.index', compact('title', 'kriteria', 'kode'));
     }
 
     /**
@@ -70,7 +72,7 @@ class KriteriaController extends Controller
                 $this->adjustExistingRankings($newRanking);
             }
 
-            // Buat kriteria baru
+            // Buat kriteria baru (tanpa bobot karena tidak ada kolom bobot di database)
             $kriteria = Kriteria::create($validated);
             Log::info('Kriteria created with ID:', ['id' => $kriteria->id]);
 
@@ -98,14 +100,14 @@ class KriteriaController extends Controller
     {
         try {
             $kriteriaId = $request->kriteria_id;
-            
+
             if (!$kriteriaId) {
                 Log::error('Kriteria ID not provided in edit request');
                 return response()->json(['error' => 'ID tidak ditemukan'], 400);
             }
 
             $kriteria = Kriteria::find($kriteriaId);
-            
+
             if (!$kriteria) {
                 Log::error("Kriteria not found with ID: {$kriteriaId}");
                 return response()->json(['error' => 'Data tidak ditemukan'], 404);
@@ -114,18 +116,17 @@ class KriteriaController extends Controller
             // Log untuk debugging
             Log::info('Kriteria edit data:', $kriteria->toArray());
 
-            // Return resource dengan format yang konsisten
+            // Return resource dengan format yang konsisten (tanpa bobot)
             return response()->json([
                 'data' => [
                     'id' => $kriteria->id,
                     'kode' => $kriteria->kode,
                     'kriteria' => $kriteria->kriteria,
-                    'bobot' => $kriteria->bobot,
                     'ranking' => $kriteria->ranking,
                     'jenis_kriteria' => $kriteria->jenis_kriteria
                 ]
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error('Error in kriteria edit: ' . $e->getMessage());
             return response()->json(['error' => 'Terjadi kesalahan sistem'], 500);
@@ -152,16 +153,20 @@ class KriteriaController extends Controller
             // Ambil kriteria yang akan diupdate
             $kriteria = Kriteria::findOrFail($kriteriaId);
             $oldRanking = $kriteria->ranking;
-            $newRanking = $validated['ranking'];
 
-            // Jika ranking berubah, adjust ranking kriteria lain
-            if ($oldRanking != $newRanking) {
-                Log::info("Adjusting rankings for update: {$oldRanking} -> {$newRanking}");
-                $this->adjustRankingsForUpdate($kriteriaId, $oldRanking, $newRanking);
+            // UNTUK EDIT, RANKING TIDAK BERUBAH (SESUAI DENGAN FORM YANG READONLY)
+            // Tapi jika ada perubahan ranking (untuk future development)
+            if (isset($validated['ranking'])) {
+                $newRanking = $validated['ranking'];
+                if ($oldRanking != $newRanking) {
+                    Log::info("Adjusting rankings for update: {$oldRanking} -> {$newRanking}");
+                    $this->adjustRankingsForUpdate($kriteriaId, $oldRanking, $newRanking);
+                }
             }
 
-            // Update kriteria
+            // Update kriteria (tanpa bobot)
             $kriteria->update($validated);
+
             Log::info('Kriteria updated successfully');
 
             DB::commit();
@@ -215,6 +220,105 @@ class KriteriaController extends Controller
             DB::rollBack();
             Log::error('Error deleting kriteria: ' . $e->getMessage());
             return to_route('kriteria')->with('error', 'Kriteria gagal dihapus: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * METODE BARU: Hitung bobot menggunakan ROC (Rank Order Centroid)
+     * Ini untuk keperluan perhitungan internal saja, tidak disimpan ke database
+     */
+    private function calculateROCWeight($ranking, $totalKriteria)
+    {
+        if ($totalKriteria == 0)
+            return 0;
+
+        $weight = 0;
+        for ($k = $ranking; $k <= $totalKriteria; $k++) {
+            $weight += 1 / $k;
+        }
+
+        return ($weight / $totalKriteria) * 100; // Dalam persentase
+    }
+
+    /**
+     * METODE BARU: Mendapatkan semua bobot ROC untuk perhitungan
+     * (tidak menyimpan ke database, hanya untuk perhitungan on-the-fly)
+     */
+    public function getROCWeights()
+    {
+        $allKriteria = Kriteria::orderBy('ranking', 'asc')->get();
+        $totalKriteria = $allKriteria->count();
+        $weights = [];
+
+        foreach ($allKriteria as $kriteria) {
+            if ($kriteria->ranking) {
+                $weights[$kriteria->id] = $this->calculateROCWeight($kriteria->ranking, $totalKriteria);
+            }
+        }
+
+        return $weights;
+    }
+
+    /**
+     * Get ROC weights untuk semua kriteria (untuk digunakan di perhitungan SMARTER)
+     * 
+     * @return array
+     */
+    public function getAllROCWeights()
+    {
+        $kriteria = Kriteria::orderBy('ranking', 'asc')->get();
+        $totalKriteria = $kriteria->count();
+        $rocWeights = [];
+
+        foreach ($kriteria as $item) {
+            if ($item->ranking) {
+                $rocWeights[$item->id] = [
+                    'kode' => $item->kode,
+                    'kriteria' => $item->kriteria,
+                    'ranking' => $item->ranking,
+                    'bobot_roc' => $this->calculateROCWeight($item->ranking, $totalKriteria),
+                    'jenis_kriteria' => $item->jenis_kriteria
+                ];
+            }
+        }
+
+        return $rocWeights;
+    }
+
+    /**
+     * Get ROC weight untuk kriteria tertentu
+     * 
+     * @param int $kriteriaId
+     * @return float
+     */
+    public function getROCWeightForKriteria($kriteriaId)
+    {
+        $kriteria = Kriteria::findOrFail($kriteriaId);
+        $totalKriteria = Kriteria::count();
+
+        return $this->calculateROCWeight($kriteria->ranking, $totalKriteria);
+    }
+
+    /**
+     * API endpoint untuk mendapatkan semua bobot ROC
+     */
+    public function apiGetROCWeights()
+    {
+        try {
+            $rocWeights = $this->getAllROCWeights();
+
+            return response()->json([
+                'success' => true,
+                'data' => $rocWeights,
+                'total_kriteria' => count($rocWeights)
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error getting ROC weights: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Gagal mengambil bobot ROC'
+            ], 500);
         }
     }
 
@@ -318,9 +422,8 @@ class KriteriaController extends Controller
         try {
             DB::beginTransaction();
 
-            // Ambil semua kriteria, urutkan berdasarkan ranking lama (jika ada) atau bobot
+            // Ambil semua kriteria, urutkan berdasarkan ranking lama (jika ada) atau ID
             $kriteria = Kriteria::orderByRaw('ranking IS NULL, ranking ASC')
-                ->orderBy('bobot', 'desc')
                 ->orderBy('id', 'asc')
                 ->get();
 
@@ -347,11 +450,10 @@ class KriteriaController extends Controller
     {
         $kriteria = Kriteria::whereNull('ranking')
             ->orWhere('ranking', 0)
-            ->orderBy('bobot', 'desc') // Fallback berdasarkan bobot
             ->orderBy('created_at', 'asc')
             ->get();
 
-        $nextRanking = Kriteria::max('ranking') + 1;
+        $nextRanking = (Kriteria::max('ranking') ?? 0) + 1;
 
         foreach ($kriteria as $item) {
             $item->update(['ranking' => $nextRanking]);

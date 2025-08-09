@@ -134,37 +134,27 @@
                     <div class="font-bold text-xl text-gray-900">SPK BPNT</div>
                     <div class="text-sm text-gray-600">Metode SMARTER</div>
                 </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-gray-700" onclick="toggleMobileMenu()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16">
+                        </path>
+                    </svg>
+                </button>
             </div>
 
-            <!-- Desktop Menu -->
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="/" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Beranda</a>
-                <a href="/login" class="text-blue-600 font-semibold">Login</a>
-                <button onclick="checkResult()"
-                    class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Cek Hasil</button>
-                <a href="/#tentang" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Tentang
-                    Kami</a>
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="mobile-menu md:hidden mt-4 px-6 py-4 bg-white rounded-lg mx-6">
+                <div class="space-y-3">
+                    <a href="/" class="block text-gray-700 hover:text-blue-600 font-medium">Beranda</a>
+                    <a href="/login" class="block text-blue-600 font-semibold">Login</a>
+                    <button onclick="checkResult()"
+                        class="block text-gray-700 hover:text-blue-600 font-medium text-left w-full">Cek Hasil</button>
+                    <a href="/#tentang" class="block text-gray-700 hover:text-blue-600 font-medium">Tentang Kami</a>
+                </div>
             </div>
-
-            <!-- Mobile Menu Button -->
-            <button class="md:hidden text-gray-700" onclick="toggleMobileMenu()">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
-                    </path>
-                </svg>
-            </button>
-        </div>
-
-        <!-- Mobile Menu -->
-        <div id="mobileMenu" class="mobile-menu md:hidden mt-4 px-6 py-4 bg-white rounded-lg mx-6">
-            <div class="space-y-3">
-                <a href="/" class="block text-gray-700 hover:text-blue-600 font-medium">Beranda</a>
-                <a href="/login" class="block text-blue-600 font-semibold">Login</a>
-                <button onclick="checkResult()"
-                    class="block text-gray-700 hover:text-blue-600 font-medium text-left w-full">Cek Hasil</button>
-                <a href="/#tentang" class="block text-gray-700 hover:text-blue-600 font-medium">Tentang Kami</a>
-            </div>
-        </div>
     </nav>
 
     <!-- Main Content -->

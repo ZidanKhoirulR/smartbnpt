@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- PERBAIKAN: Tambahkan Remix Icons untuk ikon -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         body {
@@ -55,6 +56,7 @@
             box-shadow: 0 10px 20px rgba(16, 185, 129, 0.4);
         }
 
+        /* PERBAIKAN: Styling untuk tombol yang disabled */
         .btn-disabled {
             background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
             cursor: not-allowed;
@@ -403,6 +405,13 @@
                     <span class="font-bold text-yellow-300">SMARTER</span>
                     untuk transparansi dan akurasi tertinggi dalam seleksi penerima bantuan
                 </p>
+
+                <!-- Action Button (hanya tombol orange) -->
+                <a href="{{ route('public.hasil-akhir') }}"
+                    class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200">
+                    <i class="ri-trophy-line mr-2 text-lg"></i>
+                    Lihat Hasil Akhir
+                </a>
             </div>
 
             <!-- SMARTER Method Info -->
@@ -456,7 +465,7 @@
             <!-- Statistics -->
             <div class="welcome-card rounded-3xl p-8 lg:p-10 mb-8 slide-in" style="animation-delay: 0.4s;">
                 <h3 class="text-3xl font-bold text-gray-900 text-center mb-8">Keunggulan Metode SMARTER</h3>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center mb-8">
                     <div>
                         <div class="text-4xl font-bold text-blue-600 mb-2" id="accuracy">98%</div>
                         <div class="text-gray-700 font-medium">Akurasi Seleksi</div>
@@ -477,6 +486,18 @@
                         <div class="text-gray-700 font-medium">Kepuasan</div>
                         <div class="text-sm text-gray-500">Berdasarkan survey</div>
                     </div>
+                </div>
+                <!-- Call to Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <a href="/login"
+                        class="btn-primary text-white font-bold py-4 px-8 rounded-xl text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Login Admin
+                    </a>
                 </div>
             </div>
         </div>
@@ -810,7 +831,7 @@
                 const menuButton = event.target.closest('button');
 
                 // Close mobile menu
-                if (!mobileMenu.contains(event.target) && !menuButton?.onclick?.toString().includes('toggleMobileMenu')) {
+                if (!mobileMenu.contains(event.target) && (!menuButton || !menuButton.onclick || !menuButton.onclick.toString().includes('toggleMobileMenu'))) {
                     mobileMenu.classList.remove('active');
                 }
             });

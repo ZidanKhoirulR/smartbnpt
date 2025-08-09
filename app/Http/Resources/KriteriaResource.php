@@ -18,9 +18,10 @@ class KriteriaResource extends JsonResource
             'id' => $this->id,
             'kode' => $this->kode,
             'kriteria' => $this->kriteria,
-            'bobot' => $this->bobot,
-            'ranking' => $this->ranking,  // TAMBAHKAN INI
+            'ranking' => $this->ranking,
             'jenis_kriteria' => $this->jenis_kriteria,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }
