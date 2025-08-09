@@ -50,6 +50,16 @@ Route::prefix('api/smarter')->group(function () {
         return response()->json($laporan);
     })->name('api.smarter.laporan-lengkap');
 
+    Route::get('/hasil-akhir-public', [
+        WelcomeController::class,
+        'hasilAkhirPublic'
+    ])->name('hasil-akhir.public');
+
+    Route::get('/hasil-akhir-public/pdf', [
+        WelcomeController::class,
+        'hasilAkhirPublicPDF'
+    ])->name('hasil-akhir.public.pdf');
+
 });
 
 // Web Routes untuk CRUD dengan middleware auth
@@ -74,7 +84,6 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
-Route::post('/search-nik', [WelcomeController::class, 'searchNik'])->name('search.nik');
 
 // Tetap pakai controller untuk handle POST login
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])

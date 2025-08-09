@@ -393,17 +393,11 @@
                 </p>
 
                 <!-- Action Button (hanya tombol orange) -->
-                <div class="flex justify-center mt-8">
-                    <a href="/hasil-akhir"
-                        class="btn-primary text-white px-8 py-4 rounded-xl font-semibold text-lg inline-flex items-center justify-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                            </path>
-                        </svg>
-                        Lihat Hasil Akhir
-                    </a>
-                </div>
+                <a href="{{ route('hasil-akhir.public') }}"
+                    class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200">
+                    <i class="ri-trophy-line mr-2 text-lg"></i>
+                    Lihat Hasil Akhir
+                </a>
             </div>
 
             <!-- SMARTER Method Info -->
