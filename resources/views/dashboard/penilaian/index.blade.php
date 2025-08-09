@@ -33,172 +33,167 @@
                 const form = this;
                 let isValid = true;
 
-                // Skip validation for import form
-                if ($(form).find('input[name="import_data"]').length > 0) {
-                    return true;
-                }
-
                 // Validate all select fields are selected
-                $(form).find('select[required]').each(function () {
-                    if (!this.value || this.value === 'Pilih Sub Kriteria!' || this.value === '') {
-                        isValid = false;
-                        validateSubKriteria(this);
-                    } else {
-                        validateSubKriteria(this);
+                    $(form).find('select[required]').each(function () {
+                        if (!this.value || this.value === 'Pilih Sub Kriteria!' || this.value === '') {
+                            isValid = false;
+                            validateSubKriteria(this);
+                        } else {
+                            validateSubKriteria(this);
+                        }
+                    });
+
+                    if (!isValid) {
+                        e.preventDefault();
+                        showNotification('Pastikan semua kriteria telah dipilih', 'error');
+                        return false;
+                    }
+
+                    // Show loading on submit button
+                    const $submitBtn = $(form).find('button[type="submit"]');
+                    const originalText = $submitBtn.html();
+                    $submitBtn.html('<span class="loading loading-spinner loading-sm"></span> Menyimpan...').prop('disabled', true);
+
+                    // Restore button after 3 seconds (fallback)
+                    setTimeout(() => {
+                        $submitBtn.html(originalText).prop('disabled', false);
+                    }, 3000);
+                });
+            });
+
+            function create_button(alternatif_id) {
+                // Reset form
+                $("input[name='alternatif_id']").val(alternatif_id);
+
+                // Reset all selects
+                $("select[name='sub_kriteria_id[]']").val('');
+                $("select[name='sub_kriteria_id[]']").prop('selectedIndex', 0);
+
+                // Reset validation styling
+                resetValidation();
+
+                // Auto focus on first select
+                setTimeout(() => {
+                    $("#create_button").closest('.modal').find("select[name='sub_kriteria_id[]']").first().focus();
+                }, 200);
+            }
+
+            function edit_button(alternatif_id) {
+                // Show loading
+                showLoadingState();
+
+                $.ajax({
+                    type: "get",
+                    url: "{{ route("penilaian.edit") }}",
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "alternatif_id": alternatif_id
+                    },
+                    success: function (data) {
+                        // Populate form
+                        $("input[name='alternatif_id']").val(data[0].alternatif_id);
+                        @foreach ($kriteria as $value => $item)
+                            $("input[id='kriteria_id_{{ $item->id }}']").val(data[{{ $value }}].kriteria_id);
+                            $("select[id='sub_kriteria_id_{{ $item->id }}']").val(data[{{ $value }}].sub_kriteria_id);
+                        @endforeach
+
+                        // Hide loading
+                        hideLoadingState();
+
+                        // Reset validation and validate current values
+                        resetValidation();
+                        $("select[name='sub_kriteria_id[]']").each(function () {
+                            validateSubKriteria(this);
+                        });
+                    },
+                    error: function () {
+                        hideLoadingState();
+                        showNotification('Gagal memuat data penilaian', 'error');
                     }
                 });
+            }
 
-                if (!isValid) {
-                    e.preventDefault();
-                    showNotification('Pastikan semua kriteria telah dipilih', 'error');
+            // Enhanced validation functions
+            function validateSubKriteria(select) {
+                const value = select.value;
+                const $select = $(select);
+                const $formControl = $select.closest('.form-control');
+
+                // Remove previous validation
+                $select.removeClass('select-error select-success border-red-500 border-green-500');
+                $formControl.find('.validation-message').remove();
+
+                if (!value || value === 'Pilih Sub Kriteria!' || value === '') {
+                    showValidationError($select, 'Kriteria wajib dipilih');
                     return false;
                 }
 
-                // Show loading on submit button
-                const $submitBtn = $(form).find('button[type="submit"]');
-                const originalText = $submitBtn.html();
-                $submitBtn.html('<span class="loading loading-spinner loading-sm"></span> Menyimpan...').prop('disabled', true);
-
-                // Restore button after 3 seconds (fallback)
-                setTimeout(() => {
-                    $submitBtn.html(originalText).prop('disabled', false);
-                }, 3000);
-            });
-        });
-
-        function create_button(alternatif_id) {
-            // Reset form
-            $("input[name='alternatif_id']").val(alternatif_id);
-
-            // Reset all selects
-            $("select[name='sub_kriteria_id[]']").val('');
-            $("select[name='sub_kriteria_id[]']").prop('selectedIndex', 0);
-
-            // Reset validation styling
-            resetValidation();
-
-            // Auto focus on first select
-            setTimeout(() => {
-                $("#create_button").closest('.modal').find("select[name='sub_kriteria_id[]']").first().focus();
-            }, 200);
-        }
-
-        function edit_button(alternatif_id) {
-            // Show loading
-            showLoadingState();
-
-            $.ajax({
-                type: "get",
-                url: "{{ route("penilaian.edit") }}",
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "alternatif_id": alternatif_id
-                },
-                success: function (data) {
-                    // Populate form
-                    $("input[name='alternatif_id']").val(data[0].alternatif_id);
-                    @foreach ($kriteria as $value => $item)
-                        $("input[id='kriteria_id_{{ $item->id }}']").val(data[{{ $value }}].kriteria_id);
-                        $("select[id='sub_kriteria_id_{{ $item->id }}']").val(data[{{ $value }}].sub_kriteria_id);
-                    @endforeach
-
-                    // Hide loading
-                    hideLoadingState();
-
-                    // Reset validation and validate current values
-                    resetValidation();
-                    $("select[name='sub_kriteria_id[]']").each(function () {
-                        validateSubKriteria(this);
-                    });
-                },
-                error: function () {
-                    hideLoadingState();
-                    showNotification('Gagal memuat data penilaian', 'error');
-                }
-            });
-        }
-
-        // Enhanced validation functions
-        function validateSubKriteria(select) {
-            const value = select.value;
-            const $select = $(select);
-            const $formControl = $select.closest('.form-control');
-
-            // Remove previous validation
-            $select.removeClass('select-error select-success border-red-500 border-green-500');
-            $formControl.find('.validation-message').remove();
-
-            if (!value || value === 'Pilih Sub Kriteria!' || value === '') {
-                showValidationError($select, 'Kriteria wajib dipilih');
-                return false;
+                showValidationSuccess($select);
+                return true;
             }
 
-            showValidationSuccess($select);
-            return true;
-        }
+            // Validation helper functions
+            function showValidationError($select, message) {
+                $select.addClass('select-error border-red-500');
+                const $formControl = $select.closest('.form-control');
 
-        // Validation helper functions
-        function showValidationError($select, message) {
-            $select.addClass('select-error border-red-500');
-            const $formControl = $select.closest('.form-control');
+                // Remove existing message
+                $formControl.find('.validation-message').remove();
 
-            // Remove existing message
-            $formControl.find('.validation-message').remove();
+                // Add error message
+                const errorHtml = `
+                                                                        <div class="label validation-message">
+                                                                            <span class="label-text-alt text-sm text-red-500">
+                                                                                <i class="ri-error-warning-line mr-1"></i>${message}
+                                                                            </span>
+                                                                        </div>
+                                                                    `;
+                $formControl.append(errorHtml);
+            }
 
-            // Add error message
-            const errorHtml = `
-                                                                    <div class="label validation-message">
-                                                                        <span class="label-text-alt text-sm text-red-500">
-                                                                            <i class="ri-error-warning-line mr-1"></i>${message}
-                                                                        </span>
-                                                                    </div>
-                                                                `;
-            $formControl.append(errorHtml);
-        }
+            function showValidationSuccess($select) {
+                $select.addClass('select-success border-green-500');
+                const $formControl = $select.closest('.form-control');
+                $formControl.find('.validation-message').remove();
+            }
 
-        function showValidationSuccess($select) {
-            $select.addClass('select-success border-green-500');
-            const $formControl = $select.closest('.form-control');
-            $formControl.find('.validation-message').remove();
-        }
+            function resetValidation() {
+                $('select').removeClass('select-error select-success border-red-500 border-green-500');
+                $('.validation-message').remove();
+            }
 
-        function resetValidation() {
-            $('select').removeClass('select-error select-success border-red-500 border-green-500');
-            $('.validation-message').remove();
-        }
+            // Loading state functions
+            function showLoadingState() {
+                const loading = `<span class="loading loading-dots loading-md text-purple-600"></span>`;
+                @foreach ($kriteria as $item)
+                    $("#loading_edit_{{ $item->id }}").html(loading);
+                @endforeach
+                                                                }
 
-        // Loading state functions
-        function showLoadingState() {
-            const loading = `<span class="loading loading-dots loading-md text-purple-600"></span>`;
-            @foreach ($kriteria as $item)
-                $("#loading_edit_{{ $item->id }}").html(loading);
-            @endforeach
-                                                            }
+            function hideLoadingState() {
+                @foreach ($kriteria as $item)
+                    $("#loading_edit_{{ $item->id }}").html('');
+                @endforeach
+                                                                }
 
-        function hideLoadingState() {
-            @foreach ($kriteria as $item)
-                $("#loading_edit_{{ $item->id }}").html('');
-            @endforeach
-                                                            }
+            // Enhanced notification
+            function showNotification(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `alert alert-${type} fixed top-4 right-4 w-auto z-50 shadow-lg`;
+                toast.innerHTML = `
+                                                                        <div class="flex items-center gap-2">
+                                                                            <i class="ri-${type === 'error' ? 'error-warning' : 'information'}-line"></i>
+                                                                            <span>${message}</span>
+                                                                        </div>
+                                                                    `;
 
-        // Enhanced notification
-        function showNotification(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `alert alert-${type} fixed top-4 right-4 w-auto z-50 shadow-lg`;
-            toast.innerHTML = `
-                                                                    <div class="flex items-center gap-2">
-                                                                        <i class="ri-${type === 'error' ? 'error-warning' : 'information'}-line"></i>
-                                                                        <span>${message}</span>
-                                                                    </div>
-                                                                `;
+                document.body.appendChild(toast);
 
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        }
-    </script>
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+        </script>
 @endsection
 
 @section("css")
@@ -395,63 +390,12 @@
     </div>
     {{-- Akhir Modal Edit --}}
 
-    {{-- Awal Modal Import --}}
-    <input type="checkbox" id="import_button" class="modal-toggle" />
-    <div class="modal" role="dialog">
-        <div class="modal-box">
-            <div class="mb-3 flex justify-between">
-                <h3 class="text-lg font-bold">Impor {{ $title }}</h3>
-                <label for="import_button" class="cursor-pointer">
-                    <i class="ri-close-large-fill"></i>
-                </label>
-            </div>
-            <div>
-                <div class="mb-4 rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800" role="alert">
-                    <span class="font-medium">Format Excel:</span>
-                    Pastikan kolom sesuai dengan kriteria yang tersedia dan data alternatif sudah ada.
-                </div>
-                <form action="{{ route("penilaian.import") }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <label class="form-control w-full">
-                        <div class="label">
-                            <span class="label-text font-semibold">
-                                <x-label-input-required>File Excel</x-label-input-required>
-                            </span>
-                        </div>
-                        <input type="file" name="import_data" accept=".xlsx,.xls"
-                            class="file-input file-input-bordered w-full text-primary-color" required />
-                        @error("import_data")
-                            <div class="label">
-                                <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                            </div>
-                        @enderror
-                    </label>
-                    <button type="submit"
-                        class="mt-4 w-full text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 hover:opacity-90"
-                        style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);">
-                        <i class="ri-upload-line"></i>
-                        Simpan Data Import
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-    {{-- Akhir Modal Import --}}
-
     {{-- Awal Tabel Penilaian --}}
     <div
         class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
         <div
             class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
             <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel {{ $title }}</h6>
-            <div class="flex gap-2">
-                <label for="import_button"
-                    class="mb-0 inline-block cursor-pointer rounded-lg px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-white shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2"
-                    style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
-                    <i class="ri-file-excel-2-line"></i>
-                    Impor
-                </label>
-            </div>
         </div>
         <div class="flex-auto px-0 pb-2 pt-0">
             <div class="overflow-x-auto p-0 px-6 pb-6">

@@ -72,16 +72,6 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
-        .search-box {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
-
-        .search-box:focus-within {
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-            border-color: #3b82f6;
-        }
-
         .icon-float {
             animation: float 3s ease-in-out infinite;
         }
@@ -259,12 +249,6 @@
             display: block;
         }
 
-        .search-result {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-        }
-
         footer {
             background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
         }
@@ -277,26 +261,6 @@
 
         section {
             scroll-margin-top: 80px;
-        }
-
-        #cekStatusSection {
-            scroll-margin-top: 120px;
-        }
-
-        .error-notification {
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         /* About section improvements */
@@ -322,137 +286,6 @@
             align-items: center;
             justify-content: center;
             margin: 0 auto 1.5rem auto;
-        }
-
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background-color: white;
-            min-width: 220px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-            border-radius: 12px;
-            z-index: 1000;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            margin-top: 8px;
-            padding: 8px 0;
-        }
-
-        .dropdown-content a,
-        .dropdown-content button {
-            color: #374151;
-            padding: 14px 20px;
-            text-decoration: none;
-            display: block;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-            border-radius: 8px;
-            margin: 2px 8px;
-            width: calc(100% - 16px);
-        }
-
-        .dropdown-content a:first-child,
-        .dropdown-content button:first-child {
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-        }
-
-        .dropdown-content a:last-child,
-        .dropdown-content button:last-child {
-            border-bottom-left-radius: 8px;
-            border-bottom-right-radius: 8px;
-        }
-
-        .dropdown-content a:hover,
-        .dropdown-content button:hover {
-            background-color: #f3f4f6;
-            color: #3b82f6;
-            transform: translateX(4px);
-        }
-
-        .dropdown:hover .dropdown-content,
-        .dropdown.active .dropdown-content {
-            display: block;
-            animation: dropdownFadeIn 0.3s ease;
-        }
-
-        .dropdown-content::before {
-            content: '';
-            position: absolute;
-            top: -16px;
-            left: 0;
-            right: 0;
-            height: 16px;
-            background: transparent;
-        }
-
-        @keyframes dropdownFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .dropdown-arrow {
-            transition: transform 0.3s ease;
-        }
-
-        .dropdown:hover .dropdown-arrow {
-            transform: rotate(180deg);
-        }
-
-        /* Mobile dropdown styles */
-        .mobile-dropdown {
-            position: relative;
-        }
-
-        .mobile-dropdown-content {
-            display: none;
-            background-color: #f9fafb;
-            border-radius: 8px;
-            margin-top: 8px;
-            border: 1px solid #e5e7eb;
-        }
-
-        .mobile-dropdown-content.active {
-            display: block;
-        }
-
-        .mobile-dropdown-content a,
-        .mobile-dropdown-content button {
-            color: #374151;
-            padding: 10px 16px;
-            text-decoration: none;
-            display: block;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-            border-radius: 6px;
-            margin: 4px 0;
-        }
-
-        .mobile-dropdown-content a:hover,
-        .mobile-dropdown-content button:hover {
-            background-color: #e5e7eb;
-            color: #3b82f6;
         }
 
         @media(max-width: 768px) {
@@ -484,34 +317,6 @@
             <div class="hidden md:flex items-center space-x-4">
                 <a href="#beranda"
                     class="text-gray-700 hover:text-blue-600 font-medium transition-colors px-3 py-2 rounded-lg hover:bg-blue-50">Beranda</a>
-                <div class="dropdown" id="desktopDropdown">
-                    <button onclick="toggleDesktopDropdown()"
-                        class="text-gray-700 hover:text-blue-600 font-medium transition-colors px-3 py-2 rounded-lg hover:bg-blue-50 flex items-center space-x-1">
-                        <span>Cek Hasil</span>
-                        <svg class="w-4 h-4 dropdown-arrow" id="desktopDropdownArrow" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                            </path>
-                        </svg>
-                    </button>
-                    <div class="dropdown-content" id="desktopDropdownContent">
-                        <button onclick="scrollToCekStatus()" class="flex items-center space-x-3">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            <span>Cek Status BPNT</span>
-                        </button>
-                        <button onclick="downloadData()" class="flex items-center space-x-3">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                </path>
-                            </svg>
-                            <span>Unduh Data Hasil</span>
-                        </button>
-                    </div>
-                </div>
                 <a href="#tentang"
                     class="text-gray-700 hover:text-blue-600 font-medium transition-colors px-3 py-2 rounded-lg hover:bg-blue-50">Tentang
                     Kami</a>
@@ -535,34 +340,6 @@
             <div class="space-y-3">
                 <a href="#beranda"
                     class="block text-gray-700 hover:text-blue-600 font-medium py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors">Beranda</a>
-                <div class="mobile-dropdown">
-                    <button onclick="toggleMobileDropdown()"
-                        class="flex items-center justify-between w-full text-gray-700 hover:text-blue-600 font-medium py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors">
-                        <span>Cek Hasil</span>
-                        <svg class="w-4 h-4 dropdown-arrow" id="mobileDropdownArrow" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                            </path>
-                        </svg>
-                    </button>
-                    <div class="mobile-dropdown-content" id="mobileDropdownContent">
-                        <button onclick="scrollToCekStatus(); toggleMobileMenu();" class="flex items-center space-x-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            <span>Cek Status BPNT</span>
-                        </button>
-                        <button onclick="downloadData(); toggleMobileMenu();" class="flex items-center space-x-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                </path>
-                            </svg>
-                            <span>Unduh Data Hasil</span>
-                        </button>
-                    </div>
-                </div>
                 <a href="#tentang"
                     class="block text-gray-700 hover:text-blue-600 font-medium py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors">Tentang
                     Kami</a>
@@ -614,60 +391,23 @@
                     <span class="font-bold text-yellow-300">SMARTER</span>
                     untuk transparansi dan akurasi tertinggi dalam seleksi penerima bantuan
                 </p>
-            </div>
 
-            <!-- Search NIK Section -->
-            <div id="cekStatusSection" class="welcome-card rounded-3xl p-8 lg:p-12 mb-8 slide-in"
-                style="animation-delay: 0.2s;">
-                <div class="text-center mb-8">
-                    <h3 class="text-3xl font-bold text-gray-900 mb-4">Cek Status Penerima BPNT</h3>
-                    <p class="text-lg text-gray-600">Masukkan NIK untuk mengetahui status penerimaan bantuan Anda</p>
-                </div>
-
-                <div class="max-w-2xl mx-auto">
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <div class="flex-1">
-                            <input type="text" id="nikInput" placeholder="Masukkan NIK (16 digit)" maxlength="16"
-                                class="search-box w-full px-6 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-                                onkeypress="handleEnterSearch(event)">
-                        </div>
-                        <button onclick="searchNIK()"
-                            class="btn-primary text-white px-8 py-4 rounded-xl font-semibold text-lg whitespace-nowrap">
-                            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            Cari NIK
-                        </button>
-                    </div>
-
-                    <!-- Search Result -->
-                    <div id="searchResult" class="search-result rounded-xl p-6 mt-6 hidden">
-                        <!-- Result will be populated here -->
-                    </div>
-
-                    <!-- Info Box -->
-                    <div class="mt-6 p-4 bg-blue-50 rounded-xl">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-blue-800">Informasi</p>
-                                <p class="text-xs text-blue-600">Pastikan NIK yang dimasukkan sesuai dengan KTP dan
-                                    terdaftar di sistem</p>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Action Button (hanya tombol orange) -->
+                <div class="flex justify-center mt-8">
+                    <a href="/hasil-akhir"
+                        class="btn-primary text-white px-8 py-4 rounded-xl font-semibold text-lg inline-flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                            </path>
+                        </svg>
+                        Lihat Hasil Akhir
+                    </a>
                 </div>
             </div>
 
             <!-- SMARTER Method Info -->
-            <div class="welcome-card rounded-3xl p-8 lg:p-10 mb-8 slide-in" style="animation-delay: 0.4s;">
+            <div class="welcome-card rounded-3xl p-8 lg:p-10 mb-8 slide-in" style="animation-delay: 0.2s;">
                 <div class="text-center mb-8">
                     <h3 class="text-4xl font-bold text-gray-900 mb-4">Metode SMARTER</h3>
                     <p class="text-xl text-gray-600 max-w-4xl mx-auto">
@@ -715,7 +455,7 @@
             </div>
 
             <!-- Statistics -->
-            <div class="welcome-card rounded-3xl p-8 lg:p-10 mb-8 slide-in" style="animation-delay: 0.6s;">
+            <div class="welcome-card rounded-3xl p-8 lg:p-10 mb-8 slide-in" style="animation-delay: 0.4s;">
                 <h3 class="text-3xl font-bold text-gray-900 text-center mb-8">Keunggulan Metode SMARTER</h3>
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
                     <div>
@@ -968,311 +708,10 @@
     </footer>
 
     <script>
-        // Sample database NIK untuk simulasi
-        const validNIKs = [
-            '3209012345671234',
-            '3209123456781234',
-            '3209234567891234',
-            '3209345678901234',
-            '3209456789012345',
-            '3209567890123456',
-            '3209678901234567',
-            '3209789012345678',
-            '3209890123456789',
-            '3209901234567890'
-        ];
-
-        function downloadData() {
-            // Show confirmation dialog
-            const confirmed = confirm('Apakah Anda yakin ingin mengunduh data hasil SMARTER?\n\nData yang akan diunduh:\n- Hasil perhitungan SMARTER\n- Ranking penerima BPNT\n- Status keputusan\n\nFile: BPNT_Results_2025.xlsx');
-
-            if (confirmed) {
-                // Show loading notification
-                showDownloadNotification('Memproses unduhan data...', 'info');
-
-                // Simulate download process
-                setTimeout(() => {
-                    // In real implementation, this would trigger actual file download
-                    // For demo purposes, we'll show success message
-                    showDownloadNotification('Data berhasil diunduh! File tersimpan di folder Downloads.', 'success');
-
-                    // You can add actual download logic here:
-                    // const link = document.createElement('a');
-                    // link.href = '/download/bpnt-results';
-                    // link.download = 'BPNT_Results_2025.xlsx';
-                    // link.click();
-                }, 2000);
-            }
-        }
-
-        function showDownloadNotification(message, type = 'info') {
-            // Remove any existing notifications first
-            const existingNotifications = document.querySelectorAll('.download-notification');
-            existingNotifications.forEach(notification => notification.remove());
-
-            const notification = document.createElement('div');
-            let bgColor = type === 'success' ? 'bg-green-50 border-green-200' : 'bg-blue-50 border-blue-200';
-            let iconColor = type === 'success' ? 'bg-green-500' : 'bg-blue-500';
-            let textColor = type === 'success' ? 'text-green-800' : 'text-blue-800';
-            let icon = type === 'success' ?
-                '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>' :
-                '<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>';
-
-            notification.className = `download-notification ${bgColor} border rounded-xl p-4 flex items-start space-x-3 max-w-md w-full mx-auto mt-4 shadow-lg fixed top-20 left-1/2 transform -translate-x-1/2 z-50`;
-            notification.style.animation = 'slideIn 0.3s ease-out';
-            notification.innerHTML = `
-                <div class="flex-shrink-0">
-                    <div class="w-6 h-6 ${iconColor} rounded-full flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            ${icon}
-                        </svg>
-                    </div>
-                </div>
-                <div class="flex-grow">
-                    <p class="text-sm ${textColor}">${message}</p>
-                </div>
-                <button onclick="this.parentElement.remove()" class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors">
-                    <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                    </svg>
-                </button>
-            `;
-
-            document.body.appendChild(notification);
-
-            // Auto remove after 5 seconds for info, 3 seconds for success
-            const timeout = type === 'success' ? 3000 : 5000;
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, timeout);
-        }
-
-        function toggleDesktopDropdown() {
-            const dropdown = document.getElementById('desktopDropdown');
-            const dropdownContent = document.getElementById('desktopDropdownContent');
-            const dropdownArrow = document.getElementById('desktopDropdownArrow');
-
-            if (dropdown && dropdownContent && dropdownArrow) {
-                dropdown.classList.toggle('active');
-
-                if (dropdown.classList.contains('active')) {
-                    dropdownContent.style.display = 'block';
-                    dropdownArrow.style.transform = 'rotate(180deg)';
-                } else {
-                    dropdownContent.style.display = 'none';
-                    dropdownArrow.style.transform = 'rotate(0deg)';
-                }
-            }
-        }
-
-        function toggleMobileDropdown() {
-            const content = document.getElementById('mobileDropdownContent');
-            const arrow = document.getElementById('mobileDropdownArrow');
-
-            content.classList.toggle('active');
-            arrow.style.transform = content.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
-        }
-
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobileMenu');
             if (mobileMenu) {
                 mobileMenu.classList.toggle('active');
-            }
-        }
-
-        function scrollToCekStatus() {
-            // Close desktop dropdown first
-            const desktopDropdown = document.getElementById('desktopDropdown');
-            const desktopDropdownContent = document.getElementById('desktopDropdownContent');
-            const desktopDropdownArrow = document.getElementById('desktopDropdownArrow');
-
-            if (desktopDropdown) {
-                desktopDropdown.classList.remove('active');
-                if (desktopDropdownContent) {
-                    desktopDropdownContent.style.display = 'none';
-                }
-                if (desktopDropdownArrow) {
-                    desktopDropdownArrow.style.transform = 'rotate(0deg)';
-                }
-            }
-
-            // Scroll to the specific section "Cek Status Penerima BPNT"
-            const cekStatusSection = document.getElementById('cekStatusSection');
-            if (cekStatusSection) {
-                // Calculate offset for fixed navbar
-                const navbarHeight = 100; // Sesuaikan dengan tinggi navbar Anda
-                const elementPosition = cekStatusSection.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
-
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-
-                // Focus on the NIK input after scrolling
-                setTimeout(() => {
-                    const nikInput = document.getElementById('nikInput');
-                    if (nikInput) {
-                        nikInput.focus();
-                        nikInput.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.3)';
-                        setTimeout(() => {
-                            nikInput.style.boxShadow = '';
-                        }, 2000);
-                    }
-                }, 800);
-            }
-        }
-
-        function checkResult() {
-            // This function can still be used for other purposes
-            // or redirect to the same scrollToCekStatus function
-            scrollToCekStatus();
-        }
-
-        function showErrorNotification(message, title = 'Error') {
-            // Remove any existing notifications first
-            const existingNotifications = document.querySelectorAll('.error-notification');
-            existingNotifications.forEach(notification => notification.remove());
-
-            const notification = document.createElement('div');
-            notification.className = 'error-notification bg-red-50 border border-red-200 rounded-xl p-4 flex items-start space-x-3 max-w-md w-full mx-auto mt-4 shadow-lg';
-            notification.innerHTML = `
-                <div class="flex-shrink-0">
-                    <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="flex-grow">
-                    <h4 class="text-sm font-medium text-red-800">${title}</h4>
-                    <p class="text-sm text-red-700">${message}</p>
-                </div>
-                <button onclick="this.parentElement.remove()" class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center hover:bg-red-100 transition-colors">
-                    <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                    </svg>
-                </button>
-            `;
-
-            // Insert notification in the search container
-            const searchContainer = document.querySelector('.max-w-2xl.mx-auto');
-            searchContainer.appendChild(notification);
-
-            // Auto remove after 5 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, 5000);
-        }
-
-        function searchNIK() {
-            const nikInput = document.getElementById('nikInput');
-            const nik = nikInput.value.trim();
-            const resultDiv = document.getElementById('searchResult');
-
-            if (nik.length !== 16) {
-                showErrorNotification('NIK harus terdiri dari 16 digit angka', 'Format NIK Salah');
-                nikInput.focus();
-                return;
-            }
-
-            if (!/^\d{16}$/.test(nik)) {
-                showErrorNotification('NIK hanya boleh berisi angka', 'Format NIK Salah');
-                nikInput.focus();
-                return;
-            }
-
-            // Check if NIK exists in our sample database
-            if (!validNIKs.includes(nik)) {
-                showErrorNotification('NIK tidak terdaftar di Database, silahkan menghubungi petugas', 'NIK Tidak Ditemukan');
-                nikInput.focus();
-                resultDiv.classList.add('hidden');
-                return;
-            }
-
-            // Show loading state
-            resultDiv.innerHTML = '<div class="text-center py-8"><div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div><p class="text-gray-600 mt-4">Mencari data NIK...</p></div>';
-            resultDiv.classList.remove('hidden');
-
-            // Simulate search with delay
-            setTimeout(() => {
-                const isReceived = Math.random() > 0.3; // 70% chance of being a recipient
-                const smarterScore = isReceived ? (75 + Math.random() * 25).toFixed(1) : (30 + Math.random() * 45).toFixed(1);
-                const ranking = isReceived ? Math.floor(100 + Math.random() * 500) : Math.floor(600 + Math.random() * 650);
-
-                if (isReceived) {
-                    resultDiv.innerHTML = `
-                        <div class="flex items-start space-x-4">
-                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                                <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <h4 class="text-lg font-semibold text-gray-900 mb-2">Status Penerima BPNT</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
-                                    <div>
-                                        <p><strong>NIK:</strong> ${nik}</p>
-                                        <p><strong>Status:</strong> <span class="text-green-600 font-semibold">✅ DITERIMA</span></p>
-                                        <p><strong>Periode:</strong> Januari - Desember 2025</p>
-                                    </div>
-                                    <div>
-                                        <p><strong>Skor SMARTER:</strong> ${smarterScore} / 100</p>
-                                        <p><strong>Ranking:</strong> ${ranking} dari 1,250 pendaftar</p>
-                                        <p><strong>Tanggal Penetapan:</strong> 15 September 2025</p>
-                                    </div>
-                                </div>
-                                <div class="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
-                                    <p class="text-green-700 text-sm">
-                                        <strong>📋 Informasi:</strong> Bantuan dapat diambil setiap tanggal 1-10 di agen/e-warong terdekat dengan membawa KTP asli.
-                                        <br><strong>💳 Saldo:</strong> Rp 200.000/bulan | <strong>📅 Pengambilan terakhir:</strong> 5 Februari 2025
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    resultDiv.className = 'search-result rounded-xl p-6 mt-6 border-green-200';
-                } else {
-                    resultDiv.innerHTML = `
-                        <div class="flex items-start space-x-4">
-                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                                <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <h4 class="text-lg font-semibold text-gray-900 mb-2">Status Penerima BPNT</h4>
-                                <div class="space-y-2 text-gray-700">
-                                    <p><strong>NIK:</strong> ${nik}</p>
-                                    <p><strong>Status:</strong> <span class="text-red-600 font-semibold">❌ TIDAK DITERIMA</span></p>
-                                    <p><strong>Skor SMARTER:</strong> ${smarterScore} / 100</p>
-                                    <p><strong>Ranking:</strong> ${ranking} dari 1,250 pendaftar</p>
-                                    <p><strong>Batas Minimum:</strong> 75.0 / 100</p>
-                                </div>
-                                <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-200">
-                                    <p class="text-red-700 text-sm">
-                                        <strong>📋 Informasi:</strong> Skor belum memenuhi batas minimum untuk periode ini. 
-                                        <br><strong>📅 Periode Selanjutnya:</strong> Juli 2025 | <strong>💡 Saran:</strong> Lengkapi persyaratan dan dokumen pendukung.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    resultDiv.className = 'search-result rounded-xl p-6 mt-6 border-red-200';
-                }
-
-                // Scroll to result
-                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 1500);
-        }
-
-        function handleEnterSearch(event) {
-            if (event.key === 'Enter') {
-                searchNIK();
             }
         }
 
@@ -1366,47 +805,16 @@
                 });
             });
 
-            // Close dropdowns when clicking outside
+            // Close mobile menu when clicking outside
             document.addEventListener('click', function (event) {
                 const mobileMenu = document.getElementById('mobileMenu');
-                const desktopDropdown = document.getElementById('desktopDropdown');
                 const menuButton = event.target.closest('button');
 
                 // Close mobile menu
                 if (!mobileMenu.contains(event.target) && !menuButton?.onclick?.toString().includes('toggleMobileMenu')) {
                     mobileMenu.classList.remove('active');
                 }
-
-                // Close desktop dropdown
-                if (!desktopDropdown.contains(event.target)) {
-                    desktopDropdown.classList.remove('active');
-                    const dropdownContent = document.getElementById('desktopDropdownContent');
-                    const arrow = document.getElementById('desktopDropdownArrow');
-                    if (dropdownContent) {
-                        dropdownContent.style.display = 'none';
-                    }
-                    if (arrow) {
-                        arrow.style.transform = 'rotate(0deg)';
-                    }
-                }
             });
-
-            // Auto-focus NIK input when page loads
-            const nikInput = document.getElementById('nikInput');
-            if (nikInput) {
-                setTimeout(() => {
-                    nikInput.focus();
-                }, 1000);
-            }
-        });
-
-        // Format NIK input
-        document.getElementById('nikInput').addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\s/g, '').replace(/\D/g, '');
-            if (value.length > 16) {
-                value = value.slice(0, 16);
-            }
-            e.target.value = value;
         });
     </script>
 

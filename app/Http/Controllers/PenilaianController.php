@@ -21,15 +21,18 @@ class PenilaianController extends Controller
     {
         $title = "Penilaian Alternatif";
 
-        // PERBAIKAN: Tambahkan 'jenis_kriteria' ke dalam select
-        $kriteria = Kriteria::orderBy('id', 'asc')->get(['id', 'kriteria', 'jenis_kriteria']);
-
-        // ATAU lebih baik lagi, ambil semua field:
-        $kriteria = Kriteria::orderBy('id', 'asc')->get();
+        // PERBAIKAN: Ambil semua field dengan urutan ranking
+        $kriteria = Kriteria::orderBy('ranking', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
 
         $subKriteria = SubKriteria::orderBy('kriteria_id', 'asc')->get();
         $alternatif = Alternatif::orderBy('id', 'asc')->get(['id', 'alternatif']);
-        $penilaian = PenilaianResource::collection(Penilaian::orderBy('kriteria_id', 'asc')->get());
+        $penilaian = PenilaianResource::collection(
+            Penilaian::with(['kriteria', 'subKriteria', 'alternatif'])
+                ->orderBy('kriteria_id', 'asc')
+                ->get()
+        );
 
         return view('dashboard.penilaian.index', compact('title', 'kriteria', 'subKriteria', 'alternatif', 'penilaian'));
     }

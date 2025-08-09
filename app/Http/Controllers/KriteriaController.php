@@ -14,6 +14,7 @@ use App\Models\Penilaian;
 use App\Models\SubKriteria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
 class KriteriaController extends Controller
@@ -24,6 +25,9 @@ class KriteriaController extends Controller
     public function index()
     {
         $title = "Kriteria";
+
+        // Pastikan semua kriteria memiliki ranking sebelum ditampilkan
+        $this->ensureAllKriteriaHaveRanking();
 
         // Urutkan berdasarkan ranking, lalu kode sebagai fallback
         $kriteria = KriteriaResource::collection(
@@ -56,11 +60,19 @@ class KriteriaController extends Controller
             $validated = $request->validated();
             $newRanking = $validated['ranking'];
 
-            // Adjust ranking untuk kriteria yang ada
-            $this->adjustExistingRankings($newRanking);
+            Log::info('Creating new kriteria with data:', $validated);
+
+            // Validasi ranking tidak duplikat
+            $existingRanking = Kriteria::where('ranking', $newRanking)->first();
+            if ($existingRanking) {
+                Log::info("Adjusting existing rankings from: {$newRanking}");
+                // Adjust ranking untuk kriteria yang ada
+                $this->adjustExistingRankings($newRanking);
+            }
 
             // Buat kriteria baru
             $kriteria = Kriteria::create($validated);
+            Log::info('Kriteria created with ID:', ['id' => $kriteria->id]);
 
             // Buat penilaian untuk semua alternatif yang ada
             $this->createPenilaianForAlternatif($kriteria->id);
@@ -71,6 +83,10 @@ class KriteriaController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error storing kriteria: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
             return to_route('kriteria')->with('error', 'Kriteria gagal disimpan: ' . $e->getMessage());
         }
     }
@@ -80,7 +96,40 @@ class KriteriaController extends Controller
      */
     public function edit(Request $request)
     {
-        return new KriteriaResource(Kriteria::find($request->kriteria_id));
+        try {
+            $kriteriaId = $request->kriteria_id;
+            
+            if (!$kriteriaId) {
+                Log::error('Kriteria ID not provided in edit request');
+                return response()->json(['error' => 'ID tidak ditemukan'], 400);
+            }
+
+            $kriteria = Kriteria::find($kriteriaId);
+            
+            if (!$kriteria) {
+                Log::error("Kriteria not found with ID: {$kriteriaId}");
+                return response()->json(['error' => 'Data tidak ditemukan'], 404);
+            }
+
+            // Log untuk debugging
+            Log::info('Kriteria edit data:', $kriteria->toArray());
+
+            // Return resource dengan format yang konsisten
+            return response()->json([
+                'data' => [
+                    'id' => $kriteria->id,
+                    'kode' => $kriteria->kode,
+                    'kriteria' => $kriteria->kriteria,
+                    'bobot' => $kriteria->bobot,
+                    'ranking' => $kriteria->ranking,
+                    'jenis_kriteria' => $kriteria->jenis_kriteria
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error in kriteria edit: ' . $e->getMessage());
+            return response()->json(['error' => 'Terjadi kesalahan sistem'], 500);
+        }
     }
 
     /**
@@ -93,19 +142,27 @@ class KriteriaController extends Controller
 
             $validated = $request->validated();
             $kriteriaId = $request->id;
-            $newRanking = $validated['ranking'];
+
+            Log::info('Updating kriteria with data:', $validated);
+
+            if (!$kriteriaId) {
+                throw new \Exception('ID Kriteria tidak valid');
+            }
 
             // Ambil kriteria yang akan diupdate
             $kriteria = Kriteria::findOrFail($kriteriaId);
             $oldRanking = $kriteria->ranking;
+            $newRanking = $validated['ranking'];
 
             // Jika ranking berubah, adjust ranking kriteria lain
             if ($oldRanking != $newRanking) {
+                Log::info("Adjusting rankings for update: {$oldRanking} -> {$newRanking}");
                 $this->adjustRankingsForUpdate($kriteriaId, $oldRanking, $newRanking);
             }
 
             // Update kriteria
             $kriteria->update($validated);
+            Log::info('Kriteria updated successfully');
 
             DB::commit();
 
@@ -113,6 +170,10 @@ class KriteriaController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error updating kriteria: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
             return to_route('kriteria')->with('error', 'Kriteria gagal diperbarui: ' . $e->getMessage());
         }
     }
@@ -128,6 +189,8 @@ class KriteriaController extends Controller
             $kriteriaId = $request->kriteria_id;
             $kriteria = Kriteria::findOrFail($kriteriaId);
             $deletedRanking = $kriteria->ranking;
+
+            Log::info("Deleting kriteria with ID: {$kriteriaId}, ranking: {$deletedRanking}");
 
             // Hapus relasi terkait
             Penilaian::where('kriteria_id', $kriteriaId)->delete();
@@ -150,6 +213,7 @@ class KriteriaController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error deleting kriteria: ' . $e->getMessage());
             return to_route('kriteria')->with('error', 'Kriteria gagal dihapus: ' . $e->getMessage());
         }
     }
@@ -181,7 +245,23 @@ class KriteriaController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Import error: ' . $e->getMessage());
             return to_route('kriteria')->with('error', 'Import gagal: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Pastikan semua kriteria memiliki ranking
+     */
+    private function ensureAllKriteriaHaveRanking()
+    {
+        $kriteriaWithoutRanking = Kriteria::whereNull('ranking')->get();
+        if ($kriteriaWithoutRanking->count() > 0) {
+            $maxRanking = Kriteria::max('ranking') ?? 0;
+            foreach ($kriteriaWithoutRanking as $item) {
+                $item->update(['ranking' => ++$maxRanking]);
+            }
+            Log::info("Updated {$kriteriaWithoutRanking->count()} kriteria with missing rankings");
         }
     }
 
@@ -191,8 +271,8 @@ class KriteriaController extends Controller
     private function adjustExistingRankings($newRanking)
     {
         // Geser ranking yang >= newRanking ke atas
-        Kriteria::where('ranking', '>=', $newRanking)
-            ->increment('ranking');
+        $updated = Kriteria::where('ranking', '>=', $newRanking)->increment('ranking');
+        Log::info("Adjusted {$updated} existing rankings");
     }
 
     /**
@@ -255,6 +335,7 @@ class KriteriaController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error resetting rankings: ' . $e->getMessage());
             return to_route('kriteria')->with('error', 'Gagal reset ranking: ' . $e->getMessage());
         }
     }
@@ -293,6 +374,8 @@ class KriteriaController extends Controller
                 'sub_kriteria_id' => null,
             ]);
         }
+
+        Log::info("Created penilaian for {$alternatif->count()} alternatif");
     }
 
     /**
@@ -376,6 +459,7 @@ class KriteriaController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error reordering rankings: ' . $e->getMessage());
             return response()->json(['error' => 'Gagal memperbarui ranking'], 500);
         }
     }

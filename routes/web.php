@@ -171,6 +171,7 @@ Route::middleware('auth')->group(function () {
 
         // Route untuk PDF hasil akhir
         Route::get('/pdf-hasil-akhir', [PDFController::class, 'pdf_hasil'])->name('pdf.hasilAkhir');
+
     });
 });
 

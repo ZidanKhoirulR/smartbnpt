@@ -27,18 +27,44 @@ class KriteriaRequest extends FormRequest
         $totalKriteria = Kriteria::count();
         $maxRanking = $kriteriaId ? $totalKriteria : $totalKriteria + 1; // +1 untuk create baru
 
-        return [
-            'kode' => 'required|string|max:6|unique:kriteria,kode,' . $kriteriaId,
-            'kriteria' => 'required|string|max:255|unique:kriteria,kriteria,' . $kriteriaId,
+        $rules = [
+            'kode' => [
+                'required',
+                'string',
+                'max:6',
+                Rule::unique('kriteria')->ignore($kriteriaId)
+            ],
+            'kriteria' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('kriteria')->ignore($kriteriaId)
+            ],
             'bobot' => 'required|numeric|min:0|max:100',
             'jenis_kriteria' => 'required|in:benefit,cost',
-            'ranking' => [
+        ];
+
+        // Hanya validasi ranking untuk create, tidak untuk update
+        if (!$kriteriaId) {
+            $rules['ranking'] = [
                 'required',
                 'integer',
                 'min:1',
                 "max:{$maxRanking}",
-            ],
-        ];
+                // Cek uniqueness ranking hanya untuk create
+                Rule::unique('kriteria', 'ranking')
+            ];
+        } else {
+            // Untuk edit, ranking optional dan tidak perlu unique check
+            $rules['ranking'] = [
+                'sometimes',
+                'integer',
+                'min:1',
+                "max:{$maxRanking}",
+            ];
+        }
+
+        return $rules;
     }
 
     /**
@@ -53,6 +79,7 @@ class KriteriaRequest extends FormRequest
             'ranking.integer' => 'Ranking harus berupa angka bulat',
             'ranking.min' => 'Ranking minimal adalah 1',
             'ranking.max' => 'Ranking tidak boleh melebihi jumlah kriteria yang ada',
+            'ranking.unique' => 'Ranking sudah digunakan kriteria lain',
             'kode.unique' => 'Kode kriteria sudah digunakan',
             'kriteria.unique' => 'Nama kriteria sudah digunakan',
             'bobot.min' => 'Bobot minimal adalah 0',
@@ -70,7 +97,7 @@ class KriteriaRequest extends FormRequest
     protected function prepareForValidation()
     {
         // Auto-cast ranking ke integer jika ada
-        if ($this->has('ranking')) {
+        if ($this->has('ranking') && $this->ranking !== null) {
             $this->merge([
                 'ranking' => (int) $this->ranking,
             ]);
@@ -82,5 +109,23 @@ class KriteriaRequest extends FormRequest
                 'bobot' => (float) $this->bobot,
             ]);
         }
+    }
+
+    /**
+     * Handle a failed validation attempt.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        \Log::error('Kriteria validation failed:', [
+            'errors' => $validator->errors()->toArray(),
+            'input' => $this->all()
+        ]);
+
+        parent::failedValidation($validator);
     }
 }

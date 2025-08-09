@@ -247,12 +247,12 @@
 
             // Add error message
             const errorHtml = `
-                        <div class="label validation-message">
-                            <span class="label-text-alt text-sm text-red-500">
-                                <i class="ri-error-warning-line mr-1"></i>${message}
-                            </span>
-                        </div>
-                    `;
+                            <div class="label validation-message">
+                                <span class="label-text-alt text-sm text-red-500">
+                                    <i class="ri-error-warning-line mr-1"></i>${message}
+                                </span>
+                            </div>
+                        `;
             $formControl.append(errorHtml);
         }
 
@@ -286,11 +286,11 @@
             const toast = document.createElement('div');
             toast.className = `alert alert-${type} fixed top-4 right-4 w-auto z-50 shadow-lg`;
             toast.innerHTML = `
-                        <div class="flex items-center gap-2">
-                            <i class="ri-${type === 'error' ? 'error-warning' : 'information'}-line"></i>
-                            <span>${message}</span>
-                        </div>
-                    `;
+                            <div class="flex items-center gap-2">
+                                <i class="ri-${type === 'error' ? 'error-warning' : 'information'}-line"></i>
+                                <span>${message}</span>
+                            </div>
+                        `;
 
             document.body.appendChild(toast);
 
@@ -304,41 +304,36 @@
             const form = this;
             let isValid = true;
 
-            // Skip validation for import form
-            if ($(form).find('input[name="import_data"]').length > 0) {
-                return true;
-            }
-
             // Validate required fields
-            $(form).find('input[name="nik"]').each(function () {
-                if (!validateNIK(this)) {
-                    isValid = false;
+                $(form).find('input[name="nik"]').each(function () {
+                    if (!validateNIK(this)) {
+                        isValid = false;
+                    }
+                });
+
+                $(form).find('input[name="alternatif"]').each(function () {
+                    if (!validateAlternatif(this)) {
+                        isValid = false;
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    showNotification('Periksa kembali form input Anda', 'error');
+                    return false;
                 }
+
+                // Show loading on submit button
+                const $submitBtn = $(form).find('button[type="submit"]');
+                const originalText = $submitBtn.html();
+                $submitBtn.html('<span class="loading loading-spinner loading-sm"></span> Menyimpan...').prop('disabled', true);
+
+                // Restore button after 3 seconds (fallback)
+                setTimeout(() => {
+                    $submitBtn.html(originalText).prop('disabled', false);
+                }, 3000);
             });
-
-            $(form).find('input[name="alternatif"]').each(function () {
-                if (!validateAlternatif(this)) {
-                    isValid = false;
-                }
-            });
-
-            if (!isValid) {
-                e.preventDefault();
-                showNotification('Periksa kembali form input Anda', 'error');
-                return false;
-            }
-
-            // Show loading on submit button
-            const $submitBtn = $(form).find('button[type="submit"]');
-            const originalText = $submitBtn.html();
-            $submitBtn.html('<span class="loading loading-spinner loading-sm"></span> Menyimpan...').prop('disabled', true);
-
-            // Restore button after 3 seconds (fallback)
-            setTimeout(() => {
-                $submitBtn.html(originalText).prop('disabled', false);
-            }, 3000);
-        });
-    </script>
+        </script>
 @endsection
 
 @section("css")<style>
@@ -697,7 +692,9 @@
                                 @enderror
                             </label>
 
-                            <button type="submit" class="btn btn-warning mt-4 w-full text-white">
+                            <button type="submit"
+                                class="mt-4 w-full text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 hover:opacity-90"
+                                style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);">
                                 <i class="ri-refresh-line"></i>
                                 Perbarui Alternatif
                             </button>
@@ -706,49 +703,6 @@
                 </div>
             </div>
             {{-- Akhir Modal Edit --}}
-
-            {{-- Awal Modal Import --}}
-            <input type="checkbox" id="import_button" class="modal-toggle" />
-            <div class="modal" role="dialog">
-                <div class="modal-box">
-                    <div class="mb-3 flex justify-between">
-                        <h3 class="text-lg font-bold">Impor {{ $title }}</h3>
-                        <label for="import_button" class="cursor-pointer">
-                            <i class="ri-close-large-fill"></i>
-                        </label>
-                    </div>
-                    <div>
-                        <div class="mb-4 rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800" role="alert">
-                            <span class="font-medium">Format Excel:</span>
-                            Kolom yang diperlukan: kode, nik, alternatif, keterangan
-                        </div>
-                        <form action="{{ route("alternatif.import") }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <label class="form-control w-full">
-                                <div class="label">
-                                    <span class="label-text font-semibold">
-                                        <x-label-input-required>File Excel</x-label-input-required>
-                                    </span>
-                                </div>
-                                <input type="file" name="import_data" accept=".xlsx,.xls"
-                                    class="file-input file-input-bordered w-full text-primary-color" required />
-                                @error("import_data")
-                                    <div class="label">
-                                        <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                                    </div>
-                                @enderror
-                            </label>
-                            <button type="submit"
-                                class="mt-4 w-full text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 hover:opacity-90"
-                                style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);">
-                                <i class="ri-upload-line"></i>
-                                Simpan Data Import
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            {{-- Akhir Modal Import --}}
 
             {{-- Awal Tabel Alternatif --}}
             <div
@@ -763,12 +717,6 @@
                             style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
                             <i class="ri-add-fill"></i>
                             Tambah
-                        </label>
-                        <label for="import_button"
-                            class="mb-0 inline-block cursor-pointer rounded-lg px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-white shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2"
-                            style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
-                            <i class="ri-file-excel-2-line"></i>
-                            Impor
                         </label>
                     </div>
                 </div>

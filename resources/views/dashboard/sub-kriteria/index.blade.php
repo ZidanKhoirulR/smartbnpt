@@ -436,11 +436,6 @@
                 $submitBtn.html(originalText).prop('disabled', false);
             }, 3000);
         });
-
-        // Import button function placeholder
-        function import_button() {
-            showNotification('Fitur import belum tersedia', 'info');
-        }
     </script>
 @endsection
 
@@ -715,49 +710,6 @@
             </div>
             {{-- Akhir Modal Edit --}}
 
-            {{-- Awal Modal Import --}}
-            <input type="checkbox" id="import_button" class="modal-toggle" />
-            <div class="modal" role="dialog">
-                <div class="modal-box">
-                    <div class="mb-3 flex justify-between">
-                        <h3 class="text-lg font-bold">Impor {{ $title }}</h3>
-                        <label for="import_button" class="cursor-pointer">
-                            <i class="ri-close-large-fill"></i>
-                        </label>
-                    </div>
-                    <div>
-                        <div class="mb-4 rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800" role="alert">
-                            <span class="font-medium">Format Excel:</span>
-                            Kolom yang diperlukan: kriteria_id, sub_kriteria, bobot
-                        </div>
-                        <form action="{{ route('sub-kriteria.import') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <label class="form-control w-full">
-                                <div class="label">
-                                    <span class="label-text font-semibold">
-                                        <x-label-input-required>File Excel</x-label-input-required>
-                                    </span>
-                                </div>
-                                <input type="file" name="import_data" accept=".xlsx,.xls"
-                                    class="file-input file-input-bordered w-full text-primary-color" required />
-                                @error("import_data")
-                                    <div class="label">
-                                        <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                                    </div>
-                                @enderror
-                            </label>
-                            <button type="submit"
-                                class="mt-4 w-full text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 hover:opacity-90"
-                                style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);">
-                                <i class="ri-upload-line"></i>
-                                Simpan Data Import
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            {{-- Akhir Modal Import --}}
-
             {{-- Tabel Sub Kriteria --}}
             @foreach ($kriteria as $kri)
                 <div
@@ -774,13 +726,6 @@
                                 style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
                                 <i class="ri-add-fill"></i>
                                 Tambah
-                            </label>
-                            <label for="import_button"
-                                class="mb-0 inline-block cursor-pointer rounded-lg px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-white shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2"
-                                onclick="return import_button()"
-                                style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
-                                <i class="ri-file-excel-2-line"></i>
-                                Impor
                             </label>
                         </div>
                     </div>

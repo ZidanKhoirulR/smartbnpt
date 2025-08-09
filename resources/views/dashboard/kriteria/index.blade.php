@@ -1,8 +1,10 @@
 @extends("dashboard.layouts.main")
 
 @section("js")
-
     <script>
+        // Global variable untuk menyimpan ID yang akan dihapus
+        let kriteriaToDelete = null;
+
         $(document).ready(function () {
             $('#myTable').DataTable({
                 responsive: {
@@ -14,9 +16,13 @@
                 order: [],
                 pagingType: 'full_numbers',
             });
+
             // Real-time validation for all forms
             $(document).on('input', 'input[name="ranking"]', function () {
-                validateRanking(this);
+                const isEditMode = $(this).closest('form').find("input[name='id']").val() !== '';
+                if (!isEditMode) {
+                    validateRanking(this);
+                }
             });
 
             $(document).on('input', 'input[name="kriteria"]', function () {
@@ -45,6 +51,8 @@
         }
 
         function edit_button(kriteria_id) {
+            console.log('Editing kriteria ID:', kriteria_id);
+
             // Show loading
             showLoadingState();
 
@@ -56,26 +64,36 @@
                     "kriteria_id": kriteria_id
                 },
                 dataType: 'json',
+                beforeSend: function () {
+                    console.log('Sending AJAX request to edit kriteria');
+                },
                 success: function (response) {
-                    console.log('Response:', response); // Debug log
+                    console.log('Edit response received:', response);
 
-                    // Check if response has the expected structure
-                    if (response && response.data) {
+                    // Handle both resource wrapper and direct response
+                    const data = response.data || response;
+
+                    if (data && data.id) {
                         // Populate form
-                        $("input[name='id']").val(response.data.id);
-                        $("input[name='kode']").val(response.data.kode);
-                        $("input[name='kriteria']").val(response.data.kriteria);
+                        $("input[name='id']").val(data.id);
+                        $("input[name='kode']").val(data.kode);
+                        $("input[name='kriteria']").val(data.kriteria);
 
-                        // Set ranking - langsung tampilkan ranking yang ada tanpa fallback
-                        $("#ranking_display").text(response.data.ranking);
-                        $("#ranking_hidden").val(response.data.ranking);
+                        // Set ranking - pastikan ada ranking
+                        if (data.ranking) {
+                            $("#ranking_display").text(data.ranking);
+                            $("#ranking_hidden").val(data.ranking);
+                        } else {
+                            $("#ranking_display").text('-');
+                            $("#ranking_hidden").val('');
+                        }
 
                         // Set radio button - reset first
                         $("input[name='jenis_kriteria']").prop('checked', false);
 
-                        if (response.data.jenis_kriteria == "benefit") {
+                        if (data.jenis_kriteria == "benefit") {
                             $("#benefit_edit").prop("checked", true);
-                        } else if (response.data.jenis_kriteria == "cost") {
+                        } else if (data.jenis_kriteria == "cost") {
                             $("#cost_edit").prop("checked", true);
                         }
 
@@ -86,33 +104,126 @@
                         resetValidation();
 
                         // Validate current values
-                        validateKriteria($("input[name='kriteria']")[0]);
+                        if ($("input[name='kriteria']").length > 0) {
+                            validateKriteria($("input[name='kriteria']")[0]);
+                        }
 
                         showNotification('Data kriteria berhasil dimuat', 'success');
                     } else {
                         hideLoadingState();
-                        showNotification('Format response tidak sesuai', 'error');
-                        console.error('Invalid response format:', response);
+                        showNotification('Data tidak lengkap dari server', 'error');
+                        console.error('Incomplete data from server:', response);
                     }
                 },
                 error: function (xhr, status, error) {
-                    console.error('AJAX Error:', {
+                    console.error('AJAX Error details:', {
                         status: status,
                         error: error,
                         responseText: xhr.responseText,
-                        statusCode: xhr.status
+                        statusCode: xhr.status,
+                        url: "{{ route("kriteria.edit") }}"
                     });
 
                     hideLoadingState();
 
-                    // More specific error messages
                     let errorMessage = 'Gagal memuat data kriteria';
+
+                    try {
+                        const errorResponse = JSON.parse(xhr.responseText);
+                        errorMessage = errorResponse.error || errorResponse.message || errorMessage;
+                    } catch (e) {
+                        console.error('Failed to parse error response');
+                    }
+
                     if (xhr.status === 404) {
                         errorMessage = 'Data kriteria tidak ditemukan';
                     } else if (xhr.status === 500) {
                         errorMessage = 'Terjadi kesalahan server';
                     } else if (xhr.status === 403) {
                         errorMessage = 'Tidak memiliki akses';
+                    } else if (xhr.status === 422) {
+                        errorMessage = 'Data tidak valid';
+                    }
+
+                    showNotification(errorMessage, 'error');
+                }
+            });
+        }
+
+        function delete_button(kriteria_id, kriteria_name) {
+            console.log('Preparing to delete kriteria ID:', kriteria_id);
+
+            // Simpan ID yang akan dihapus
+            kriteriaToDelete = kriteria_id;
+
+            // Update nama kriteria di modal
+            document.getElementById('delete_kriteria_name').textContent = kriteria_name || 'Kriteria ini';
+
+            // Buka modal
+            document.getElementById('delete_modal').checked = true;
+        }
+
+        // Fungsi untuk konfirmasi penghapusan
+        function confirmDelete() {
+            if (!kriteriaToDelete) {
+                showNotification('Tidak ada data yang dipilih untuk dihapus', 'error');
+                return;
+            }
+
+            console.log('Confirming delete for kriteria ID:', kriteriaToDelete);
+
+            // Tutup modal
+            document.getElementById('delete_modal').checked = false;
+
+            // Show loading notification
+            showNotification('Menghapus data kriteria...', 'info');
+
+            $.ajax({
+                type: "POST",
+                url: "{{ route('kriteria.delete') }}",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "_method": "DELETE",
+                    "kriteria_id": kriteriaToDelete
+                },
+                dataType: 'json',
+                success: function (response) {
+                    console.log('Delete response received:', response);
+
+                    // Reset variable
+                    kriteriaToDelete = null;
+
+                    // Show success notification
+                    showNotification('Data kriteria berhasil dihapus', 'success');
+
+                    // Reload page to update the table
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Delete AJAX Error:', xhr.responseText);
+
+                    // Reset variable
+                    kriteriaToDelete = null;
+
+                    let errorMessage = 'Gagal menghapus data kriteria';
+
+                    try {
+                        const errorResponse = JSON.parse(xhr.responseText);
+                        errorMessage = errorResponse.error || errorResponse.message || errorMessage;
+                    } catch (e) {
+                        console.error('Failed to parse error response');
+                    }
+
+                    if (xhr.status === 404) {
+                        errorMessage = 'Data kriteria tidak ditemukan';
+                    } else if (xhr.status === 500) {
+                        errorMessage = 'Terjadi kesalahan server';
+                    } else if (xhr.status === 403) {
+                        errorMessage = 'Tidak memiliki akses untuk menghapus';
+                    } else if (xhr.status === 422) {
+                        errorMessage = 'Data tidak dapat dihapus (mungkin masih digunakan)';
                     }
 
                     showNotification(errorMessage, 'error');
@@ -125,6 +236,8 @@
             const form = this;
             let isValid = true;
             const isEditMode = $(form).find("input[name='id']").val() !== '';
+
+            console.log('Form submission - Edit mode:', isEditMode);
 
             // Validate all required fields
             $(form).find('input[required]').each(function () {
@@ -149,23 +262,18 @@
                 return false;
             }
 
+            // Debug: log form data
+            console.log('Form data being submitted:', $(form).serialize());
+
             // Show loading on submit button
             const $submitBtn = $(form).find('button[type="submit"]');
             const originalText = $submitBtn.html();
             $submitBtn.html('<span class="loading loading-spinner loading-sm"></span> Menyimpan...').prop('disabled', true);
 
-            // Restore button after 3 seconds (fallback)
+            // Restore button after 10 seconds (fallback)
             setTimeout(() => {
                 $submitBtn.html(originalText).prop('disabled', false);
-            }, 3000);
-        });
-
-        // Update event listener untuk real-time validation - hanya untuk create mode
-        $(document).on('input', 'input[name="ranking"]', function () {
-            const isEditMode = $(this).closest('form').find("input[name='id']").val() !== '';
-            if (!isEditMode) {
-                validateRanking(this);
-            }
+            }, 10000);
         });
 
         // Validation functions
@@ -173,10 +281,16 @@
             const value = parseInt(input.value);
             const $input = $(input);
             const $formControl = $input.closest('.form-control');
+            const isEditMode = $input.closest('form').find("input[name='id']").val() !== '';
 
             // Remove previous validation
             $input.removeClass('input-error input-success border-red-500 border-green-500');
             $formControl.find('.validation-message').remove();
+
+            // Skip validasi ranking untuk edit mode
+            if (isEditMode) {
+                return true;
+            }
 
             if (!input.value.trim()) {
                 showValidationError($input, 'Ranking wajib diisi');
@@ -238,13 +352,13 @@
         // Loading state functions
         function showLoadingState() {
             const loading = `<span class="loading loading-dots loading-md text-purple-600"></span>`;
-            for (let i = 1; i <= 3; i++) {
+            for (let i = 1; i <= 2; i++) {
                 $(`#loading_edit${i}`).html(loading);
             }
         }
 
         function hideLoadingState() {
-            for (let i = 1; i <= 3; i++) {
+            for (let i = 1; i <= 2; i++) {
                 $(`#loading_edit${i}`).html('');
             }
         }
@@ -286,133 +400,134 @@
             }, 5000);
         }
     </script>
-    @section("css")
-        <style>
-            #myTable {
-                border-collapse: separate;
-                border-spacing: 0;
-                border-radius: 12px;
-                overflow: hidden;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            }
+@endsection
 
-            #myTable thead th:first-child {
-                border-top-left-radius: 12px;
-            }
+@section("css")
+    <style>
+        #myTable {
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
 
-            #myTable thead th:last-child {
-                border-top-right-radius: 12px;
-            }
+        #myTable thead th:first-child {
+            border-top-left-radius: 12px;
+        }
 
-            #myTable tbody tr:hover {
-                background-color: #f8fafc;
-                transform: scale(1.01);
-                transition: all 0.2s ease;
-            }
+        #myTable thead th:last-child {
+            border-top-right-radius: 12px;
+        }
 
-            /* ALIGNMENT FIXES - Pastikan semua sel rata tengah dengan padding yang lebih kecil */
-            #myTable td,
-            #myTable th {
-                text-align: center !important;
-                vertical-align: middle !important;
-                min-height: 50px;
-                padding: 12px 8px !important;
-            }
+        #myTable tbody tr:hover {
+            background-color: #f8fafc;
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+        }
 
-            /* Semua kolom termasuk Nama Kriteria rata tengah */
-            #myTable td:nth-child(4),
-            #myTable th:nth-child(4) {
-                text-align: center !important;
-                vertical-align: middle !important;
-                padding: 12px 8px !important;
-            }
+        /* ALIGNMENT FIXES - Pastikan semua sel rata tengah dengan padding yang lebih kecil */
+        #myTable td,
+        #myTable th {
+            text-align: center !important;
+            vertical-align: middle !important;
+            min-height: 50px;
+            padding: 12px 8px !important;
+        }
 
-            /* Hapus semua div wrapper - langsung styling pada td/th */
-            #myTable td>div {
-                display: block !important;
-                width: 100%;
-                text-align: center !important;
-            }
+        /* Semua kolom termasuk Nama Kriteria rata tengah */
+        #myTable td:nth-child(4),
+        #myTable th:nth-child(4) {
+            text-align: center !important;
+            vertical-align: middle !important;
+            padding: 12px 8px !important;
+        }
 
-            /* Semua div dalam sel rata tengah */
-            #myTable td:nth-child(4)>div {
-                text-align: center !important;
-            }
+        /* Hapus semua div wrapper - langsung styling pada td/th */
+        #myTable td>div {
+            display: block !important;
+            width: 100%;
+            text-align: center !important;
+        }
 
-            /* Pastikan paragraf dalam sel juga mengikuti alignment */
-            #myTable td p,
-            #myTable th p {
-                margin: 0 !important;
-                padding: 0 !important;
-                text-align: inherit;
-                width: 100%;
-            }
+        /* Semua div dalam sel rata tengah */
+        #myTable td:nth-child(4)>div {
+            text-align: center !important;
+        }
 
-            /* Pastikan span badge center */
-            #myTable td span {
-                display: inline-block;
-                text-align: center;
-            }
+        /* Pastikan paragraf dalam sel juga mengikuti alignment */
+        #myTable td p,
+        #myTable th p {
+            margin: 0 !important;
+            padding: 0 !important;
+            text-align: inherit;
+            width: 100%;
+        }
 
-            /* Pastikan button actions center */
-            #myTable td:last-child>div {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 8px;
-            }
+        /* Pastikan span badge center */
+        #myTable td span {
+            display: inline-block;
+            text-align: center;
+        }
 
-            /* Pastikan semua header rata tengah dengan force dan padding konsisten */
-            #myTable thead th {
-                text-align: center !important;
-                vertical-align: middle !important;
-                padding: 12px 8px !important;
-            }
+        /* Pastikan button actions center */
+        #myTable td:last-child>div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
 
-            /* Pastikan semua teks dalam header rata tengah */
-            #myTable thead th * {
-                text-align: center !important;
-            }
+        /* Pastikan semua header rata tengah dengan force dan padding konsisten */
+        #myTable thead th {
+            text-align: center !important;
+            vertical-align: middle !important;
+            padding: 12px 8px !important;
+        }
 
-            /* Konsistensi lebar kolom - disesuaikan tanpa kolom bobot */
-            #myTable th:nth-child(1),
-            #myTable td:nth-child(1) {
-                width: 8%;
-            }
+        /* Pastikan semua teks dalam header rata tengah */
+        #myTable thead th * {
+            text-align: center !important;
+        }
 
-            /* No */
-            #myTable th:nth-child(2),
-            #myTable td:nth-child(2) {
-                width: 12%;
-            }
+        /* Konsistensi lebar kolom - disesuaikan tanpa kolom bobot */
+        #myTable th:nth-child(1),
+        #myTable td:nth-child(1) {
+            width: 8%;
+        }
 
-            /* Kode */
-            #myTable th:nth-child(3),
-            #myTable td:nth-child(3) {
-                width: 12%;
-            }
+        /* No */
+        #myTable th:nth-child(2),
+        #myTable td:nth-child(2) {
+            width: 12%;
+        }
 
-            /* Ranking */
-            #myTable th:nth-child(4),
-            #myTable td:nth-child(4) {
-                width: 50%;
-            }
+        /* Kode */
+        #myTable th:nth-child(3),
+        #myTable td:nth-child(3) {
+            width: 12%;
+        }
 
-            /* Nama Kriteria */
-            #myTable th:nth-child(5),
-            #myTable td:nth-child(5) {
-                width: 12%;
-            }
+        /* Ranking */
+        #myTable th:nth-child(4),
+        #myTable td:nth-child(4) {
+            width: 50%;
+        }
 
-            /* Jenis */
-            #myTable th:nth-child(6),
-            #myTable td:nth-child(6) {
-                width: 6%;
-            }
+        /* Nama Kriteria */
+        #myTable th:nth-child(5),
+        #myTable td:nth-child(5) {
+            width: 12%;
+        }
 
-            /* Aksi */
-        </style>
-    @endsection
+        /* Jenis */
+        #myTable th:nth-child(6),
+        #myTable td:nth-child(6) {
+            width: 6%;
+        }
+
+        /* Aksi */
+    </style>
 @endsection
 
 @section("container")
@@ -581,7 +696,6 @@
                                         <span class="label-text text-xs font-semibold">
                                             <x-label-input-required>Jenis Kriteria</x-label-input-required>
                                         </span>
-                                        <span class="label-text-alt" id="loading_edit3"></span>
                                     </div>
                                     <div class="flex gap-2">
                                         <label class="label cursor-pointer p-1 flex-1">
@@ -615,6 +729,41 @@
                 </div>
             </div>
             {{-- Akhir Modal Edit --}}
+
+            {{-- Awal Modal Delete --}}
+            <input type="checkbox" id="delete_modal" class="modal-toggle" />
+            <div class="modal" role="dialog">
+                <div class="modal-box w-80 max-w-xs">
+                    <div class="mb-2 flex justify-between items-center">
+                        <h3 class="text-sm font-bold text-red-600">Hapus Kriteria</h3>
+                        <label for="delete_modal" class="cursor-pointer">
+                            <i class="ri-close-large-fill text-sm"></i>
+                        </label>
+                    </div>
+                    <div class="py-4">
+                        <div class="text-center">
+                            <i class="ri-delete-bin-line text-4xl text-red-500 mb-3"></i>
+                            <p class="text-sm text-gray-600 mb-2">Apakah Anda yakin ingin menghapus kriteria ini?</p>
+                            <p class="text-xs text-red-500 mb-4 font-semibold" id="delete_kriteria_name"></p>
+                            <p class="text-xs text-gray-400">Data yang dihapus tidak dapat dikembalikan!</p>
+                        </div>
+
+                        <div class="flex gap-2 mt-6">
+                            <label for="delete_modal"
+                                class="flex-1 text-center px-3 py-2 rounded-lg text-gray-600 font-semibold cursor-pointer transition-all duration-200 hover:opacity-90 text-xs border border-gray-300">
+                                Batal
+                            </label>
+                            <button onclick="confirmDelete()"
+                                class="flex-1 text-white px-3 py-2 rounded-lg font-semibold transition-all duration-200 hover:opacity-90 text-xs"
+                                style="background: linear-gradient(135deg, #e11d48, #be185d); box-shadow: 0 4px 15px rgba(225, 29, 72, 0.3);">
+                                <i class="ri-delete-bin-line mr-1"></i>
+                                Hapus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- Akhir Modal Delete --}}
 
             {{-- Awal Tabel Kriteria --}}
             <div
@@ -694,9 +843,9 @@
                                                 style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
                                                 <i class="ri-pencil-line text-base"></i>
                                             </label>
-                                            <label for="delete_button"
+                                            <label for="delete_modal"
                                                 class="px-3 py-2 rounded-lg text-white font-semibold cursor-pointer transition-all duration-200 hover:opacity-90 text-sm inline-flex items-center"
-                                                onclick="return delete_button('{{ $item->id }}')"
+                                                onclick="return delete_button('{{ $item->id }}', '{{ $item->kriteria }}')"
                                                 style="background: linear-gradient(135deg, #e11d48, #be185d); box-shadow: 0 4px 15px rgba(225, 29, 72, 0.3);">
                                                 <i class="ri-delete-bin-line text-base"></i>
                                             </label>
@@ -710,4 +859,5 @@
             </div>
             {{-- Akhir Tabel Kriteria --}}
         </div>
-</div>@endsection
+    </div>
+@endsection

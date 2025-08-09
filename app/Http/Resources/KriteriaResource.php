@@ -19,6 +19,7 @@ class KriteriaResource extends JsonResource
             'kode' => $this->kode,
             'kriteria' => $this->kriteria,
             'bobot' => $this->bobot,
+            'ranking' => $this->ranking,  // TAMBAHKAN INI
             'jenis_kriteria' => $this->jenis_kriteria,
         ];
     }
