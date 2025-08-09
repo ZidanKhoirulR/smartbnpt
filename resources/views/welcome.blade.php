@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- PERBAIKAN: Tambahkan Remix Icons untuk ikon -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         body {
@@ -56,7 +55,6 @@
             box-shadow: 0 10px 20px rgba(16, 185, 129, 0.4);
         }
 
-        /* PERBAIKAN: Styling untuk tombol yang disabled */
         .btn-disabled {
             background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
             cursor: not-allowed;
@@ -405,13 +403,6 @@
                     <span class="font-bold text-yellow-300">SMARTER</span>
                     untuk transparansi dan akurasi tertinggi dalam seleksi penerima bantuan
                 </p>
-
-                <!-- Action Button (hanya tombol orange) -->
-                <a href="{{ route('hasil-akhir.public') }}"
-                    class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200">
-                    <i class="ri-trophy-line mr-2 text-lg"></i>
-                    Lihat Hasil Akhir
-                </a>
             </div>
 
             <!-- SMARTER Method Info -->

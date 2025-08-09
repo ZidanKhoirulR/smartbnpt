@@ -149,12 +149,4 @@ class AlternatifController extends Controller
             return to_route('alternatif')->with('error', 'Alternatif Gagal Disimpan');
         }
     }
-
-    /**
-     * Search alternatif by NIK for public access
-     */
-    public function searchByNik($nik)
-    {
-        return Alternatif::where('nik', $nik)->first();
-    }
 }

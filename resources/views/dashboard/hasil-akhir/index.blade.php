@@ -55,14 +55,14 @@
             }
 
             /* Semua div dalam sel rata tengah */
-            #myTable td > div {
+            #myTable td>div {
                 display: block !important;
                 width: 100%;
                 text-align: center !important;
             }
 
             /* Kolom alternatif div tetap rata kiri */
-            #myTable td:nth-child(2) > div {
+            #myTable td:nth-child(2)>div {
                 text-align: left !important;
             }
 
@@ -124,9 +124,20 @@
             }
 
             /* Medali icons */
-            .medal-gold { color: #f59e0b; font-size: 1.2rem; }
-            .medal-silver { color: #6b7280; font-size: 1.2rem; }
-            .medal-bronze { color: #d97706; font-size: 1.2rem; }
+            .medal-gold {
+                color: #f59e0b;
+                font-size: 1.2rem;
+            }
+
+            .medal-silver {
+                color: #6b7280;
+                font-size: 1.2rem;
+            }
+
+            .medal-bronze {
+                color: #d97706;
+                font-size: 1.2rem;
+            }
         </style>
     @endsection
 @endsection
@@ -138,16 +149,18 @@
             <div class="mb-4 rounded-lg p-4 text-sm text-white" role="alert"
                 style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);">
                 <span class="font-medium">Info Hasil Akhir:</span>
-                Hasil perhitungan SMARTER-ROC telah diurutkan berdasarkan nilai tertinggi. 
+                Hasil perhitungan SMARTER-ROC telah diurutkan berdasarkan nilai tertinggi.
                 Alternatif dengan nilai tertinggi adalah yang terbaik sesuai kriteria yang telah ditetapkan.
             </div>
 
             {{-- Awal Tabel Hasil Akhir --}}
-            <div class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
-                <div class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
+            <div
+                class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
+                <div
+                    class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
                     <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel {{ $title }}</h6>
                     <div class="w-1/2 max-w-full flex-none px-3 text-right">
-                        <a href="{{ route('pdf.hasilAkhir') }}" target="_blank" 
+                        <a href="{{ route('pdf.hasil') }}" target="_blank"
                             class="mb-0 inline-block cursor-pointer rounded-lg px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-white shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2"
                             style="background: linear-gradient(135deg, #e11d48, #be185d); box-shadow: 0 4px 15px rgba(225, 29, 72, 0.3);">
                             <i class="ri-file-pdf-2-line"></i>
@@ -157,7 +170,9 @@
                 </div>
                 <div class="flex-auto px-0 pb-2 pt-0">
                     <div class="overflow-x-auto p-0 px-6 pb-6">
-                        <table id="myTable" class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top text-center" style="width: 100%;">
+                        <table id="myTable"
+                            class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top text-center"
+                            style="width: 100%;">
                             <thead class="align-bottom">
                                 <tr class="text-xs font-bold uppercase text-white text-center"
                                     style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);">
@@ -168,8 +183,9 @@
                             </thead>
                             <tbody>
                                 @foreach ($nilaiAkhir as $index => $item)
-                                    <tr class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200 
-                                        @if($index === 0) ranking-1 @elseif($index === 1) ranking-2 @elseif($index === 2) ranking-3 @endif">
+                                    <tr
+                                        class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200 
+                                                @if($index === 0) ranking-1 @elseif($index === 1) ranking-2 @elseif($index === 2) ranking-3 @endif">
 
                                         <!-- Kode -->
                                         <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
@@ -189,12 +205,13 @@
                                         <td class="py-4 px-3 border-r border-gray-200 align-middle text-left">
                                             <div class="flex items-center gap-3">
                                                 <!-- Ranking Badge -->
-                                                <span class="flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold text-white"
+                                                <span
+                                                    class="flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold text-white"
                                                     style="background: linear-gradient(135deg, 
-                                                        @if($index === 0) #f59e0b, #d97706 
-                                                        @elseif($index === 1) #6366f1, #4f46e5 
-                                                        @elseif($index === 2) #ef4444, #dc2626 
-                                                        @else #6b7280, #4b5563 @endif);">
+                                                                @if($index === 0) #f59e0b, #d97706 
+                                                                @elseif($index === 1) #6366f1, #4f46e5 
+                                                                @elseif($index === 2) #ef4444, #dc2626 
+                                                                @else #6b7280, #4b5563 @endif);">
                                                     {{ $index + 1 }}
                                                 </span>
 
@@ -215,17 +232,16 @@
 
                                         <!-- Nilai Akhir -->
                                         <td class="py-4 px-3 align-middle text-center">
-                                            <span class="px-3 py-2 rounded-full text-sm font-bold text-white"
-                                                style="background: linear-gradient(135deg, 
-                                                    @if($index === 0) #f59e0b, #d97706
-                                                    @elseif($index === 1) #6366f1, #4f46e5
-                                                    @elseif($index === 2) #ef4444, #dc2626
-                                                    @else #10b981, #059669 @endif); 
-                                                    box-shadow: 0 4px 15px rgba(
-                                                        @if($index === 0) 245, 158, 11, 0.3
-                                                        @elseif($index === 1) 99, 102, 241, 0.3
-                                                        @elseif($index === 2) 239, 68, 68, 0.3
-                                                        @else 16, 185, 129, 0.3 @endif);">
+                                            <span class="px-3 py-2 rounded-full text-sm font-bold text-white" style="background: linear-gradient(135deg, 
+                                                            @if($index === 0) #f59e0b, #d97706
+                                                            @elseif($index === 1) #6366f1, #4f46e5
+                                                            @elseif($index === 2) #ef4444, #dc2626
+                                                            @else #10b981, #059669 @endif); 
+                                                            box-shadow: 0 4px 15px rgba(
+                                                                @if($index === 0) 245, 158, 11, 0.3
+                                                                @elseif($index === 1) 99, 102, 241, 0.3
+                                                                @elseif($index === 2) 239, 68, 68, 0.3
+                                                                @else 16, 185, 129, 0.3 @endif);">
                                                 {{ $item->nilai }}
                                             </span>
                                         </td>
@@ -242,7 +258,8 @@
                                     <i class="ri-trophy-line text-lg"></i>
                                     <span class="font-bold">Peringkat 1</span>
                                 </div>
-                                <p class="text-xs">Alternatif dengan nilai tertinggi dan performa terbaik sesuai kriteria yang ditetapkan.</p>
+                                <p class="text-xs">Alternatif dengan nilai tertinggi dan performa terbaik sesuai kriteria
+                                    yang ditetapkan.</p>
                             </div>
 
                             <div class="p-4 rounded-lg text-sm text-white"
@@ -251,7 +268,8 @@
                                     <i class="ri-line-chart-line text-lg"></i>
                                     <span class="font-bold">Metode SMARTER-ROC</span>
                                 </div>
-                                <p class="text-xs">Pembobotan otomatis berdasarkan ranking kriteria dengan normalisasi utility 0-1.</p>
+                                <p class="text-xs">Pembobotan otomatis berdasarkan ranking kriteria dengan normalisasi
+                                    utility 0-1.</p>
                             </div>
 
                             <div class="p-4 rounded-lg text-sm text-white"
@@ -260,7 +278,8 @@
                                     <i class="ri-file-pdf-2-line text-lg"></i>
                                     <span class="font-bold">Laporan PDF</span>
                                 </div>
-                                <p class="text-xs">Hasil lengkap dapat dicetak dalam format PDF untuk dokumentasi dan presentasi.</p>
+                                <p class="text-xs">Hasil lengkap dapat dicetak dalam format PDF untuk dokumentasi dan
+                                    presentasi.</p>
                             </div>
                         </div>
 

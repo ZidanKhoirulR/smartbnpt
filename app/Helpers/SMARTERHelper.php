@@ -1,7 +1,5 @@
 <?php
 
-// File: app/Helpers/SMARTERHelper.php
-
 namespace App\Helpers;
 
 use App\Models\Kriteria;

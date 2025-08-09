@@ -1,4 +1,6 @@
 <?php
+// File: app/Http/Requests/AlternatifRequest.php
+// VERSION: CLEAN - Tetap validasi NIK untuk admin internal
 
 namespace App\Http\Requests;
 
@@ -41,6 +43,11 @@ class AlternatifRequest extends FormRequest
             'nik.size' => 'NIK harus terdiri dari 16 digit',
             'nik.regex' => 'NIK hanya boleh berisi angka',
             'nik.unique' => 'NIK sudah terdaftar dalam sistem',
+            'kode.required' => 'Kode alternatif harus diisi',
+            'kode.unique' => 'Kode alternatif sudah digunakan',
+            'alternatif.required' => 'Nama alternatif harus diisi',
+            'alternatif.max' => 'Nama alternatif maksimal 255 karakter',
+            'keterangan.max' => 'Keterangan maksimal 1000 karakter',
         ];
     }
 }

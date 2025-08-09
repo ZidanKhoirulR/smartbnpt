@@ -9,7 +9,7 @@ use App\Models\NilaiAkhir;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Middleware untuk memastikan sinkronisasi data antara admin dan public
+ * Middleware untuk memastikan sinkronisasi data admin dashboard
  * Akan membersihkan cache ketika ada perubahan data
  */
 class CacheSyncMiddleware
@@ -37,7 +37,9 @@ class CacheSyncMiddleware
             'nilai-utility.calculate',
             'nilai-akhir.calculate',
             'normalisasi-bobot.calculate',
-            // Tambahkan route lain yang mempengaruhi perhitungan
+            'sub-kriteria.store',
+            'sub-kriteria.update',
+            'sub-kriteria.destroy',
         ];
 
         // Cek jika request adalah POST, PUT, PATCH, DELETE ke route yang mempengaruhi data
@@ -95,17 +97,18 @@ class CacheSyncMiddleware
             }
         }
 
-        // Cek berdasarkan URI pattern
+        // Cek berdasarkan URI pattern untuk admin dashboard
         $uri = $request->path();
         $dataAffectingUris = [
             'dashboard/kriteria',
             'dashboard/alternatif',
             'dashboard/penilaian',
+            'dashboard/sub-kriteria',
             'dashboard/nilai-utility',
             'dashboard/nilai-akhir',
             'dashboard/normalisasi',
-            'admin/calculate',
-            'admin/recalculate',
+            'dashboard/calculate',
+            'dashboard/recalculate',
         ];
 
         foreach ($dataAffectingUris as $pattern) {
@@ -118,28 +121,21 @@ class CacheSyncMiddleware
     }
 
     /**
-     * Membersihkan semua cache yang terkait dengan perhitungan
+     * Membersihkan semua cache yang terkait dengan perhitungan admin
      */
     private function clearCalculationCache(): void
     {
         try {
-            // Cache keys yang perlu dibersihkan
+            // Cache keys yang perlu dibersihkan untuk admin dashboard
             $cacheKeys = [
-                'has_calculation_results',
-                'public_ranking_data',
+                'has_calculation_results_v2',
                 'admin_ranking_data',
+                'admin_system_stats',
                 'calculation_timestamp',
-                'total_alternatif',
-                'total_penerima',
-                'ranking_cache_*', // Pattern untuk cache ranking individual
+                'dashboard_stats',
             ];
 
             foreach ($cacheKeys as $key) {
-                if (str_contains($key, '*')) {
-                    // Untuk pattern cache, gunakan flush atau hapus manual
-                    // Laravel tidak mendukung wildcard delete secara native
-                    continue;
-                }
                 Cache::forget($key);
             }
 
