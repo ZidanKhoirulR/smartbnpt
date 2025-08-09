@@ -50,10 +50,7 @@ Route::prefix('api/smarter')->group(function () {
         return response()->json($laporan);
     })->name('api.smarter.laporan-lengkap');
 
-    Route::get('/hasil-akhir-public', [
-        WelcomeController::class,
-        'hasilAkhirPublic'
-    ])->name('hasil-akhir.public');
+    Route::get('/hasil-akhir', [WelcomeController::class, 'hasilAkhirPublic'])->name('hasil-akhir.public');
 
     Route::get('/hasil-akhir-public/pdf', [
         WelcomeController::class,
@@ -64,6 +61,11 @@ Route::prefix('api/smarter')->group(function () {
 
 // Web Routes untuk CRUD dengan middleware auth
 Route::middleware(['auth'])->group(function () {
+
+    Route::middleware(['auth'])->prefix('dashboard')->group(function () {
+        // Dashboard admin routes...
+        Route::get('/hasil-akhir/pdf', [PDFController::class, 'pdf_hasil'])->name('pdf.hasilAkhir');
+    });
 
     // Additional web routes untuk kriteria management
     Route::post('kriteria/reset-rankings', [KriteriaController::class, 'resetRankings'])
@@ -84,6 +86,9 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
+
+Route::get('/hasil-akhir', [WelcomeController::class, 'hasilAkhirPublic'])->name('hasil-akhir.public')->withoutMiddleware('auth');
+Route::get('/hasil-akhir/pdf', [WelcomeController::class, 'hasilAkhirPublicPDF'])->name('hasil-akhir.public.pdf')->withoutMiddleware('auth');
 
 // Tetap pakai controller untuk handle POST login
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])
@@ -124,8 +129,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/ubah', [SubKriteriaController::class, 'update'])->name('sub-kriteria.update');
         Route::post('/hapus', [SubKriteriaController::class, 'delete'])->name('sub-kriteria.delete');
         Route::post('/impor', [SubKriteriaController::class, 'import'])->name('sub-kriteria.import');
-        // Tambahan route untuk template download
-        Route::get('/template', [SubKriteriaController::class, 'downloadTemplate'])->name('sub-kriteria.template');
     });
 
     Route::group([
@@ -179,7 +182,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/hasil-perhitungan', [SMARTERController::class, 'hasilPerhitungan'])->name('hasil-perhitungan');
 
         // Route untuk PDF hasil akhir
-        Route::get('/pdf-hasil-akhir', [PDFController::class, 'pdf_hasil'])->name('pdf.hasilAkhir');
+        Route::get('/pdf-hasil-akhir', [PDFController::class, 'pdf_hasil']);
+
 
     });
 });

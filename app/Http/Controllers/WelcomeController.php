@@ -3,12 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alternatif;
-use App\Models\Kriteria;
 use App\Models\NilaiAkhir;
-use App\Models\NilaiUtility;
-use App\Models\NormalisasiBobot;
-use App\Models\Penilaian;
-use Barryvdh\DomPDF\Facade\PDF;
 use Illuminate\Http\Request;
 
 class WelcomeController extends Controller
@@ -78,80 +73,6 @@ class WelcomeController extends Controller
             'result' => $result,
             'search_nik' => $nik
         ])->withInput();
-    }
-
-    /**
-     * Menampilkan halaman hasil akhir untuk public
-     */
-    public function hasilAkhirPublic()
-    {
-        // Cek apakah ada data nilai akhir
-        $nilaiAkhirExists = NilaiAkhir::exists();
-
-        if (!$nilaiAkhirExists) {
-            return redirect()->route('welcome')->with([
-                'warning' => 'Hasil perhitungan belum tersedia. Silakan hubungi administrator.'
-            ]);
-        }
-
-        // Ambil data perankingan seperti di dashboard admin
-        $nilaiAkhir = NilaiAkhir::query()
-            ->join('alternatif as a', 'a.id', '=', 'nilai_akhir.alternatif_id')
-            ->selectRaw("a.kode, a.alternatif, SUM(nilai_akhir.nilai) as nilai")
-            ->groupBy('a.kode', 'a.alternatif')
-            ->orderBy('nilai', 'desc')
-            ->get();
-
-        $title = 'Hasil Akhir Perankingan';
-
-        return view('public.hasil-akhir', [
-            'title' => $title,
-            'nilaiAkhir' => $nilaiAkhir,
-            'maxRecipients' => self::MAX_RECIPIENTS
-        ]);
-    }
-
-    /**
-     * Generate PDF hasil akhir untuk public
-     */
-    public function hasilAkhirPublicPDF()
-    {
-        // Cek apakah ada data nilai akhir
-        $nilaiAkhirExists = NilaiAkhir::exists();
-
-        if (!$nilaiAkhirExists) {
-            return redirect()->route('welcome')->with([
-                'error' => 'Hasil perhitungan belum tersedia untuk dicetak.'
-            ]);
-        }
-
-        // Ambil data yang sama seperti di PDFController
-        $judul = 'Laporan Hasil Akhir Perankingan Bantuan Sosial';
-        $tabelPenilaian = Penilaian::with('kriteria', 'subKriteria', 'alternatif')->get();
-        $tabelNormalisasi = NormalisasiBobot::with('kriteria')->get();
-        $tabelUtility = NilaiUtility::with('kriteria', 'alternatif')->get();
-        $tabelNilaiAkhir = NilaiAkhir::with('kriteria', 'alternatif')->get();
-        $tabelPerankingan = NilaiAkhir::query()
-            ->join('alternatif as a', 'a.id', '=', 'nilai_akhir.alternatif_id')
-            ->selectRaw("a.kode, a.alternatif, SUM(nilai) as nilai")
-            ->groupBy('a.kode', 'a.alternatif')
-            ->orderBy('nilai', 'desc')
-            ->get();
-        $kriteria = Kriteria::orderBy('id', 'asc')->get(['id', 'kriteria']);
-        $alternatif = Alternatif::orderBy('id', 'asc')->get(['id', 'alternatif']);
-
-        $pdf = PDF::setOptions(['defaultFont' => 'sans-serif'])->loadview('public.pdf.hasil_akhir', [
-            'judul' => $judul,
-            'tabelPenilaian' => $tabelPenilaian,
-            'tabelNormalisasi' => $tabelNormalisasi,
-            'tabelUtility' => $tabelUtility,
-            'tabelNilaiAkhir' => $tabelNilaiAkhir,
-            'tabelPerankingan' => $tabelPerankingan,
-            'kriteria' => $kriteria,
-            'alternatif' => $alternatif,
-        ]);
-
-        return $pdf->stream('laporan-hasil-akhir-bantuan-sosial.pdf');
     }
 
     private function calculateRankingAndStatus($alternatif)

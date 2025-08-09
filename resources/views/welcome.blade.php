@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- PERBAIKAN: Tambahkan Remix Icons untuk ikon -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -52,6 +54,18 @@
             background: linear-gradient(135deg, #059669 0%, #047857 100%);
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        /* PERBAIKAN: Styling untuk tombol yang disabled */
+        .btn-disabled {
+            background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn-disabled:hover {
+            transform: none;
+            box-shadow: none;
         }
 
         .navbar {
