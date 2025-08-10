@@ -19,7 +19,9 @@
                     </div>
                 </div>
                 <div class="overflow-x-auto p-3">
-                    <table id="tabel_data_hasil" class="nowrap stripe hover w-full text-left text-sm text-gray-500 dark:text-gray-400" style="width:100%; padding-top: 1em; padding-bottom: 1em;">
+                    <table id="tabel_data_hasil"
+                        class="nowrap stripe hover w-full text-left text-sm text-gray-500 dark:text-gray-400"
+                        style="width:100%; padding-top: 1em; padding-bottom: 1em;">
                         <thead class="bg-gray-50 text-xs uppercase text-gray-700">
                             <tr>
                                 <th scope="col" class="px-4 py-3">Alternatif</th>
@@ -51,12 +53,15 @@
                 <div class="d mb-5 flex items-center justify-between p-4">
                     <div class="flex space-x-3">
                         <div class="flex items-center space-x-3">
-                            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">Hasil Normalisasi Bobot Kriteria</h2>
+                            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">Hasil Normalisasi Bobot Kriteria
+                            </h2>
                         </div>
                     </div>
                 </div>
                 <div class="overflow-x-auto p-3">
-                    <table id="tabel_data_hasil" class="nowrap stripe hover w-full text-left text-sm text-gray-500 dark:text-gray-400" style="width:100%; padding-top: 1em; padding-bottom: 1em;">
+                    <table id="tabel_data_hasil"
+                        class="nowrap stripe hover w-full text-left text-sm text-gray-500 dark:text-gray-400"
+                        style="width:100%; padding-top: 1em; padding-bottom: 1em;">
                         <thead class="bg-gray-50 text-xs uppercase text-gray-700">
                             <tr>
                                 <th scope="col" class="px-4 py-3">Kode</th>
@@ -93,7 +98,9 @@
                     </div>
                 </div>
                 <div class="overflow-x-auto p-3">
-                    <table id="tabel_data_hasil" class="nowrap stripe hover w-full text-left text-sm text-gray-500 dark:text-gray-400" style="width:100%; padding-top: 1em; padding-bottom: 1em;">
+                    <table id="tabel_data_hasil"
+                        class="nowrap stripe hover w-full text-left text-sm text-gray-500 dark:text-gray-400"
+                        style="width:100%; padding-top: 1em; padding-bottom: 1em;">
                         <thead class="bg-gray-50 text-xs uppercase text-gray-700">
                             <tr>
                                 <th scope="col" class="px-4 py-3">Alternatif</th>
@@ -130,7 +137,9 @@
                     </div>
                 </div>
                 <div class="overflow-x-auto p-3">
-                    <table id="tabel_data_hasil" class="nowrap stripe hover w-full text-left text-sm text-gray-500 dark:text-gray-400" style="width:100%; padding-top: 1em; padding-bottom: 1em;">
+                    <table id="tabel_data_hasil"
+                        class="nowrap stripe hover w-full text-left text-sm text-gray-500 dark:text-gray-400"
+                        style="width:100%; padding-top: 1em; padding-bottom: 1em;">
                         <thead class="bg-gray-50 text-xs uppercase text-gray-700">
                             <tr>
                                 <th scope="col" class="px-4 py-3">Alternatif</th>
@@ -171,7 +180,9 @@
                     </div>
                 </div>
                 <div class="overflow-x-auto p-3">
-                    <table id="tabel_data_hasil" class="nowrap stripe hover w-full text-left text-sm text-gray-500 dark:text-gray-400" style="width:100%; padding-top: 1em; padding-bottom: 1em;">
+                    <table id="tabel_data_hasil"
+                        class="nowrap stripe hover w-full text-left text-sm text-gray-500 dark:text-gray-400"
+                        style="width:100%; padding-top: 1em; padding-bottom: 1em;">
                         <thead class="bg-gray-50 text-xs uppercase text-gray-700">
                             <tr>
                                 <th scope="col" class="px-4 py-3">Kode</th>
@@ -200,8 +211,9 @@
                     @php
                         $topRanking = $tabelPerankingan->first();
                     @endphp
-                    <h2>Simpulan</h2>
-                    <p>Berdasarkan tabel dari perhitungan SMART yang dapat dijadikan rekomendasi alternatif, maka didapatkan alternatif dengan nilai tertinggi yaitu: <span style="font-weight: bold;">{{ $topRanking->alternatif }}</span> dengan nilai <span style="font-weight: bold;">{{ round($topRanking->nilai, 3) }}</span></p>
+                    <h2>KETERANGAN</h2>
+                    <p>Berdasarkan tabel dari perhitungan SMART yang mendapatkan nilai >0.75 maka lolos untuk mendapatkan
+                        bantuan</span></p>
                 </div>
             </div>
         </div>
