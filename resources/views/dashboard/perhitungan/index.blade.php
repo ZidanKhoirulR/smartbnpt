@@ -35,6 +35,16 @@
                 order: [],
                 pagingType: 'full_numbers',
             });
+            $('#myTable4').DataTable({
+                responsive: {
+                    details: {
+                        type: 'column',
+                        target: 'tr',
+                    },
+                },
+                order: [],
+                pagingType: 'full_numbers',
+            });
         });
 
         function perhitungan_button() {
@@ -102,7 +112,8 @@
             /* Styling untuk semua tabel */
             #myTable1,
             #myTable2,
-            #myTable3 {
+            #myTable3,
+            #myTable4 {
                 border-collapse: separate;
                 border-spacing: 0;
                 border-radius: 12px;
@@ -113,20 +124,23 @@
             /* Header corners */
             #myTable1 thead th:first-child,
             #myTable2 thead th:first-child,
-            #myTable3 thead th:first-child {
+            #myTable3 thead th:first-child,
+            #myTable4 thead th:first-child {
                 border-top-left-radius: 12px;
             }
 
             #myTable1 thead th:last-child,
             #myTable2 thead th:last-child,
-            #myTable3 thead th:last-child {
+            #myTable3 thead th:last-child,
+            #myTable4 thead th:last-child {
                 border-top-right-radius: 12px;
             }
 
             /* Hover effects */
             #myTable1 tbody tr:hover,
             #myTable2 tbody tr:hover,
-            #myTable3 tbody tr:hover {
+            #myTable3 tbody tr:hover,
+            #myTable4 tbody tr:hover {
                 background-color: #f8fafc;
                 transform: scale(1.01);
                 transition: all 0.2s ease;
@@ -138,7 +152,9 @@
             #myTable2 td,
             #myTable2 th,
             #myTable3 td,
-            #myTable3 th {
+            #myTable3 th,
+            #myTable4 td,
+            #myTable4 th {
                 text-align: center !important;
                 vertical-align: middle !important;
                 min-height: 50px;
@@ -147,14 +163,16 @@
 
             /* Kolom alternatif tetap rata kiri */
             #myTable2 td:first-child,
-            #myTable3 td:first-child {
+            #myTable3 td:first-child,
+            #myTable4 td:first-child {
                 text-align: left !important;
             }
 
             /* Semua div dalam sel rata tengah */
             #myTable1 td>div,
             #myTable2 td>div,
-            #myTable3 td>div {
+            #myTable3 td>div,
+            #myTable4 td>div {
                 display: block !important;
                 width: 100%;
                 text-align: center !important;
@@ -162,7 +180,8 @@
 
             /* Kolom alternatif div tetap rata kiri */
             #myTable2 td:first-child>div,
-            #myTable3 td:first-child>div {
+            #myTable3 td:first-child>div,
+            #myTable4 td:first-child>div {
                 text-align: left !important;
             }
 
@@ -172,7 +191,9 @@
             #myTable2 td p,
             #myTable2 th p,
             #myTable3 td p,
-            #myTable3 th p {
+            #myTable3 th p,
+            #myTable4 td p,
+            #myTable4 th p {
                 margin: 0 !important;
                 padding: 0 !important;
                 text-align: inherit;
@@ -182,7 +203,8 @@
             /* Pastikan span badge center */
             #myTable1 td span,
             #myTable2 td span,
-            #myTable3 td span {
+            #myTable3 td span,
+            #myTable4 td span {
                 display: inline-block;
                 text-align: center;
             }
@@ -190,7 +212,8 @@
             /* Pastikan semua header rata tengah */
             #myTable1 thead th,
             #myTable2 thead th,
-            #myTable3 thead th {
+            #myTable3 thead th,
+            #myTable4 thead th {
                 text-align: center !important;
                 vertical-align: middle !important;
                 padding: 12px 8px !important;
@@ -198,14 +221,16 @@
 
             #myTable1 thead th *,
             #myTable2 thead th *,
-            #myTable3 thead th * {
+            #myTable3 thead th *,
+            #myTable4 thead th * {
                 text-align: center !important;
             }
 
             /* Footer alignment */
             #myTable1 tfoot td,
             #myTable2 tfoot td,
-            #myTable3 tfoot td {
+            #myTable3 tfoot td,
+            #myTable4 tfoot td {
                 vertical-align: middle !important;
             }
 
@@ -458,16 +483,18 @@
                 </div>
                 <div class="flex-auto px-0 pb-2 pt-0">
                     <div class="overflow-x-auto p-0 px-6 pb-6">
-                        <table class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top"
+                        <table id="myTable4"
+                            class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top text-center"
                             style="width: 100%;">
                             <thead class="align-bottom">
-                                <tr class="bg-success text-xs font-bold uppercase text-white">
-                                    <th class="rounded-tl">Alternatif</th>
+                                <tr class="text-xs font-bold uppercase text-white text-center"
+                                    style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);">
+                                    <th class="text-center py-4 px-3 border-r border-gray-600">Alternatif</th>
                                     @foreach ($kriteria as $item)
-                                        <th>
+                                        <th class="text-center py-4 px-3 border-r border-gray-600">
                                             {{ $item->kriteria }}
                                             @if($normalisasiBobot->where('kriteria_id', $item->id)->first())
-                                                <br><small>(W:
+                                                <br><small class="text-xs opacity-80">(W:
                                                     {{ round($normalisasiBobot->where('kriteria_id', $item->id)->first()->normalisasi, 4) }})</small>
                                             @endif
                                         </th>
@@ -476,29 +503,24 @@
                             </thead>
                             <tbody>
                                 @foreach ($alternatif as $item)
-                                    <tr class="border-b border-primary-color bg-transparent dark:border-primary-color-dark">
-                                        <td>
-                                            <p
-                                                class="text-left align-middle text-base font-semibold leading-tight text-primary-color dark:text-primary-color-dark">
-                                                {{ $item->alternatif }}
-                                            </p>
+                                    <tr
+                                        class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200">
+                                        <td class="py-4 px-3 border-r border-gray-200 align-middle text-left">
+                                            <strong>{{ $item->alternatif }}</strong>
                                         </td>
                                         @if (isset($matriksTernormalisasi) && $matriksTernormalisasi->first())
                                             @foreach ($matriksTernormalisasi->where("alternatif_id", $item->id) as $value)
-                                                <td>
-                                                    <p
-                                                        class="text-center align-middle text-base font-semibold leading-tight text-success">
+                                                <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
+                                                    <span class="px-2 py-1 rounded-full text-xs font-semibold text-white"
+                                                        style="background: linear-gradient(135deg, #059669, #047857);">
                                                         {{ round($value->nilai, 4) }}
-                                                    </p>
+                                                    </span>
                                                 </td>
                                             @endforeach
                                         @else
                                             @foreach ($kriteria as $krit)
-                                                <td>
-                                                    <p
-                                                        class="text-center align-middle text-base font-semibold leading-tight text-primary-color dark:text-primary-color-dark">
-                                                        -
-                                                    </p>
+                                                <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
+                                                    <span class="text-gray-400">-</span>
                                                 </td>
                                             @endforeach
                                         @endif
@@ -507,19 +529,18 @@
                             </tbody>
                         </table>
 
-                        <div class="w-fit overflow-x-auto">
-                            <table class="table table-xs">
-                                <tr>
-                                    <td class="text-base font-semibold text-primary-color dark:text-primary-color-dark">
-                                        Keterangan:</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td class="text-base text-success">* Matriks Ternormalisasi = Nilai Utility × Bobot ROC
-                                    </td>
-                                    <td class="text-base text-primary-color dark:text-primary-color-dark"></td>
-                                </tr>
-                            </table>
+                        <div class="mt-3 p-4 rounded-lg text-sm text-white"
+                            style="background: linear-gradient(135deg, #059669, #047857); box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);">
+                            <h6 class="font-bold mb-2">Formula Matriks Ternormalisasi:</h6>
+                            <p class="mb-2">
+                                <strong>MT<sub>ij</sub> = u<sub>ij</sub> × w<sub>j</sub></strong>
+                            </p>
+                            <ul class="list-disc ml-5">
+                                <li>MT<sub>ij</sub> = Matriks ternormalisasi alternatif ke-i pada kriteria ke-j</li>
+                                <li>u<sub>ij</sub> = Nilai utility alternatif ke-i pada kriteria ke-j</li>
+                                <li>w<sub>j</sub> = Bobot ROC kriteria ke-j</li>
+                                <li>Hasil perkalian utility dengan bobot ROC</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
