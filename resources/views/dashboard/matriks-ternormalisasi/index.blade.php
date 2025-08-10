@@ -1,0 +1,162 @@
+@extends("dashboard.layouts.main")
+
+@section("js")
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable({
+                responsive: {
+                    details: {
+                        type: 'column',
+                        target: 'tr',
+                    },
+                },
+                order: [],
+                pagingType: 'full_numbers',
+            });
+        });
+
+        function matriks_button() {
+            Swal.fire({
+                title: 'Matriks Ternormalisasi',
+                text: "Menghitung matriks ternormalisasi (Utility × Bobot ROC)",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#6419E6',
+                cancelButtonColor: '#F87272',
+                confirmButtonText: 'Hitung',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "post",
+                        url: "{{ route("matriks-ternormalisasi.perhitungan") }}",
+                        data: {
+                            "_token": "{{ csrf_token() }}",
+                        },
+                        success: function (response) {
+                            Swal.fire({
+                                title: 'Perhitungan berhasil dilakukan!',
+                                icon: 'success',
+                                confirmButtonColor: '#6419E6',
+                                confirmButtonText: 'OK'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload();
+                                }
+                            });
+                        },
+                        error: function (response) {
+                            Swal.fire({
+                                title: 'Perhitungan gagal dilakukan!',
+                                icon: 'error',
+                                confirmButtonColor: '#6419E6',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    });
+                }
+            })
+        }
+    </script>
+@endsection
+
+@section("container")
+    <div class="-mx-3 flex flex-wrap">
+        <div class="w-full max-w-full flex-none px-3">
+            {{-- Awal Tabel Matriks Ternormalisasi --}}
+            <div
+                class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
+                <div
+                    class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
+                    <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel {{ $title }}</h6>
+                    <div class="w-1/2 max-w-full flex-none px-3 text-right">
+                        <button
+                            class="mb-0 inline-block cursor-pointer rounded-lg border border-solid border-success bg-transparent px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-success shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2"
+                            onclick="return matriks_button()">
+                            <i class="ri-add-line"></i>
+                            Hitung Matriks Ternormalisasi
+                        </button>
+                    </div>
+                </div>
+                <div class="flex-auto px-0 pb-2 pt-0">
+                    <div class="overflow-x-auto p-0 px-6 pb-6">
+                        <table id="myTable"
+                            class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top"
+                            style="width: 100%;">
+                            <thead class="align-bottom">
+                                <tr
+                                    class="bg-primary-color text-xs font-bold uppercase text-white dark:bg-primary-color-dark dark:text-white">
+                                    <th class="rounded-tl"></th>
+                                    @foreach ($kriteria as $item)
+                                        <th>
+                                            {{ $item->kriteria }}
+                                            <br><small>(Bobot: {{ $item->bobot ?? 'N/A' }})</small>
+                                        </th>
+                                    @endforeach
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($alternatif as $item)
+                                    <tr class="border-b border-primary-color bg-transparent dark:border-primary-color-dark">
+                                        <td>
+                                            <p
+                                                class="text-left align-middle text-base font-semibold leading-tight text-primary-color dark:text-primary-color-dark">
+                                                {{ $item->alternatif }}
+                                            </p>
+                                        </td>
+                                        @if ($matriksTernormalisasi->first())
+                                            @foreach ($matriksTernormalisasi->where("alternatif_id", $item->id) as $value)
+                                                <td>
+                                                    <p
+                                                        class="text-center align-middle text-base font-semibold leading-tight text-primary-color dark:text-primary-color-dark">
+                                                        @if ($value->nilai == 0)
+                                                            {{ round($value->nilai, 4) }}
+                                                        @elseif ($value->nilai == null)
+                                                            -
+                                                        @else
+                                                            {{ round($value->nilai, 4) }}
+                                                        @endif
+                                                    </p>
+                                                </td>
+                                            @endforeach
+                                        @else
+                                            @foreach ($kriteria as $item)
+                                                <td>
+                                                    <p
+                                                        class="text-center align-middle text-base font-semibold leading-tight text-primary-color dark:text-primary-color-dark">
+                                                        -
+                                                    </p>
+                                                </td>
+                                            @endforeach
+                                        @endif
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
+                        <div class="w-fit overflow-x-auto">
+                            <table class="table table-xs">
+                                <tr>
+                                    <td class="text-base font-semibold text-primary-color dark:text-primary-color-dark">
+                                        Keterangan:</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-base text-primary-color dark:text-primary-color-dark">* Matriks
+                                        Ternormalisasi = Nilai Utility × Bobot ROC</td>
+                                    <td class="text-base text-primary-color dark:text-primary-color-dark"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-base text-primary-color dark:text-primary-color-dark">* Pastikan
+                                        normalisasi bobot dan nilai utility sudah dihitung terlebih dahulu</td>
+                                    <td class="text-base text-primary-color dark:text-primary-color-dark"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- Akhir Tabel Matriks Ternormalisasi --}}
+        </div>
+    </div>
+@endsection

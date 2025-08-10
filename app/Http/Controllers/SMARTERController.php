@@ -7,12 +7,14 @@ use App\Http\Resources\KriteriaResource;
 use App\Http\Resources\NilaiAkhirResource;
 use App\Http\Resources\NilaiUtilityResource;
 use App\Http\Resources\NormalisasiBobotResource;
+use App\Http\Resources\MatriksTernormalisasiResource;
 use App\Models\Alternatif;
 use App\Models\Kriteria;
 use App\Models\NilaiAkhir;
 use App\Models\NilaiUtility;
 use App\Models\NormalisasiBobot;
 use App\Models\Penilaian;
+use App\Models\MatriksTernormalisasi;
 
 class SMARTERController extends Controller
 {
@@ -37,9 +39,14 @@ class SMARTERController extends Controller
             NilaiUtility::orderBy('alternatif_id', 'asc')->orderBy('kriteria_id', 'asc')->get()
         );
 
+        // Data matriks ternormalisasi
+        $matriksTernormalisasi = MatriksTernormalisasiResource::collection(
+            MatriksTernormalisasi::orderBy('alternatif_id', 'asc')->orderBy('kriteria_id', 'asc')->get()
+        );
+
         // Data nilai akhir
         $nilaiAkhir = NilaiAkhirResource::collection(
-            NilaiAkhir::orderBy('alternatif_id', 'asc')->orderBy('kriteria_id', 'asc')->get()
+            NilaiAkhir::orderBy('alternatif_id', 'asc')->get()
         );
 
         // Sum bobot kriteria untuk validasi
@@ -51,6 +58,7 @@ class SMARTERController extends Controller
             'kriteria',
             'alternatif',
             'nilaiUtility',
+            'matriksTernormalisasi',
             'nilaiAkhir',
             'sumBobotKriteria'
         ));
@@ -68,7 +76,10 @@ class SMARTERController extends Controller
             // 2. Hitung nilai utility
             $this->perhitunganNilaiUtility();
 
-            // 3. Hitung nilai akhir
+            // 3. Hitung matriks ternormalisasi
+            $this->perhitunganMatriksTernormalisasi();
+
+            // 4. Hitung nilai akhir
             $this->perhitunganNilaiAkhir();
 
             return response()->json([
@@ -201,22 +212,29 @@ class SMARTERController extends Controller
         }
     }
 
-    public function indexNilaiAkhir()
+    public function indexMatriksTernormalisasi()
     {
-        $title = "Nilai Akhir SMARTER";
-        $nilaiAkhir = NilaiAkhirResource::collection(NilaiAkhir::orderBy('alternatif_id', 'asc')->orderBy('kriteria_id', 'asc')->get());
+        $title = "Matriks Ternormalisasi SMARTER";
+        $matriksTernormalisasi = MatriksTernormalisasiResource::collection(
+            MatriksTernormalisasi::orderBy('alternatif_id', 'asc')->orderBy('kriteria_id', 'asc')->get()
+        );
         $alternatif = AlternatifResource::collection(Alternatif::orderBy('kode', 'asc')->get());
         $kriteria = KriteriaResource::collection(Kriteria::orderBy('ranking', 'asc')->get());
-        return view('dashboard.nilai-akhir.index', compact('title', 'nilaiAkhir', 'alternatif', 'kriteria'));
+
+        return view('dashboard.matriks-ternormalisasi.index', compact('title', 'matriksTernormalisasi', 'alternatif', 'kriteria'));
     }
 
-    public function perhitunganNilaiAkhir()
+    /**
+     * Perhitungan matriks ternormalisasi
+     * Formula: Nilai Utility × Bobot ROC
+     */
+    public function perhitunganMatriksTernormalisasi()
     {
         $kriteria = KriteriaResource::collection(Kriteria::orderBy('ranking', 'asc')->get());
         $alternatif = AlternatifResource::collection(Alternatif::orderBy('kode', 'asc')->get());
 
         if ($kriteria->isEmpty() || $alternatif->isEmpty()) {
-            return to_route('nilai-akhir')->with('error', 'Data kriteria atau alternatif tidak tersedia');
+            return to_route('matriks-ternormalisasi')->with('error', 'Data kriteria atau alternatif tidak tersedia');
         }
 
         // Pastikan normalisasi bobot dan utility sudah ada
@@ -224,15 +242,15 @@ class SMARTERController extends Controller
         $utilityCount = NilaiUtility::count();
 
         if ($normalisasiCount == 0) {
-            return to_route('nilai-akhir')->with('error', 'Silakan lakukan normalisasi bobot terlebih dahulu');
+            return to_route('matriks-ternormalisasi')->with('error', 'Silakan lakukan normalisasi bobot terlebih dahulu');
         }
 
         if ($utilityCount == 0) {
-            return to_route('nilai-akhir')->with('error', 'Silakan hitung nilai utility terlebih dahulu');
+            return to_route('matriks-ternormalisasi')->with('error', 'Silakan hitung nilai utility terlebih dahulu');
         }
 
-        NilaiAkhir::truncate();
-        $createNilaiAkhir = false;
+        MatriksTernormalisasi::truncate();
+        $createMatriks = false;
 
         foreach ($alternatif as $alt) {
             foreach ($kriteria as $krit) {
@@ -245,15 +263,65 @@ class SMARTERController extends Controller
                     ->first();
 
                 if ($normalisasiBobot && $nilaiUtility) {
-                    // Nilai Akhir = Bobot ROC × Utility
-                    $nilaiAkhir = $normalisasiBobot->normalisasi * $nilaiUtility->nilai;
+                    // Matriks Ternormalisasi = Utility × Bobot ROC
+                    $nilaiMatriks = $nilaiUtility->nilai * $normalisasiBobot->normalisasi;
 
-                    $createNilaiAkhir = NilaiAkhir::create([
+                    $createMatriks = MatriksTernormalisasi::create([
                         'alternatif_id' => $alt->id,
                         'kriteria_id' => $krit->id,
-                        'nilai' => round($nilaiAkhir, 4),
+                        'nilai' => round($nilaiMatriks, 4),
                     ]);
                 }
+            }
+        }
+
+        if ($createMatriks) {
+            return to_route('matriks-ternormalisasi')->with('success', 'Matriks Ternormalisasi SMARTER Berhasil Dihitung');
+        } else {
+            return to_route('matriks-ternormalisasi')->with('error', 'Matriks Ternormalisasi SMARTER Gagal Dihitung');
+        }
+    }
+
+    public function indexNilaiAkhir()
+    {
+        $title = "Nilai Akhir SMARTER";
+        $nilaiAkhir = NilaiAkhirResource::collection(NilaiAkhir::orderBy('alternatif_id', 'asc')->orderBy('kriteria_id', 'asc')->get());
+        $alternatif = AlternatifResource::collection(Alternatif::orderBy('kode', 'asc')->get());
+        $kriteria = KriteriaResource::collection(Kriteria::orderBy('ranking', 'asc')->get());
+        return view('dashboard.nilai-akhir.index', compact('title', 'nilaiAkhir', 'alternatif', 'kriteria'));
+    }
+
+    public function perhitunganNilaiAkhir()
+    {
+        $alternatif = AlternatifResource::collection(Alternatif::orderBy('kode', 'asc')->get());
+
+        if ($alternatif->isEmpty()) {
+            return to_route('nilai-akhir')->with('error', 'Data alternatif tidak tersedia');
+        }
+
+        // Pastikan matriks ternormalisasi sudah ada
+        $matriksCount = MatriksTernormalisasi::count();
+
+        if ($matriksCount == 0) {
+            return to_route('nilai-akhir')->with('error', 'Silakan hitung matriks ternormalisasi terlebih dahulu');
+        }
+
+        NilaiAkhir::truncate();
+        $createNilaiAkhir = false;
+
+        foreach ($alternatif as $alt) {
+            // Ambil semua nilai matriks ternormalisasi untuk alternatif ini
+            $nilaiMatriks = MatriksTernormalisasi::where('alternatif_id', $alt->id)->get();
+
+            if ($nilaiMatriks->count() > 0) {
+                // Jumlahkan semua nilai matriks ternormalisasi
+                $totalNilai = $nilaiMatriks->sum('nilai');
+
+                $createNilaiAkhir = NilaiAkhir::create([
+                    'alternatif_id' => $alt->id,
+                    'kriteria_id' => null, // Tidak ada kriteria_id karena ini total
+                    'nilai' => round($totalNilai, 4),
+                ]);
             }
         }
 

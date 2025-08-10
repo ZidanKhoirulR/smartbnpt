@@ -50,167 +50,175 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Show loading
-                        Swal.fire({
-                            title: 'Menghitung...',
-                            text: 'Sedang melakukan perhitungan SMARTER-ROC',
-                            allowOutsideClick: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
+                    Swal.fire({
+                        title: 'Menghitung...',
+                        text: 'Sedang melakukan perhitungan SMARTER-ROC',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
 
-                        $.ajax({
-                            type: "post",
-                            url: "{{ route("perhitungan.smarter") }}",
-                            data: {
-                                "_token": "{{ csrf_token() }}",
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    title: 'Perhitungan berhasil dilakukan!',
-                                    text: 'Perhitungan SMARTER-ROC telah selesai. Anda dapat melihat hasil detail.',
-                                    icon: 'success',
-                                    confirmButtonColor: '#6419E6',
-                                    confirmButtonText: 'OK'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        location.reload();
-                                    }
-                                });
-                            },
-                            error: function(response) {
-                                Swal.fire({
-                                    title: 'Perhitungan gagal dilakukan!',
-                                    text: 'Terjadi kesalahan saat melakukan perhitungan. Silakan coba lagi.',
-                                    icon: 'error',
-                                    confirmButtonColor: '#6419E6',
-                                    confirmButtonText: 'OK'
-                                });
-                            }
-                        });
-                    }
-                })
+                    $.ajax({
+                        type: "post",
+                        url: "{{ route("perhitungan.smarter") }}",
+                        data: {
+                            "_token": "{{ csrf_token() }}",
+                        },
+                        success: function (response) {
+                            Swal.fire({
+                                title: 'Perhitungan berhasil dilakukan!',
+                                text: 'Perhitungan SMARTER-ROC telah selesai. Anda dapat melihat hasil detail.',
+                                icon: 'success',
+                                confirmButtonColor: '#6419E6',
+                                confirmButtonText: 'OK'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload();
+                                }
+                            });
+                        },
+                        error: function (response) {
+                            Swal.fire({
+                                title: 'Perhitungan gagal dilakukan!',
+                                text: 'Terjadi kesalahan saat melakukan perhitungan. Silakan coba lagi.',
+                                icon: 'error',
+                                confirmButtonColor: '#6419E6',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    });
+                }
+            })
+        }
+
+        function lihat_hasil_detail() {
+            window.location.href = "{{ route('hasil-perhitungan') }}";
+        }
+    </script>
+
+    @section("css")
+        <style>
+            /* Styling untuk semua tabel */
+            #myTable1,
+            #myTable2,
+            #myTable3 {
+                border-collapse: separate;
+                border-spacing: 0;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             }
 
-            function lihat_hasil_detail() {
-                window.location.href = "{{ route('hasil-perhitungan') }}";
+            /* Header corners */
+            #myTable1 thead th:first-child,
+            #myTable2 thead th:first-child,
+            #myTable3 thead th:first-child {
+                border-top-left-radius: 12px;
             }
-        </script>
 
-        @section("css")
-            <style>
-                /* Styling untuk semua tabel */
-                #myTable1, #myTable2, #myTable3 {
-                    border-collapse: separate;
-                    border-spacing: 0;
-                    border-radius: 12px;
-                    overflow: hidden;
-                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-                }
+            #myTable1 thead th:last-child,
+            #myTable2 thead th:last-child,
+            #myTable3 thead th:last-child {
+                border-top-right-radius: 12px;
+            }
 
-                /* Header corners */
-                #myTable1 thead th:first-child,
-                #myTable2 thead th:first-child,
-                #myTable3 thead th:first-child {
-                    border-top-left-radius: 12px;
-                }
+            /* Hover effects */
+            #myTable1 tbody tr:hover,
+            #myTable2 tbody tr:hover,
+            #myTable3 tbody tr:hover {
+                background-color: #f8fafc;
+                transform: scale(1.01);
+                transition: all 0.2s ease;
+            }
 
-                #myTable1 thead th:last-child,
-                #myTable2 thead th:last-child,
-                #myTable3 thead th:last-child {
-                    border-top-right-radius: 12px;
-                }
+            /* ALIGNMENT FIXES - Semua sel rata tengah dengan padding konsisten */
+            #myTable1 td,
+            #myTable1 th,
+            #myTable2 td,
+            #myTable2 th,
+            #myTable3 td,
+            #myTable3 th {
+                text-align: center !important;
+                vertical-align: middle !important;
+                min-height: 50px;
+                padding: 12px 8px !important;
+            }
 
-                /* Hover effects */
-                #myTable1 tbody tr:hover,
-                #myTable2 tbody tr:hover,
-                #myTable3 tbody tr:hover {
-                    background-color: #f8fafc;
-                    transform: scale(1.01);
-                    transition: all 0.2s ease;
-                }
+            /* Kolom alternatif tetap rata kiri */
+            #myTable2 td:first-child,
+            #myTable3 td:first-child {
+                text-align: left !important;
+            }
 
-                /* ALIGNMENT FIXES - Semua sel rata tengah dengan padding konsisten */
-                #myTable1 td, #myTable1 th,
-                #myTable2 td, #myTable2 th,
-                #myTable3 td, #myTable3 th {
-                    text-align: center !important;
-                    vertical-align: middle !important;
-                    min-height: 50px;
-                    padding: 12px 8px !important;
-                }
+            /* Semua div dalam sel rata tengah */
+            #myTable1 td>div,
+            #myTable2 td>div,
+            #myTable3 td>div {
+                display: block !important;
+                width: 100%;
+                text-align: center !important;
+            }
 
-                /* Kolom alternatif tetap rata kiri */
-                #myTable2 td:first-child,
-                #myTable3 td:first-child {
-                    text-align: left !important;
-                }
+            /* Kolom alternatif div tetap rata kiri */
+            #myTable2 td:first-child>div,
+            #myTable3 td:first-child>div {
+                text-align: left !important;
+            }
 
-                /* Semua div dalam sel rata tengah */
-                #myTable1 td > div,
-                #myTable2 td > div,
-                #myTable3 td > div {
-                    display: block !important;
-                    width: 100%;
-                    text-align: center !important;
-                }
+            /* Pastikan paragraf mengikuti alignment */
+            #myTable1 td p,
+            #myTable1 th p,
+            #myTable2 td p,
+            #myTable2 th p,
+            #myTable3 td p,
+            #myTable3 th p {
+                margin: 0 !important;
+                padding: 0 !important;
+                text-align: inherit;
+                width: 100%;
+            }
 
-                /* Kolom alternatif div tetap rata kiri */
-                #myTable2 td:first-child > div,
-                #myTable3 td:first-child > div {
-                    text-align: left !important;
-                }
+            /* Pastikan span badge center */
+            #myTable1 td span,
+            #myTable2 td span,
+            #myTable3 td span {
+                display: inline-block;
+                text-align: center;
+            }
 
-                /* Pastikan paragraf mengikuti alignment */
-                #myTable1 td p, #myTable1 th p,
-                #myTable2 td p, #myTable2 th p,
-                #myTable3 td p, #myTable3 th p {
-                    margin: 0 !important;
-                    padding: 0 !important;
-                    text-align: inherit;
-                    width: 100%;
-                }
+            /* Pastikan semua header rata tengah */
+            #myTable1 thead th,
+            #myTable2 thead th,
+            #myTable3 thead th {
+                text-align: center !important;
+                vertical-align: middle !important;
+                padding: 12px 8px !important;
+            }
 
-                /* Pastikan span badge center */
-                #myTable1 td span,
-                #myTable2 td span,
-                #myTable3 td span {
-                    display: inline-block;
-                    text-align: center;
-                }
+            #myTable1 thead th *,
+            #myTable2 thead th *,
+            #myTable3 thead th * {
+                text-align: center !important;
+            }
 
-                /* Pastikan semua header rata tengah */
-                #myTable1 thead th,
-                #myTable2 thead th,
-                #myTable3 thead th {
-                    text-align: center !important;
-                    vertical-align: middle !important;
-                    padding: 12px 8px !important;
-                }
+            /* Footer alignment */
+            #myTable1 tfoot td,
+            #myTable2 tfoot td,
+            #myTable3 tfoot td {
+                vertical-align: middle !important;
+            }
 
-                #myTable1 thead th *,
-                #myTable2 thead th *,
-                #myTable3 thead th * {
-                    text-align: center !important;
-                }
+            #myTable1 tfoot td[colspan="2"],
+            #myTable1 tfoot td[colspan="3"] {
+                text-align: right !important;
+            }
 
-                /* Footer alignment */
-                #myTable1 tfoot td,
-                #myTable2 tfoot td,
-                #myTable3 tfoot td {
-                    vertical-align: middle !important;
-                }
-
-                #myTable1 tfoot td[colspan="2"],
-                #myTable1 tfoot td[colspan="3"] {
-                    text-align: right !important;
-                }
-
-                #myTable1 tfoot td:not([colspan]) {
-                    text-align: center !important;
-                }
-            </style>
-        @endsection
+            #myTable1 tfoot td:not([colspan]) {
+                text-align: center !important;
+            }
+        </style>
+    @endsection
 @endsection
 
 @section("container")
@@ -220,26 +228,30 @@
             <div class="mb-4 rounded-lg p-4 text-sm text-white" role="alert"
                 style="background: linear-gradient(135deg, #3b82f6, #6366f1); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);">
                 <span class="font-medium">Info Metode SMARTER-ROC:</span>
-                SMARTER menggunakan pembobotan ROC (Rank Order Centroid) yang otomatis dihitung berdasarkan ranking kriteria.
+                SMARTER menggunakan pembobotan ROC (Rank Order Centroid) yang otomatis dihitung berdasarkan ranking
+                kriteria.
                 Semakin kecil ranking, semakin besar bobotnya.
             </div>
 
             {{-- Header dengan tombol aksi --}}
-            <div class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
-                <div class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
-                    <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Perhitungan Metode SMARTER-ROC</h6>
+            <div
+                class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
+                <div
+                    class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
+                    <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Perhitungan Metode SMARTER-ROC
+                    </h6>
                     <div class="w-1/2 max-w-full flex-none px-3 text-right">
                         @if($nilaiAkhir->first())
-                            <button 
-                                class="mb-0 inline-block cursor-pointer rounded-lg px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-white shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2 mr-2" 
+                            <button
+                                class="mb-0 inline-block cursor-pointer rounded-lg px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-white shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2 mr-2"
                                 onclick="return lihat_hasil_detail()"
                                 style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
                                 <i class="ri-eye-line"></i>
                                 Lihat Detail
                             </button>
                         @endif
-                        <button 
-                            class="mb-0 inline-block cursor-pointer rounded-lg px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-white shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2" 
+                        <button
+                            class="mb-0 inline-block cursor-pointer rounded-lg px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-white shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2"
                             onclick="return perhitungan_button()"
                             style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
                             <i class="ri-calculator-line"></i>
@@ -267,13 +279,18 @@
             @endif
 
             {{-- Awal Tabel Normalisasi Bobot Kriteria (ROC) --}}
-            <div class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
-                <div class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
-                    <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel Bobot ROC (Rank Order Centroid)</h6>
+            <div
+                class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
+                <div
+                    class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
+                    <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel Bobot ROC (Rank Order
+                        Centroid)</h6>
                 </div>
                 <div class="flex-auto px-0 pb-2 pt-0">
                     <div class="overflow-x-auto p-0 px-6 pb-6">
-                        <table id="myTable1" class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top text-center" style="width: 100%;">
+                        <table id="myTable1"
+                            class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top text-center"
+                            style="width: 100%;">
                             <thead class="align-bottom">
                                 <tr class="text-xs font-bold uppercase text-white text-center"
                                     style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);">
@@ -286,7 +303,8 @@
                             </thead>
                             <tbody>
                                 @foreach ($normalisasiBobot as $item)
-                                    <tr class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200">
+                                    <tr
+                                        class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200">
                                         <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
                                             {{ $item->kriteria->kode }}
                                         </td>
@@ -320,7 +338,8 @@
                             <tfoot>
                                 <tr class="border-t-2 border-gray-300"
                                     style="background: linear-gradient(135deg, #f8fafc, #e2e8f0);">
-                                    <td colspan="3" class="text-right py-4 px-3 text-base font-semibold text-gray-800 border-r border-gray-200">
+                                    <td colspan="3"
+                                        class="text-right py-4 px-3 text-base font-semibold text-gray-800 border-r border-gray-200">
                                         Total Bobot:
                                     </td>
                                     <td class="text-center py-4 px-3 text-base font-bold text-white border-r border-gray-200"
@@ -336,7 +355,8 @@
                                 style="background: linear-gradient(135deg, #06b6d4, #0891b2); box-shadow: 0 8px 25px rgba(6, 182, 212, 0.3);">
                                 <h6 class="font-bold mb-2">Formula ROC:</h6>
                                 <p class="mb-2">
-                                    <strong>w<sub>j</sub> = (1/K) × Σ<sub>k=r<sub>j</sub></sub><sup>K</sup> (1/r<sub>k</sub>)</strong>
+                                    <strong>w<sub>j</sub> = (1/K) × Σ<sub>k=r<sub>j</sub></sub><sup>K</sup>
+                                        (1/r<sub>k</sub>)</strong>
                                 </p>
                                 <ul class="list-disc ml-5 text-sm">
                                     <li>w<sub>j</sub> = Bobot kriteria ke-j</li>
@@ -352,13 +372,17 @@
             {{-- Akhir Tabel Normalisasi Bobot Kriteria --}}
 
             {{-- Awal Tabel Nilai Utility --}}
-            <div class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
-                <div class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
+            <div
+                class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
+                <div
+                    class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
                     <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel Nilai Utility</h6>
                 </div>
                 <div class="flex-auto px-0 pb-2 pt-0">
                     <div class="overflow-x-auto p-0 px-6 pb-6">
-                        <table id="myTable2" class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top text-center" style="width: 100%;">
+                        <table id="myTable2"
+                            class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top text-center"
+                            style="width: 100%;">
                             <thead class="align-bottom">
                                 <tr class="text-xs font-bold uppercase text-white text-center"
                                     style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);">
@@ -373,7 +397,8 @@
                             </thead>
                             <tbody>
                                 @foreach ($alternatif as $item)
-                                    <tr class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200">
+                                    <tr
+                                        class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200">
                                         <td class="py-4 px-3 border-r border-gray-200 align-middle text-left">
                                             <strong>{{ $item->alternatif }}</strong>
                                         </td>
@@ -411,8 +436,10 @@
                             style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);">
                             <h6 class="font-bold mb-2">Formula Utility:</h6>
                             <ul class="list-disc ml-5">
-                                <li><strong>Benefit:</strong> u<sub>ij</sub> = (x<sub>ij</sub> - x<sub>min</sub>) / (x<sub>max</sub> - x<sub>min</sub>)</li>
-                                <li><strong>Cost:</strong> u<sub>ij</sub> = (x<sub>max</sub> - x<sub>ij</sub>) / (x<sub>max</sub> - x<sub>min</sub>)</li>
+                                <li><strong>Benefit:</strong> u<sub>ij</sub> = (x<sub>ij</sub> - x<sub>min</sub>) /
+                                    (x<sub>max</sub> - x<sub>min</sub>)</li>
+                                <li><strong>Cost:</strong> u<sub>ij</sub> = (x<sub>max</sub> - x<sub>ij</sub>) /
+                                    (x<sub>max</sub> - x<sub>min</sub>)</li>
                                 <li>Nilai utility berkisar antara 0 hingga 1</li>
                                 <li>Pastikan setiap alternatif terisi semua pada menu penilaian</li>
                             </ul>
@@ -422,14 +449,95 @@
             </div>
             {{-- Akhir Tabel Nilai Utility --}}
 
+            {{-- Tabel Matriks Ternormalisasi --}}
+            <div
+                class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
+                <div
+                    class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
+                    <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel Matriks Ternormalisasi</h6>
+                </div>
+                <div class="flex-auto px-0 pb-2 pt-0">
+                    <div class="overflow-x-auto p-0 px-6 pb-6">
+                        <table class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top"
+                            style="width: 100%;">
+                            <thead class="align-bottom">
+                                <tr class="bg-success text-xs font-bold uppercase text-white">
+                                    <th class="rounded-tl">Alternatif</th>
+                                    @foreach ($kriteria as $item)
+                                        <th>
+                                            {{ $item->kriteria }}
+                                            @if($normalisasiBobot->where('kriteria_id', $item->id)->first())
+                                                <br><small>(W:
+                                                    {{ round($normalisasiBobot->where('kriteria_id', $item->id)->first()->normalisasi, 4) }})</small>
+                                            @endif
+                                        </th>
+                                    @endforeach
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($alternatif as $item)
+                                    <tr class="border-b border-primary-color bg-transparent dark:border-primary-color-dark">
+                                        <td>
+                                            <p
+                                                class="text-left align-middle text-base font-semibold leading-tight text-primary-color dark:text-primary-color-dark">
+                                                {{ $item->alternatif }}
+                                            </p>
+                                        </td>
+                                        @if (isset($matriksTernormalisasi) && $matriksTernormalisasi->first())
+                                            @foreach ($matriksTernormalisasi->where("alternatif_id", $item->id) as $value)
+                                                <td>
+                                                    <p
+                                                        class="text-center align-middle text-base font-semibold leading-tight text-success">
+                                                        {{ round($value->nilai, 4) }}
+                                                    </p>
+                                                </td>
+                                            @endforeach
+                                        @else
+                                            @foreach ($kriteria as $krit)
+                                                <td>
+                                                    <p
+                                                        class="text-center align-middle text-base font-semibold leading-tight text-primary-color dark:text-primary-color-dark">
+                                                        -
+                                                    </p>
+                                                </td>
+                                            @endforeach
+                                        @endif
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
+                        <div class="w-fit overflow-x-auto">
+                            <table class="table table-xs">
+                                <tr>
+                                    <td class="text-base font-semibold text-primary-color dark:text-primary-color-dark">
+                                        Keterangan:</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-base text-success">* Matriks Ternormalisasi = Nilai Utility × Bobot ROC
+                                    </td>
+                                    <td class="text-base text-primary-color dark:text-primary-color-dark"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- Akhir Matriks Ternormalisasi --}}
+
             {{-- Awal Tabel Nilai Akhir --}}
-            <div class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
-                <div class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
+            <div
+                class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
+                <div
+                    class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
                     <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel Nilai Akhir SMARTER</h6>
                 </div>
                 <div class="flex-auto px-0 pb-2 pt-0">
                     <div class="overflow-x-auto p-0 px-6 pb-6">
-                        <table id="myTable3" class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top text-center" style="width: 100%;">
+                        <table id="myTable3"
+                            class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top text-center"
+                            style="width: 100%;">
                             <thead class="align-bottom">
                                 <tr class="text-xs font-bold uppercase text-white text-center"
                                     style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);">
@@ -442,7 +550,8 @@
                             </thead>
                             <tbody>
                                 @foreach ($alternatif as $item)
-                                    <tr class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200">
+                                    <tr
+                                        class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200">
                                         <td class="py-4 px-3 border-r border-gray-200 align-middle text-left">
                                             <strong>{{ $item->alternatif }}</strong>
                                         </td>

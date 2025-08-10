@@ -103,6 +103,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/nilai-utility', [SMARTERController::class, 'perhitunganNilaiUtility'])->name('nilai-utility.perhitungan');
         Route::post('/nilai-utility/hitung', [SMARTERController::class, 'perhitunganNilaiUtility'])->name('nilai-utility.hitung');
 
+        // Matriks Ternormalisasi - NEW ROUTES
+        Route::get('/matriks-ternormalisasi', [SMARTERController::class, 'indexMatriksTernormalisasi'])->name('matriks-ternormalisasi');
+        Route::post('/matriks-ternormalisasi', [SMARTERController::class, 'perhitunganMatriksTernormalisasi'])->name('matriks-ternormalisasi.perhitungan');
+        Route::post('/matriks-ternormalisasi/hitung', [SMARTERController::class, 'perhitunganMatriksTernormalisasi'])->name('matriks-ternormalisasi.hitung');
+
         // Nilai Akhir
         Route::get('/nilai-akhir', [SMARTERController::class, 'indexNilaiAkhir'])->name('nilai-akhir');
         Route::post('/nilai-akhir', [SMARTERController::class, 'perhitunganNilaiAkhir'])->name('nilai-akhir.perhitungan');
