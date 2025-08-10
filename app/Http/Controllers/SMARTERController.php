@@ -36,21 +36,38 @@ class SMARTERController extends Controller
 
         // Data nilai utility
         $nilaiUtility = NilaiUtilityResource::collection(
-            NilaiUtility::orderBy('alternatif_id', 'asc')->orderBy('kriteria_id', 'asc')->get()
+            NilaiUtility::with(['alternatif', 'kriteria'])
+                ->orderBy('alternatif_id', 'asc')
+                ->orderBy('kriteria_id', 'asc')
+                ->get()
         );
 
-        // Data matriks ternormalisasi
+        // PERBAIKAN: Data matriks ternormalisasi dengan relasi
         $matriksTernormalisasi = MatriksTernormalisasiResource::collection(
-            MatriksTernormalisasi::orderBy('alternatif_id', 'asc')->orderBy('kriteria_id', 'asc')->get()
+            MatriksTernormalisasi::with(['alternatif', 'kriteria'])
+                ->orderBy('alternatif_id', 'asc')
+                ->orderBy('kriteria_id', 'asc')
+                ->get()
         );
 
-        // Data nilai akhir
+        // PERBAIKAN: Data nilai akhir - hanya total per alternatif
         $nilaiAkhir = NilaiAkhirResource::collection(
-            NilaiAkhir::orderBy('alternatif_id', 'asc')->get()
+            NilaiAkhir::with(['alternatif'])
+                ->whereNull('kriteria_id') // Hanya ambil record total
+                ->orderBy('alternatif_id', 'asc')
+                ->get()
         );
 
         // Sum bobot kriteria untuk validasi
         $sumBobotKriteria = $kriteria->sum('bobot');
+
+        // DEBUG: Tambahkan ini untuk debugging
+        \Log::info('Debug Data:', [
+            'kriteria_count' => $kriteria->count(),
+            'alternatif_count' => $alternatif->count(),
+            'matriks_count' => $matriksTernormalisasi->count(),
+            'nilai_akhir_count' => $nilaiAkhir->count()
+        ]);
 
         return view('dashboard.perhitungan.index', compact(
             'title',
@@ -285,10 +302,33 @@ class SMARTERController extends Controller
     public function indexNilaiAkhir()
     {
         $title = "Nilai Akhir SMARTER";
-        $nilaiAkhir = NilaiAkhirResource::collection(NilaiAkhir::orderBy('alternatif_id', 'asc')->orderBy('kriteria_id', 'asc')->get());
+
+        // Tambahkan ini
+        $matriksTernormalisasi = MatriksTernormalisasiResource::collection(
+            MatriksTernormalisasi::with(['alternatif', 'kriteria'])
+                ->orderBy('alternatif_id', 'asc')
+                ->orderBy('kriteria_id', 'asc')
+                ->get()
+        );
+
+        $nilaiAkhir = NilaiAkhirResource::collection(
+            NilaiAkhir::with(['alternatif'])
+                ->whereNull('kriteria_id')
+                ->orderBy('alternatif_id', 'asc')
+                ->get()
+        );
+
         $alternatif = AlternatifResource::collection(Alternatif::orderBy('kode', 'asc')->get());
         $kriteria = KriteriaResource::collection(Kriteria::orderBy('ranking', 'asc')->get());
-        return view('dashboard.nilai-akhir.index', compact('title', 'nilaiAkhir', 'alternatif', 'kriteria'));
+
+        return view('dashboard.nilai-akhir.index', compact(
+            'title',
+            'nilaiAkhir',
+            'alternatif',
+            'kriteria',
+            'matriksTernormalisasi'  // Tambahkan ini
+        ));
+
     }
 
     public function perhitunganNilaiAkhir()
@@ -301,7 +341,6 @@ class SMARTERController extends Controller
 
         // Pastikan matriks ternormalisasi sudah ada
         $matriksCount = MatriksTernormalisasi::count();
-
         if ($matriksCount == 0) {
             return to_route('nilai-akhir')->with('error', 'Silakan hitung matriks ternormalisasi terlebih dahulu');
         }
@@ -314,12 +353,13 @@ class SMARTERController extends Controller
             $nilaiMatriks = MatriksTernormalisasi::where('alternatif_id', $alt->id)->get();
 
             if ($nilaiMatriks->count() > 0) {
+                // HANYA SIMPAN 1 RECORD UNTUK TOTAL NILAI
                 // Jumlahkan semua nilai matriks ternormalisasi
                 $totalNilai = $nilaiMatriks->sum('nilai');
 
                 $createNilaiAkhir = NilaiAkhir::create([
                     'alternatif_id' => $alt->id,
-                    'kriteria_id' => null, // Tidak ada kriteria_id karena ini total
+                    'kriteria_id' => null, // NULL karena ini adalah total
                     'nilai' => round($totalNilai, 4),
                 ]);
             }
