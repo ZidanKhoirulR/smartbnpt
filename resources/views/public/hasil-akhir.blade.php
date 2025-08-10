@@ -389,32 +389,65 @@
     </footer>
 
     <script>
-        $(document).ready(function () {
-            $('#myTable').DataTable({
-                responsive: {
-                    details: {
-                        type: 'column',
-                        target: 'tr',
-                    },
-                },
-                ordering: false,
-                pagingType: 'full_numbers',
-                language: {
-                    search: "Cari:",
-                    lengthMenu: "Tampilkan _MENU_ data per halaman",
-                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                    infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
-                    infoFiltered: "(disaring dari _MAX_ total data)",
-                    paginate: {
-                        first: "Pertama",
-                        last: "Terakhir",
-                        next: "Selanjutnya",
-                        previous: "Sebelumnya"
-                    },
-                    emptyTable: "Tidak ada data yang tersedia"
+     $(document).ready(function () {
+    // Inisialisasi DataTable dengan error handling
+    function initializeDataTable(tableId) {
+        try {
+            if ($.fn.DataTable.isDataTable('#' + tableId)) {
+                $('#' + tableId).DataTable().destroy();
+            }
+            
+            // Hitung jumlah kolom dari header
+            var columnCount = $('#' + tableId + ' thead tr:first th').length;
+            
+            // Validasi konsistensi kolom
+            var isValidTable = true;
+            $('#' + tableId + ' tbody tr').each(function() {
+                var rowColumnCount = $(this).find('td').length;
+                if (rowColumnCount !== columnCount) {
+                    console.warn('Table ' + tableId + ' has inconsistent column count. Header: ' + columnCount + ', Row: ' + rowColumnCount);
+                    isValidTable = false;
                 }
             });
-        });
+            
+            if (isValidTable) {
+                $('#' + tableId).DataTable({
+                    responsive: {
+                        details: {
+                            type: 'column',
+                            target: 'tr',
+                        },
+                    },
+                    order: [],
+                    pagingType: 'full_numbers',
+                    columnDefs: [
+                        { targets: '_all', className: 'text-center' }
+                    ],
+                    language: {
+                        emptyTable: "Tidak ada data yang tersedia",
+                        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entries",
+                        infoEmpty: "Menampilkan 0 sampai 0 dari 0 entries",
+                        infoFiltered: "(disaring dari _MAX_ total entries)",
+                        lengthMenu: "Tampilkan _MENU_ entries",
+                        loadingRecords: "Memuat...",
+                        processing: "Sedang memproses...",
+                        search: "Cari:",
+                        zeroRecords: "Tidak ditemukan data yang sesuai",
+                        paginate: {
+                            first: "Pertama",
+                            last: "Terakhir",
+                            next: "Selanjutnya",
+                            previous: "Sebelumnya"
+                        }
+                    }
+                });
+            } else {
+                console.error('Skipping DataTable initialization for ' + tableId + ' due to column mismatch');
+            }
+        } catch (error) {
+            console.error('Error initializing DataTable for ' + tableId + ':', error);
+        }
+    }
     </script>
 
 </body>

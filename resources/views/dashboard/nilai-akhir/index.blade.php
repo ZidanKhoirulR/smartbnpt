@@ -63,44 +63,29 @@
 @section("container")
     <div class="-mx-3 flex flex-wrap">
         <div class="w-full max-w-full flex-none px-3">
+
             {{-- Awal Tabel Nilai Akhir --}}
             <div
                 class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
                 <div
                     class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
-                    <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel {{ $title }}</h6>
-                    <div class="w-1/2 max-w-full flex-none px-3 text-right">
-                        <button
-                            class="mb-0 inline-block cursor-pointer rounded-lg border border-solid border-success bg-transparent px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-success shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2"
-                            onclick="return nilai_akhir_button()">
-                            <i class="ri-add-line"></i>
-                            Hitung Nilai Akhir
-                        </button>
-                    </div>
+                    <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel Nilai Akhir SMARTER</h6>
                 </div>
                 <div class="flex-auto px-0 pb-2 pt-0">
                     <div class="overflow-x-auto p-0 px-6 pb-6">
-                        <table id="myTable"
-                            class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top"
+                        <table id="myTable3"
+                            class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top text-center"
                             style="width: 100%;">
                             <thead class="align-bottom">
-                                <tr
-                                    class="bg-primary-color text-xs font-bold uppercase text-white dark:bg-primary-color-dark dark:text-white">
-                                    <th class="rounded-tl"></th>
+                                <tr class="text-xs font-bold uppercase text-white text-center"
+                                    style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);">
+                                    <th class="text-center py-4 px-3 border-r border-gray-600">Alternatif</th>
                                     @foreach ($kriteria as $item)
-                                        <th>
-                                            {{ $item->kriteria }}
-                                        </th>
+                                        <th class="text-center py-4 px-3 border-r border-gray-600">{{ $item->kriteria }}</th>
                                     @endforeach
-                                    <th class="rounded-tr">
-                                        Total
-                                    </th>
+                                    <th class="text-center py-4 px-3">Total Nilai</th>
                                 </tr>
                             </thead>
-                            {{-- Perbaikan untuk tabel nilai akhir di resources/views/dashboard/perhitungan/index.blade.php
-                            --}}
-
-                            {{-- Bagian Tabel Nilai Akhir yang diperbaiki --}}
                             <tbody>
                                 @foreach ($alternatif as $item)
                                     <tr
@@ -114,13 +99,19 @@
                                             <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
                                                 @php
                                                     // Cari nilai dari matriks ternormalisasi
-                                                    $matriksValue = $matriksTernormalisasi
-                                                        ->where("alternatif_id", $item->id)
-                                                        ->where("kriteria_id", $krit->id)
-                                                        ->first();
+                                                    $matriksValue = null;
+                                                    if ($matriksTernormalisasi && $matriksTernormalisasi->count() > 0) {
+                                                        $matriksValue = $matriksTernormalisasi
+                                                            ->where("alternatif_id", $item->id)
+                                                            ->where("kriteria_id", $krit->id)
+                                                            ->first();
+                                                    }
                                                 @endphp
-                                                @if ($matriksValue && $matriksValue->nilai !== null)
-                                                    {{ number_format($matriksValue->nilai, 4) }}
+                                                @if ($matriksValue && isset($matriksValue->nilai) && $matriksValue->nilai !== null)
+                                                    <span class="px-2 py-1 rounded-full text-xs font-semibold text-white"
+                                                        style="background: linear-gradient(135deg, #059669, #047857);">
+                                                        {{ number_format($matriksValue->nilai, 4) }}
+                                                    </span>
                                                 @else
                                                     <span class="text-gray-400">-</span>
                                                 @endif
@@ -131,9 +122,12 @@
                                         <td class="py-4 px-3 align-middle text-center">
                                             @php
                                                 // Cari total dari nilai akhir
-                                                $totalRecord = $nilaiAkhir->where("alternatif_id", $item->id)->first();
+                                                $totalRecord = null;
+                                                if ($nilaiAkhirTotal && $nilaiAkhirTotal->count() > 0) {
+                                                    $totalRecord = $nilaiAkhirTotal->where("alternatif_id", $item->id)->first();
+                                                }
                                             @endphp
-                                            @if ($totalRecord && $totalRecord->nilai !== null)
+                                            @if ($totalRecord && isset($totalRecord->nilai) && $totalRecord->nilai !== null)
                                                 <span class="px-3 py-2 rounded-full text-sm font-bold text-white"
                                                     style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
                                                     {{ number_format($totalRecord->nilai, 4) }}
@@ -147,35 +141,17 @@
                             </tbody>
                         </table>
 
-                        {{-- Ganti bagian keterangan di resources/views/dashboard/nilai-akhir/index.blade.php --}}
-
-                        <div class="w-fit overflow-x-auto">
-                            <table class="table table-xs">
-                                <tr>
-                                    <td class="text-base font-semibold text-primary-color dark:text-primary-color-dark">
-                                        Formula Nilai Akhir:</td>
-                                    <td class="text-base text-primary-color dark:text-primary-color-dark">
-                                        <strong>NA<sub>i</sub> = Σ<sub>j=1</sub><sup>n</sup> MT<sub>ij</sub></strong>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="text-base text-primary-color dark:text-primary-color-dark">Keterangan:</td>
-                                    <td class="text-base text-primary-color dark:text-primary-color-dark">
-                                        NA<sub>i</sub> = Nilai akhir alternatif ke-i, MT<sub>ij</sub> = Matriks
-                                        ternormalisasi
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="text-base text-primary-color dark:text-primary-color-dark">* Pastikan telah
-                                        melakukan perhitungan nilai utility dan normalisasi bobot kriteria</td>
-                                    <td class="text-base text-primary-color dark:text-primary-color-dark"></td>
-                                </tr>
-                                <tr>
-                                    <td class="text-base text-primary-color dark:text-primary-color-dark">* Nilai akhir =
-                                        Penjumlahan semua nilai matriks ternormalisasi per alternatif</td>
-                                    <td class="text-base text-primary-color dark:text-primary-color-dark"></td>
-                                </tr>
-                            </table>
+                        <div class="mt-3 p-4 rounded-lg text-sm text-white"
+                            style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);">
+                            <h6 class="font-bold mb-2">Formula Nilai Akhir:</h6>
+                            <p class="mb-2"><strong>NA<sub>i</sub> = Σ<sub>j=1</sub><sup>n</sup> MT<sub>ij</sub></strong>
+                            </p>
+                            <ul class="list-disc ml-5">
+                                <li>NA<sub>i</sub> = Nilai akhir alternatif ke-i</li>
+                                <li>MT<sub>ij</sub> = Matriks ternormalisasi alternatif ke-i pada kriteria ke-j</li>
+                                <li>n = Jumlah kriteria @if($kriteria->count() > 0)({{ $kriteria->count() }})@endif</li>
+                                <li>Alternatif dengan nilai tertinggi adalah yang terbaik</li>
+                            </ul>
                         </div>
                     </div>
                 </div>

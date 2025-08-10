@@ -42,7 +42,7 @@ class SMARTERController extends Controller
                 ->get()
         );
 
-        // PERBAIKAN: Data matriks ternormalisasi dengan relasi
+        // Data matriks ternormalisasi dengan relasi
         $matriksTernormalisasi = MatriksTernormalisasiResource::collection(
             MatriksTernormalisasi::with(['alternatif', 'kriteria'])
                 ->orderBy('alternatif_id', 'asc')
@@ -50,13 +50,33 @@ class SMARTERController extends Controller
                 ->get()
         );
 
-        // PERBAIKAN: Data nilai akhir - hanya total per alternatif
-        $nilaiAkhir = NilaiAkhirResource::collection(
+        // Data nilai akhir per kriteria DAN total
+        $nilaiAkhirPerKriteria = collect();
+        $nilaiAkhirTotal = NilaiAkhirResource::collection(
             NilaiAkhir::with(['alternatif'])
-                ->whereNull('kriteria_id') // Hanya ambil record total
+                ->whereNull('kriteria_id') // Hanya record total
                 ->orderBy('alternatif_id', 'asc')
                 ->get()
         );
+
+        // TAMBAHAN: Buat struktur data nilai akhir per kriteria dari matriks ternormalisasi
+        // untuk menampilkan detail per kriteria di tabel nilai akhir
+        foreach ($alternatif as $alt) {
+            foreach ($kriteria as $krit) {
+                $matriksValue = $matriksTernormalisasi
+                    ->where("alternatif_id", $alt->id)
+                    ->where("kriteria_id", $krit->id)
+                    ->first();
+
+                if ($matriksValue) {
+                    $nilaiAkhirPerKriteria->push([
+                        'alternatif_id' => $alt->id,
+                        'kriteria_id' => $krit->id,
+                        'nilai' => $matriksValue->nilai
+                    ]);
+                }
+            }
+        }
 
         // Sum bobot kriteria untuk validasi
         $sumBobotKriteria = $kriteria->sum('bobot');
@@ -66,7 +86,8 @@ class SMARTERController extends Controller
             'kriteria_count' => $kriteria->count(),
             'alternatif_count' => $alternatif->count(),
             'matriks_count' => $matriksTernormalisasi->count(),
-            'nilai_akhir_count' => $nilaiAkhir->count()
+            'nilai_akhir_count' => $nilaiAkhirTotal->count(),
+            'matriks_sample' => $matriksTernormalisasi->take(3)->toArray(),
         ]);
 
         return view('dashboard.perhitungan.index', compact(
@@ -76,7 +97,8 @@ class SMARTERController extends Controller
             'alternatif',
             'nilaiUtility',
             'matriksTernormalisasi',
-            'nilaiAkhir',
+            'nilaiAkhirTotal',
+            'nilaiAkhirPerKriteria',
             'sumBobotKriteria'
         ));
     }
@@ -311,9 +333,9 @@ class SMARTERController extends Controller
                 ->get()
         );
 
-        $nilaiAkhir = NilaiAkhirResource::collection(
+        $nilaiAkhirTotal = NilaiAkhirResource::collection(
             NilaiAkhir::with(['alternatif'])
-                ->whereNull('kriteria_id')
+                ->whereNull('kriteria_id') // Hanya ambil record total
                 ->orderBy('alternatif_id', 'asc')
                 ->get()
         );
@@ -326,7 +348,7 @@ class SMARTERController extends Controller
             'nilaiAkhir',
             'alternatif',
             'kriteria',
-            'matriksTernormalisasi'  // Tambahkan ini
+            'matriksTernormalisasi'
         ));
 
     }

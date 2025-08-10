@@ -3,50 +3,102 @@
 @section("js")
     <script>
         $(document).ready(function () {
-            $('#myTable1').DataTable({
-                responsive: {
-                    details: {
-                        type: 'column',
-                        target: 'tr',
-                    },
-                },
-                order: [],
-                pagingType: 'full_numbers',
-            });
+            // Function untuk inisialisasi DataTable dengan error handling
+            function initDataTable(tableId) {
+                try {
+                    // Destroy existing DataTable jika ada
+                    if ($.fn.DataTable.isDataTable('#' + tableId)) {
+                        $('#' + tableId).DataTable().destroy();
+                    }
 
-            $('#myTable2').DataTable({
-                responsive: {
-                    details: {
-                        type: 'column',
-                        target: 'tr',
-                    },
-                },
-                order: [],
-                pagingType: 'full_numbers',
-            });
+                    // Cek apakah tabel ada
+                    if ($('#' + tableId).length === 0) {
+                        console.warn('Table ' + tableId + ' not found');
+                        return;
+                    }
 
-            $('#myTable3').DataTable({
-                responsive: {
-                    details: {
-                        type: 'column',
-                        target: 'tr',
-                    },
-                },
-                order: [],
-                pagingType: 'full_numbers',
-            });
-            $('#myTable4').DataTable({
-                responsive: {
-                    details: {
-                        type: 'column',
-                        target: 'tr',
-                    },
-                },
-                order: [],
-                pagingType: 'full_numbers',
-            });
+                    // Hitung kolom header
+                    var headerCount = $('#' + tableId + ' thead tr:first th').length;
+
+                    // Validasi setiap row memiliki jumlah kolom yang sama
+                    var validTable = true;
+                    $('#' + tableId + ' tbody tr').each(function (index) {
+                        var rowCount = $(this).find('td').length;
+                        if (rowCount !== headerCount) {
+                            console.error('Table ' + tableId + ' row ' + index + ' has ' + rowCount + ' columns, but header has ' + headerCount);
+                            validTable = false;
+                        }
+                    });
+
+                    if (!validTable) {
+                        console.error('Skipping DataTable initialization for ' + tableId + ' due to column count mismatch');
+                        return;
+                    }
+
+                    // Inisialisasi DataTable
+                    $('#' + tableId).DataTable({
+                        responsive: {
+                            details: {
+                                type: 'column',
+                                target: 'tr',
+                            },
+                        },
+                        order: [],
+                        pagingType: 'full_numbers',
+                        columnDefs: [
+                            {
+                                targets: '_all',
+                                className: 'text-center',
+                                orderable: true
+                            },
+                            {
+                                targets: 0,
+                                className: 'text-left',
+                                orderable: true
+                            }
+                        ],
+                        language: {
+                            emptyTable: "Tidak ada data yang tersedia",
+                            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entries",
+                            infoEmpty: "Menampilkan 0 sampai 0 dari 0 entries",
+                            infoFiltered: "(disaring dari _MAX_ total entries)",
+                            lengthMenu: "Tampilkan _MENU_ entries",
+                            loadingRecords: "Memuat...",
+                            processing: "Sedang memproses...",
+                            search: "Cari:",
+                            zeroRecords: "Tidak ditemukan data yang sesuai",
+                            paginate: {
+                                first: "Pertama",
+                                last: "Terakhir",
+                                next: "Selanjutnya",
+                                previous: "Sebelumnya"
+                            }
+                        },
+                        drawCallback: function (settings) {
+                            console.log('DataTable ' + tableId + ' initialized successfully');
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('Error initializing DataTable ' + tableId + ':', error);
+                }
+            }
+
+            // Inisialisasi dengan delay untuk memastikan DOM sudah ready
+            setTimeout(function () {
+                console.log('Initializing DataTables...');
+
+                // Inisialisasi semua tabel
+                initDataTable('myTable1'); // Normalisasi Bobot
+                initDataTable('myTable2'); // Nilai Utility
+                initDataTable('myTable3'); // Nilai Akhir
+                initDataTable('myTable4'); // Matriks Ternormalisasi
+
+                console.log('DataTables initialization completed');
+            }, 200);
         });
 
+        // Function untuk perhitungan SMARTER
         function perhitungan_button() {
             Swal.fire({
                 title: 'Perhitungan Metode SMARTER',
@@ -71,7 +123,7 @@
 
                     $.ajax({
                         type: "post",
-                        url: "{{ route("perhitungan.smarter") }}",
+                        url: "{{ route('perhitungan.smarter') }}",
                         data: {
                             "_token": "{{ csrf_token() }}",
                         },
@@ -89,9 +141,15 @@
                             });
                         },
                         error: function (response) {
+                            let errorMessage = 'Terjadi kesalahan saat melakukan perhitungan. Silakan coba lagi.';
+
+                            if (response.responseJSON && response.responseJSON.message) {
+                                errorMessage = response.responseJSON.message;
+                            }
+
                             Swal.fire({
                                 title: 'Perhitungan gagal dilakukan!',
-                                text: 'Terjadi kesalahan saat melakukan perhitungan. Silakan coba lagi.',
+                                text: errorMessage,
                                 icon: 'error',
                                 confirmButtonColor: '#6419E6',
                                 confirmButtonText: 'OK'
@@ -99,7 +157,7 @@
                         }
                     });
                 }
-            })
+            });
         }
 
         function lihat_hasil_detail() {
@@ -280,7 +338,7 @@
             <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Perhitungan Metode SMARTER-ROC
             </h6>
             <div class="w-1/2 max-w-full flex-none px-3 text-right">
-                @if($nilaiAkhir->first())
+                @if($nilaiAkhirTotal && $nilaiAkhirTotal->first())
                     <button
                         class="mb-0 inline-block cursor-pointer rounded-lg px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-white shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2 mr-2"
                         onclick="return lihat_hasil_detail()"
@@ -439,31 +497,37 @@
                                 <td class="py-4 px-3 border-r border-gray-200 align-middle text-left">
                                     <strong>{{ $item->alternatif }}</strong>
                                 </td>
-                                @if ($nilaiUtility->first())
-                                    @foreach ($nilaiUtility->where("alternatif_id", $item->id) as $value)
-                                        <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
-                                            @if ($value->nilai == 0)
-                                                <span class="px-2 py-1 rounded-full text-xs font-semibold text-white"
-                                                    style="background: linear-gradient(135deg, #ef4444, #dc2626);">
-                                                    {{ round($value->nilai, 4) }}
-                                                </span>
-                                            @elseif ($value->nilai == null)
-                                                <span class="text-gray-400">-</span>
-                                            @else
-                                                <span class="px-2 py-1 rounded-full text-xs font-semibold text-white"
-                                                    style="background: linear-gradient(135deg, #10b981, #059669);">
-                                                    {{ round($value->nilai, 4) }}
-                                                </span>
-                                            @endif
-                                        </td>
-                                    @endforeach
-                                @else
-                                    @foreach ($kriteria as $krit_item)
-                                        <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
-                                            <span class="text-gray-400">-</span>
-                                        </td>
-                                    @endforeach
-                                @endif
+
+                                {{-- TAMPILKAN NILAI PER KRITERIA --}}
+                                <td class="py-4 px-3 align-middle text-center">
+                                    @php
+                                        $totalRecord = $nilaiAkhirTotal->where("alternatif_id", $item->id)->first();
+                                    @endphp
+                                    @if ($totalRecord && $totalRecord->nilai !== null)
+                                        <span class="px-3 py-2 rounded-full text-sm font-bold text-white"
+                                            style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
+                                            {{ number_format($totalRecord->nilai, 4) }}
+                                        </span>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
+                                {{-- TAMPILKAN AKHIR NILAI PER KRITERIA --}}
+
+                                {{-- TOTAL NILAI --}}
+                                <td class="py-4 px-3 align-middle text-center">
+                                    @php
+                                        $totalRecord = $nilaiAkhirTotal->where("alternatif_id", $item->id)->first();
+                                    @endphp
+                                    @if ($totalRecord && $totalRecord->nilai !== null)
+                                        <span class="px-3 py-2 rounded-full text-sm font-bold text-white"
+                                            style="background: linear-gradient(135deg, #8b5cf6, #a855f7);">
+                                            {{ number_format($totalRecord->nilai, 4) }}
+                                        </span>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -581,39 +645,62 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($alternatif as $item)
-                            <tr class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200">
+                        @foreach ($alternatif as $alt)<tr
+                                class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200">
                                 <td class="py-4 px-3 border-r border-gray-200 align-middle text-left">
-                                    <strong>{{ $item->alternatif }}</strong>
+                                    <strong>{{ $alt->alternatif }}</strong>
                                 </td>
-                                @if ($nilaiAkhir->first())
-                                    @foreach ($nilaiAkhir->where("alternatif_id", $item->id) as $value)
-                                        <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
-                                            @if ($value->nilai == 0)
-                                                {{ round($value->nilai, 4) }}
-                                            @elseif ($value->nilai == null)
-                                                <span class="text-gray-400">-</span>
+
+                                {{-- TAMPILKAN NILAI PER KRITERIA DARI MATRIKS TERNORMALISASI --}}
+                                @foreach ($kriteria as $krit)
+                                    <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
+                                        @php
+                                            // Cari nilai dari collection matriks ternormalisasi
+                                            $matriksValue = $matriksTernormalisasi
+                                                ->filter(function ($item) use ($alt, $krit) {
+                                                    return $item->alternatif_id == $alt->id && $item->kriteria_id == $krit->id;
+                                                })
+                                                ->first();
+                                        @endphp
+
+                                        @if ($matriksValue && $matriksValue->nilai !== null)
+                                            @if ($matriksValue->nilai == 0)
+                                                <span class="px-2 py-1 rounded-full text-xs font-semibold text-white"
+                                                    style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                                                    {{ number_format($matriksValue->nilai, 4) }}
+                                                </span>
                                             @else
-                                                {{ round($value->nilai, 4) }}
+                                                <span class="px-2 py-1 rounded-full text-xs font-semibold text-white"
+                                                    style="background: linear-gradient(135deg, #059669, #047857);">
+                                                    {{ number_format($matriksValue->nilai, 4) }}
+                                                </span>
                                             @endif
-                                        </td>
-                                    @endforeach
-                                    <td class="py-4 px-3 align-middle text-center">
+                                        @else
+                                            <span class="text-gray-400">-</span>
+                                        @endif
+                                    </td>
+                                @endforeach
+
+                                {{-- TOTAL NILAI --}}
+                                <td class="py-4 px-3 align-middle text-center">
+                                    @php
+                                        // Cari total dari collection nilai akhir
+                                        $totalRecord = $nilaiAkhirTotal
+                                            ->filter(function ($item) use ($alt) {
+                                                return $item->alternatif_id == $alt->id;
+                                            })
+                                            ->first();
+                                    @endphp
+
+                                    @if ($totalRecord && $totalRecord->nilai !== null)
                                         <span class="px-3 py-2 rounded-full text-sm font-bold text-white"
                                             style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
-                                            {{ round($nilaiAkhir->where("alternatif_id", $item->id)->sum("nilai"), 4) }}
+                                            {{ number_format($totalRecord->nilai, 4) }}
                                         </span>
-                                    </td>
-                                @else
-                                    @foreach ($kriteria as $krit_item)
-                                        <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
-                                            <span class="text-gray-400">-</span>
-                                        </td>
-                                    @endforeach
-                                    <td class="py-4 px-3 align-middle text-center">
+                                    @else
                                         <span class="text-gray-400">-</span>
-                                    </td>
-                                @endif
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -622,14 +709,12 @@
                 <div class="mt-3 p-4 rounded-lg text-sm text-white"
                     style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);">
                     <h6 class="font-bold mb-2">Formula Nilai Akhir:</h6>
-                    <p class="mb-2 text-lg">
-                        <strong>Total = K1 + K2 + K3 + ... + Kn</strong>
-                    </p>
+                    <p class="mb-2"><strong>NA<sub>i</sub> = Σ<sub>j=1</sub><sup>n</sup> MT<sub>ij</sub></strong></p>
                     <ul class="list-disc ml-5">
-                        <li>Total = Penjumlahan nilai semua kriteria untuk setiap alternatif</li>
-                        <li>K1, K2, K3 = Nilai setiap kriteria dari matriks ternormalisasi</li>
-                        <li>Contoh: Alternatif A = 0.2500 + 0.1875 + 0.0833 = 0.5208</li>
-                        <li>Alternatif dengan total nilai tertinggi = alternatif terbaik</li>
+                        <li>NA<sub>i</sub> = Nilai akhir alternatif ke-i</li>
+                        <li>MT<sub>ij</sub> = Matriks ternormalisasi alternatif ke-i pada kriteria ke-j</li>
+                        <li>n = Jumlah kriteria ({{ $kriteria->count() }})</li>
+                        <li>Alternatif dengan nilai tertinggi adalah yang terbaik</li>
                     </ul>
                 </div>
             </div>
