@@ -99,6 +99,7 @@
         });
 
         // Function untuk perhitungan SMARTER
+        // Function untuk perhitungan SMARTER
         function perhitungan_button() {
             Swal.fire({
                 title: 'Perhitungan Metode SMARTER',
@@ -223,7 +224,7 @@
             #myTable2 td:first-child,
             #myTable3 td:first-child,
             #myTable4 td:first-child {
-                text-align: left !important;
+                text-align: cente r !important;
             }
 
             /* Semua div dalam sel rata tengah */
@@ -321,10 +322,11 @@
                 <span class="font-medium">Formula Kunci:</span>
                 <ul class="list-disc ml-5 mt-1 text-sm">
                     <li><strong>ROC:</strong> w<sub>j</sub> = (1/K) × Σ(1/r<sub>k</sub>)</li>
+                    <li><strong>Matriks:</strong> MT<sub>ij</sub> = u<sub>ij</sub> × w<sub>j</sub></li>
                     <li><strong>Utility:</strong> u<sub>ij</sub> = (x<sub>ij</sub> - x<sub>min</sub>) / (x<sub>max</sub> -
                         x<sub>min</sub>)</li>
-                    <li><strong>Matriks:</strong> MT<sub>ij</sub> = u<sub>ij</sub> × w<sub>j</sub></li>
-                    <li><strong>Nilai Akhir:</strong> NA<sub>i</sub> = Σ MT<sub>ij</sub></li>
+                    <li><strong>Nilai Akhir: A<sub>i</sub> = K<sub>1</sub> + K<sub>2</sub> + K<sub>3</sub> + ... +
+                            K<sub>n</sub></strong></li>
                 </ul>
             </div>
         </div>
@@ -338,15 +340,6 @@
             <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Perhitungan Metode SMARTER-ROC
             </h6>
             <div class="w-1/2 max-w-full flex-none px-3 text-right">
-                @if($nilaiAkhirTotal && $nilaiAkhirTotal->first())
-                    <button
-                        class="mb-0 inline-block cursor-pointer rounded-lg px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-white shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2 mr-2"
-                        onclick="return lihat_hasil_detail()"
-                        style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
-                        <i class="ri-eye-line"></i>
-                        Lihat Detail
-                    </button>
-                @endif
                 <button
                     class="mb-0 inline-block cursor-pointer rounded-lg px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-white shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2"
                     onclick="return perhitungan_button()"
@@ -492,55 +485,47 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($alternatif as $item)
+                        @foreach ($alternatif as $alt)
                             <tr class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200">
                                 <td class="py-4 px-3 border-r border-gray-200 align-middle text-left">
-                                    <strong>{{ $item->alternatif }}</strong>
+                                    <strong>{{ $alt->alternatif }}</strong>
                                 </td>
 
-                                {{-- TAMPILKAN NILAI PER KRITERIA --}}
-                                <td class="py-4 px-3 align-middle text-center">
-                                    @php
-                                        $totalRecord = $nilaiAkhirTotal->where("alternatif_id", $item->id)->first();
-                                    @endphp
-                                    @if ($totalRecord && $totalRecord->nilai !== null)
-                                        <span class="px-3 py-2 rounded-full text-sm font-bold text-white"
-                                            style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
-                                            {{ number_format($totalRecord->nilai, 4) }}
-                                        </span>
-                                    @else
-                                        <span class="text-gray-400">-</span>
-                                    @endif
-                                </td>
-                                {{-- TAMPILKAN AKHIR NILAI PER KRITERIA --}}
+                                {{-- TAMPILKAN NILAI UTILITY PER KRITERIA --}}
+                                @foreach ($kriteria as $krit)
+                                    <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
+                                        @php
+                                            // Cari nilai utility untuk alternatif dan kriteria ini
+                                            $utilityValue = $nilaiUtility
+                                                ->filter(function ($item) use ($alt, $krit) {
+                                                    return $item->alternatif_id == $alt->id && $item->kriteria_id == $krit->id;
+                                                })
+                                                ->first();
+                                        @endphp
 
-                                {{-- TOTAL NILAI --}}
-                                <td class="py-4 px-3 align-middle text-center">
-                                    @php
-                                        $totalRecord = $nilaiAkhirTotal->where("alternatif_id", $item->id)->first();
-                                    @endphp
-                                    @if ($totalRecord && $totalRecord->nilai !== null)
-                                        <span class="px-3 py-2 rounded-full text-sm font-bold text-white"
-                                            style="background: linear-gradient(135deg, #8b5cf6, #a855f7);">
-                                            {{ number_format($totalRecord->nilai, 4) }}
-                                        </span>
-                                    @else
-                                        <span class="text-gray-400">-</span>
-                                    @endif
-                                </td>
+                                        @if ($utilityValue && $utilityValue->nilai !== null)
+                                            <span class="px-2 py-1 rounded-full text-xs font-semibold text-white"
+                                                style="background: linear-gradient(135deg, #10b981, #059669);">
+                                                {{ number_format($utilityValue->nilai, 4) }}
+                                            </span>
+                                        @else
+                                            <span class="text-gray-400">-</span>
+                                        @endif
+                                    </td>
+                                @endforeach
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
 
                 <div class="mt-3 p-4 rounded-lg text-sm text-white"
-                    style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);">
+                    style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);">
                     <h6 class="font-bold mb-2">Formula Utility:</h6>
                     <ul class="list-disc ml-5">
-                        <li><strong>Benefit:</strong> u<sub>ij</sub> = (x<sub>ij</sub> - x<sub>min</sub>) /
-                            (x<sub>max</sub> - x<sub>min</sub>)</li>
-                        <li><strong>Cost:</strong> u<sub>ij</sub> = (x<sub>max</sub> - x<sub>ij</sub>) /
-                            (x<sub>max</sub> - x<sub>min</sub>)</li>
+                        <li><strong>Benefit:</strong> u<sub>ij</sub> = (x<sub>ij</sub> - x<sub>min</sub>) / (x<sub>max</sub>
+                            - x<sub>min</sub>)</li>
+                        <li><strong>Cost:</strong> u<sub>ij</sub> = (x<sub>max</sub> - x<sub>ij</sub>) / (x<sub>max</sub> -
+                            x<sub>min</sub>)</li>
                         <li>Nilai utility berkisar antara 0 hingga 1</li>
                         <li>Pastikan setiap alternatif terisi semua pada menu penilaian</li>
                     </ul>
@@ -627,7 +612,7 @@
         class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
         <div
             class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
-            <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel Nilai Akhir SMARTER</h6>
+            <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel Nilai Akhir</h6>
         </div>
         <div class="flex-auto px-0 pb-2 pt-0">
             <div class="overflow-x-auto p-0 px-6 pb-6">
@@ -664,17 +649,10 @@
                                         @endphp
 
                                         @if ($matriksValue && $matriksValue->nilai !== null)
-                                            @if ($matriksValue->nilai == 0)
-                                                <span class="px-2 py-1 rounded-full text-xs font-semibold text-white"
-                                                    style="background: linear-gradient(135deg, #ef4444, #dc2626);">
-                                                    {{ number_format($matriksValue->nilai, 4) }}
-                                                </span>
-                                            @else
-                                                <span class="px-2 py-1 rounded-full text-xs font-semibold text-white"
-                                                    style="background: linear-gradient(135deg, #059669, #047857);">
-                                                    {{ number_format($matriksValue->nilai, 4) }}
-                                                </span>
-                                            @endif
+                                            <span class="px-2 py-1 rounded-full text-xs font-semibold text-white"
+                                                style="background: linear-gradient(135deg, #059669, #047857);">
+                                                {{ number_format($matriksValue->nilai, 4) }}
+                                            </span>
                                         @else
                                             <span class="text-gray-400">-</span>
                                         @endif
@@ -709,18 +687,22 @@
                 <div class="mt-3 p-4 rounded-lg text-sm text-white"
                     style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);">
                     <h6 class="font-bold mb-2">Formula Nilai Akhir:</h6>
-                    <p class="mb-2"><strong>NA<sub>i</sub> = Σ<sub>j=1</sub><sup>n</sup> MT<sub>ij</sub></strong></p>
+                    <p class="mb-2"><strong>A<sub>i</sub> = K<sub>1</sub> + K<sub>2</sub> + K<sub>3</sub> + ... +
+                            K<sub>n</sub></strong></p>
                     <ul class="list-disc ml-5">
-                        <li>NA<sub>i</sub> = Nilai akhir alternatif ke-i</li>
-                        <li>MT<sub>ij</sub> = Matriks ternormalisasi alternatif ke-i pada kriteria ke-j</li>
+                        <li>A<sub>i</sub> = Nilai akhir alternatif ke-i</li>
+                        <li>K<sub>j</sub> = Nilai matriks ternormalisasi pada kriteria ke-j</li>
                         <li>n = Jumlah kriteria ({{ $kriteria->count() }})</li>
                         <li>Alternatif dengan nilai tertinggi adalah yang terbaik</li>
                     </ul>
+                    <div class="mt-5 p-5 bg-white/20 rounded">
+                        <small><strong>Contoh:</strong> A<sub>1</sub> = K<sub>1</sub> + K<sub>2</sub> + K<sub>3</sub> +
+                            K<sub>4</sub> + K<sub>5</sub></small>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    {{-- Akhir Tabel Nilai Akhir --}}
+        {{-- Akhir Tabel Nilai Akhir --}}
     </div>
     </div>
 @endsection
