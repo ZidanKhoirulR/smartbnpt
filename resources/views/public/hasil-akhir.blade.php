@@ -256,249 +256,237 @@
                         0.75. </p>
             </div>
 
-            <!-- Results Table -->
-            <div class="content-card rounded-3xl p-8 shadow-xl">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-3xl font-bold text-gray-900">Tabel {{ $title }}</h2>
-                    <a href="{{ route('public.pdf.hasil') }}" target="_blank"
-                        class="btn-primary text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2">
-                        <i class="ri-file-pdf-2-line"></i>
-                        Cetak PDF
-                    </a>
-                </div>
+            <div class="overflow-x-auto">
+                <table id="myTable" class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top"
+                    style="width: 100%;">
+                    <thead class="align-bottom">
+                        <tr class="text-xs font-bold uppercase text-white text-center"
+                            style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);">
+                            <th class="text-center py-4 px-3 border-r border-gray-600">Kode</th>
+                            <th class="text-center py-4 px-3 border-r border-gray-600">NIK</th>
+                            <th class="text-center py-4 px-3 border-r border-gray-600">Alternatif</th>
+                            <th class="text-center py-4 px-3 border-r border-gray-600">Nilai Akhir</th>
+                            <th class="text-center py-4 px-3">Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($nilaiAkhir as $index => $item)
+                            @php
+                                $nilai = isset($item->nilai_raw) ? $item->nilai_raw : (is_numeric($item->nilai) ? (float) $item->nilai : 0.0);
+                                $status = $nilai >= 0.75 ? 'diterima' : 'tidak_diterima';
+                                $nilaiDisplay = isset($item->nilai_formatted) ? $item->nilai_formatted : number_format($nilai, 4);
+                            @endphp
+                            <tr
+                                class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200 
+                                                                @if($index === 0) ranking-1 @elseif($index === 1) ranking-2 @elseif($index === 2) ranking-3 @endif">
 
-                <div class="overflow-x-auto">
-                    <table id="myTable"
-                        class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top"
-                        style="width: 100%;">
-                        <thead class="align-bottom">
-                            <tr class="text-xs font-bold uppercase text-white text-center"
-                                style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);">
-                                <th class="text-center py-4 px-3 border-r border-gray-600">Kode</th>
-                                <th class="text-center py-4 px-3 border-r border-gray-600">NIK</th>
-                                <th class="text-center py-4 px-3 border-r border-gray-600">Alternatif</th>
-                                <th class="text-center py-4 px-3 border-r border-gray-600">Nilai Akhir</th>
-                                <th class="text-center py-4 px-3">Keterangan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($nilaiAkhir as $index => $item)
-                                @php
-                                    $nilai = isset($item->nilai_raw) ? $item->nilai_raw : (is_numeric($item->nilai) ? (float) $item->nilai : 0.0);
-                                    $status = $nilai >= 0.75 ? 'diterima' : 'tidak_diterima';
-                                    $nilaiDisplay = isset($item->nilai_formatted) ? $item->nilai_formatted : number_format($nilai, 4);
-                                @endphp
-                                <tr
-                                    class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200 
-                                            @if($index === 0) ranking-1 @elseif($index === 1) ranking-2 @elseif($index === 2) ranking-3 @endif">
-
-                                    <!-- Kode -->
-                                    <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
-                                        <div class="flex items-center justify-center gap-2">
-                                            @if($index === 0)
-                                                <i class="ri-medal-line medal-gold"></i>
-                                            @elseif($index === 1)
-                                                <i class="ri-medal-line medal-silver"></i>
-                                            @elseif($index === 2)
-                                                <i class="ri-medal-line medal-bronze"></i>
-                                            @endif
-                                            <span class="font-semibold text-lg">{{ $item->kode }}</span>
-                                        </div>
-                                    </td>
-
-                                    <!-- NIK -->
-                                    <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
-                                        <span class="nik-badge">
-                                            {{ $item->nik ?? 'N/A' }}
-                                        </span>
-                                    </td>
-
-                                    <!-- Alternatif -->
-                                    <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
-                                        <div class="flex flex-col items-center gap-2">
-                                            <!-- Ranking Badge -->
-                                            <span
-                                                class="flex items-center justify-center w-10 h-10 rounded-full text-sm font-bold text-white"
-                                                style="background: linear-gradient(135deg, 
-                                                            @if($index === 0) #f59e0b, #d97706 
-                                                            @elseif($index === 1) #6366f1, #4f46e5 
-                                                            @elseif($index === 2) #ef4444, #dc2626 
-                                                            @else #6b7280, #4b5563 @endif);">
-                                                {{ $index + 1 }}
-                                            </span>
-
-                                            <div class="text-center">
-                                                <div class="font-semibold text-lg text-gray-900">{{ $item->alternatif }}
-                                                </div>
-                                                @if($index === 0)
-                                                    <small class="text-yellow-600 font-medium">🏆 Alternatif Terbaik</small>
-                                                @elseif($index === 1)
-                                                    <small class="text-blue-600 font-medium">🥈 Alternatif Kedua</small>
-                                                @elseif($index === 2)
-                                                    <small class="text-red-600 font-medium">🥉 Alternatif Ketiga</small>
-                                                @else
-                                                    <small class="text-gray-500">Peringkat {{ $index + 1 }}</small>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                    <!-- Nilai Akhir -->
-                                    <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
-                                        <span class="px-4 py-3 rounded-full text-lg font-bold text-white" style="background: linear-gradient(135deg, 
-                                                        @if($index === 0) #f59e0b, #d97706
-                                                        @elseif($index === 1) #6366f1, #4f46e5
-                                                        @elseif($index === 2) #ef4444, #dc2626
-                                                        @else #10b981, #059669 @endif); 
-                                                        box-shadow: 0 4px 15px rgba(
-                                                            @if($index === 0) 245, 158, 11, 0.3
-                                                            @elseif($index === 1) 99, 102, 241, 0.3
-                                                            @elseif($index === 2) 239, 68, 68, 0.3
-                                                            @else 16, 185, 129, 0.3 @endif);">
-                                            {{ $nilaiDisplay }}
-                                        </span>
-                                    </td>
-
-                                    <!-- Keterangan Status -->
-                                    <td class="py-4 px-3 align-middle text-center">
-                                        @if($status === 'diterima')
-                                            <span class="status-diterima">
-                                                <i class="ri-checkbox-circle-line"></i>
-                                                DITERIMA
-                                            </span>
-                                        @else
-                                            <span class="status-tidak-diterima">
-                                                <i class="ri-close-circle-line"></i>
-                                                TIDAK DITERIMA
-                                            </span>
+                                <!-- Kode -->
+                                <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        @if($index === 0)
+                                            <i class="ri-medal-line medal-gold"></i>
+                                        @elseif($index === 1)
+                                            <i class="ri-medal-line medal-silver"></i>
+                                        @elseif($index === 2)
+                                            <i class="ri-medal-line medal-bronze"></i>
                                         @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                                        <span class="font-semibold text-lg">{{ $item->kode }}</span>
+                                    </div>
+                                </td>
 
-                {{-- Statistik Status --}}
-                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    @php
-                        $totalDiterima = collect($nilaiAkhir)->filter(function ($item) {
-                            $nilai = isset($item->nilai_raw) ? $item->nilai_raw : (is_numeric($item->nilai) ? (float) $item->nilai : 0.0);
-                            return $nilai >= 0.75;
-                        })->count();
-                        $totalTidakDiterima = collect($nilaiAkhir)->count() - $totalDiterima;
-                    @endphp
+                                <!-- NIK -->
+                                <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
+                                    <span class="nik-badge">
+                                        {{ $item->nik ?? 'N/A' }}
+                                    </span>
+                                </td>
 
-                    <div class="p-6 rounded-xl text-sm text-white"
-                        style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);">
-                        <div class="flex items-center gap-2 mb-3">
-                            <i class="ri-checkbox-circle-line text-2xl"></i>
-                            <span class="font-bold text-lg">Status DITERIMA</span>
-                        </div>
-                        <p class="text-green-100">{{ $totalDiterima }} alternatif dengan nilai ≥ 0.75</p>
-                        <div class="mt-3">
-                            <div class="bg-white bg-opacity-30 rounded-full h-3">
-                                <div class="bg-white rounded-full h-3"
-                                    style="width: {{ $nilaiAkhir->count() > 0 ? ($totalDiterima / $nilaiAkhir->count()) * 100 : 0 }}%">
-                                </div>
+                                <!-- Alternatif -->
+                                <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
+                                    <div class="flex flex-col items-center gap-2">
+                                        <!-- Ranking Badge -->
+                                        <span
+                                            class="flex items-center justify-center w-10 h-10 rounded-full text-sm font-bold text-white"
+                                            style="background: linear-gradient(135deg, 
+                                                                                @if($index === 0) #f59e0b, #d97706 
+                                                                                @elseif($index === 1) #6366f1, #4f46e5 
+                                                                                @elseif($index === 2) #ef4444, #dc2626 
+                                                                                @else #6b7280, #4b5563 @endif);">
+                                            {{ $index + 1 }}
+                                        </span>
+
+                                        <div class="text-center">
+                                            <div class="font-semibold text-lg text-gray-900">{{ $item->alternatif }}
+                                            </div>
+                                            @if($index === 0)
+                                                <small class="text-yellow-600 font-medium">🏆 Alternatif Terbaik</small>
+                                            @elseif($index === 1)
+                                                <small class="text-blue-600 font-medium">🥈 Alternatif Kedua</small>
+                                            @elseif($index === 2)
+                                                <small class="text-red-600 font-medium">🥉 Alternatif Ketiga</small>
+                                            @else
+                                                <small class="text-gray-500">Peringkat {{ $index + 1 }}</small>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Nilai Akhir -->
+                                <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
+                                    <span class="px-4 py-3 rounded-full text-lg font-bold text-white" style="background: linear-gradient(135deg, 
+                                                                            @if($index === 0) #f59e0b, #d97706
+                                                                            @elseif($index === 1) #6366f1, #4f46e5
+                                                                            @elseif($index === 2) #ef4444, #dc2626
+                                                                            @else #10b981, #059669 @endif); 
+                                                                            box-shadow: 0 4px 15px rgba(
+                                                                                @if($index === 0) 245, 158, 11, 0.3
+                                                                                @elseif($index === 1) 99, 102, 241, 0.3
+                                                                                @elseif($index === 2) 239, 68, 68, 0.3
+                                                                                @else 16, 185, 129, 0.3 @endif);">
+                                        {{ $nilaiDisplay }}
+                                    </span>
+                                </td>
+
+                                <!-- Keterangan Status -->
+                                <td class="py-4 px-3 align-middle text-center">
+                                    @if($status === 'diterima')
+                                        <span class="status-diterima">
+                                            <i class="ri-checkbox-circle-line"></i>
+                                            DITERIMA
+                                        </span>
+                                    @else
+                                        <span class="status-tidak-diterima">
+                                            <i class="ri-close-circle-line"></i>
+                                            TIDAK DITERIMA
+                                        </span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Statistik Status --}}
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                @php
+                    $totalDiterima = collect($nilaiAkhir)->filter(function ($item) {
+                        $nilai = isset($item->nilai_raw) ? $item->nilai_raw : (is_numeric($item->nilai) ? (float) $item->nilai : 0.0);
+                        return $nilai >= 0.75;
+                    })->count();
+                    $totalTidakDiterima = collect($nilaiAkhir)->count() - $totalDiterima;
+                @endphp
+
+                <div class="p-6 rounded-xl text-sm text-white"
+                    style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="ri-checkbox-circle-line text-2xl"></i>
+                        <span class="font-bold text-lg">Status DITERIMA</span>
+                    </div>
+                    <p class="text-green-100">{{ $totalDiterima }} alternatif dengan nilai ≥ 0.75</p>
+                    <div class="mt-3">
+                        <div class="bg-white bg-opacity-30 rounded-full h-3">
+                            <div class="bg-white rounded-full h-3"
+                                style="width: {{ $nilaiAkhir->count() > 0 ? ($totalDiterima / $nilaiAkhir->count()) * 100 : 0 }}%">
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="p-6 rounded-xl text-sm text-white"
-                        style="background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);">
-                        <div class="flex items-center gap-2 mb-3">
-                            <i class="ri-close-circle-line text-2xl"></i>
-                            <span class="font-bold text-lg">Status TIDAK DITERIMA</span>
-                        </div>
-                        <p class="text-red-100">{{ $totalTidakDiterima }} alternatif dengan nilai < 0.75</p>
-                                <div class="mt-3">
-                                    <div class="bg-white bg-opacity-30 rounded-full h-3">
-                                        <div class="bg-white rounded-full h-3"
-                                            style="width: {{ $nilaiAkhir->count() > 0 ? ($totalTidakDiterima / $nilaiAkhir->count()) * 100 : 0 }}%">
-                                        </div>
+                <div class="p-6 rounded-xl text-sm text-white"
+                    style="background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="ri-close-circle-line text-2xl"></i>
+                        <span class="font-bold text-lg">Status TIDAK DITERIMA</span>
+                    </div>
+                    <p class="text-red-100">{{ $totalTidakDiterima }} alternatif dengan nilai < 0.75</p>
+                            <div class="mt-3">
+                                <div class="bg-white bg-opacity-30 rounded-full h-3">
+                                    <div class="bg-white rounded-full h-3"
+                                        style="width: {{ $nilaiAkhir->count() > 0 ? ($totalTidakDiterima / $nilaiAkhir->count()) * 100 : 0 }}%">
                                     </div>
                                 </div>
-                    </div>
-                </div>
-
-                <!-- Info Cards -->
-                <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="p-6 rounded-xl text-sm text-white"
-                        style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);">
-                        <div class="flex items-center gap-2 mb-3">
-                            <i class="ri-trophy-line text-2xl"></i>
-                            <span class="font-bold text-lg">Syarat Penerimaan BPNT</span>
-                        </div>
-                        <p class="text-yellow-100">
-                            Alternatif dengan nilai ≥ 0.75 berstatus <strong>DITERIMA</strong>,
-                            nilai < 0.75 berstatus <strong>TIDAK DITERIMA</strong>
-                        </p>
-                    </div>
-
-                    <div class="p-6 rounded-xl text-sm text-white"
-                        style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);">
-                        <div class="flex items-center gap-2 mb-3">
-                            <i class="ri-line-chart-line text-2xl"></i>
-                            <span class="font-bold text-lg">Metode SMARTER-ROC</span>
-                        </div>
-                        <p class="text-green-100">
-                            Pembobotan otomatis berdasarkan ranking kriteria dengan normalisasi utility 0-1 untuk
-                            akurasi maksimal.
-                        </p>
-                    </div>
-
-                    <div class="p-6 rounded-xl text-sm text-white"
-                        style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);">
-                        <div class="flex items-center gap-2 mb-3">
-                            <i class="ri-shield-check-line text-2xl"></i>
-                            <span class="font-bold text-lg">Transparansi Penuh</span>
-                        </div>
-                        <p class="text-purple-100">
-                            Proses seleksi yang transparan dan dapat dipertanggungjawabkan dengan dokumentasi lengkap.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Interpretation Guide -->
-                <div class="mt-8 p-6 rounded-xl text-sm text-white"
-                    style="background: linear-gradient(135deg, #06b6d4, #0891b2); box-shadow: 0 8px 25px rgba(6, 182, 212, 0.3);">
-                    <h3 class="font-bold text-xl mb-4 flex items-center gap-2">
-                        <i class="ri-information-line text-2xl"></i>
-                        Interpretasi Nilai Akhir & Status
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="font-semibold mb-2 text-cyan-100">Kategori Nilai:</h4>
-                            <ul class="space-y-1 text-cyan-100">
-                                <li><strong>0.8 - 1.0:</strong> Sangat Baik</li>
-                                <li><strong>0.75 - 0.8:</strong> Baik (DITERIMA)</li>
-                                <li><strong>0.6 - 0.75:</strong> Cukup (TIDAK DITERIMA)</li>
-                                <li><strong>
-                                        < 0.6:</strong> Kurang (TIDAK DITERIMA)</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold mb-2 text-cyan-100">Status & Metodologi:</h4>
-                            <ul class="space-y-1 text-cyan-100">
-                                <li>🟢 Status DITERIMA: Nilai ≥ 0.75</li>
-                                <li>🔴 Status TIDAK DITERIMA: Nilai < 0.75</li>
-                                <li>• Ranking otomatis berdasarkan nilai tertinggi</li>
-                                <li>• Batas minimum penerimaan: 0.75</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Back to Home -->
-                <div class="mt-8 text-center">
-                    <a href="{{ route('welcome') }}"
-                        class="btn-secondary text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center gap-2">
-                        <i class="ri-arrow-left-line"></i>
-                        Kembali ke Beranda
-                    </a>
+                            </div>
                 </div>
             </div>
+
+            <!-- Info Cards -->
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-6 rounded-xl text-sm text-white"
+                    style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="ri-trophy-line text-2xl"></i>
+                        <span class="font-bold text-lg">Syarat Penerimaan BPNT</span>
+                    </div>
+                    <p class="text-yellow-100">
+                        Alternatif dengan nilai ≥ 0.75 berstatus <strong>DITERIMA</strong>,
+                        nilai < 0.75 berstatus <strong>TIDAK DITERIMA</strong>
+                    </p>
+                </div>
+
+                <div class="p-6 rounded-xl text-sm text-white"
+                    style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="ri-line-chart-line text-2xl"></i>
+                        <span class="font-bold text-lg">Metode SMARTER-ROC</span>
+                    </div>
+                    <p class="text-green-100">
+                        Pembobotan otomatis berdasarkan ranking kriteria dengan normalisasi utility 0-1 untuk
+                        akurasi maksimal.
+                    </p>
+                </div>
+
+                <div class="p-6 rounded-xl text-sm text-white"
+                    style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="ri-shield-check-line text-2xl"></i>
+                        <span class="font-bold text-lg">Transparansi Penuh</span>
+                    </div>
+                    <p class="text-purple-100">
+                        Proses seleksi yang transparan dan dapat dipertanggungjawabkan dengan dokumentasi lengkap.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Interpretation Guide -->
+            <div class="mt-8 p-6 rounded-xl text-sm text-white"
+                style="background: linear-gradient(135deg, #06b6d4, #0891b2); box-shadow: 0 8px 25px rgba(6, 182, 212, 0.3);">
+                <h3 class="font-bold text-xl mb-4 flex items-center gap-2">
+                    <i class="ri-information-line text-2xl"></i>
+                    Interpretasi Nilai Akhir & Status
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold mb-2 text-cyan-100">Kategori Nilai:</h4>
+                        <ul class="space-y-1 text-cyan-100">
+                            <li><strong>0.8 - 1.0:</strong> Sangat Baik</li>
+                            <li><strong>0.75 - 0.8:</strong> Baik</li>
+                            <li><strong>0.6 - 0.7:</strong> Cukup</li>
+                            <li><strong>
+                                    < 0.6:</strong> Kurang</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-2 text-cyan-100">Status & Metodologi:</h4>
+                        <ul class="space-y-1 text-cyan-100">
+                            <li>🟢 Status DITERIMA: Nilai ≥ 0.75</li>
+                            <li>🔴 Status TIDAK DITERIMA: Nilai < 0.75</li>
+                            <li>• Ranking otomatis berdasarkan nilai tertinggi</li>
+                            <li>• Batas minimum penerimaan: 0.75</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back to Home -->
+            <div class="mt-8 text-center">
+                <a href="{{ route('welcome') }}"
+                    class="btn-secondary text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center gap-2">
+                    <i class="ri-arrow-left-line"></i>
+                    Kembali ke Beranda
+                </a>
+            </div>
+        </div>
         </div>
     </section>
 

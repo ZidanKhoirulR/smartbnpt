@@ -465,7 +465,7 @@
         class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
         <div
             class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
-            <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel Utility</h6>
+            <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel Matriks Ternormalisasi</h6>
         </div>
         <div class="flex-auto px-0 pb-2 pt-0">
             <div class="overflow-x-auto p-0 px-6 pb-6">
@@ -520,7 +520,7 @@
 
                 <div class="mt-3 p-4 rounded-lg text-sm text-white"
                     style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);">
-                    <h6 class="font-bold mb-2">Formula Utility:</h6>
+                    <h6 class="font-bold mb-2">Formula Matriks Ternormalisasi:</h6>
                     <ul class="list-disc ml-5">
                         <li><strong>Benefit:</strong> u<sub>ij</sub> = (x<sub>ij</sub> - x<sub>min</sub>) / (x<sub>max</sub>
                             - x<sub>min</sub>)</li>
@@ -540,7 +540,7 @@
         class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
         <div
             class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
-            <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel Matriks Ternormalisasi</h6>
+            <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel Utility</h6>
         </div>
         <div class="flex-auto px-0 pb-2 pt-0">
             <div class="overflow-x-auto p-0 px-6 pb-6">
@@ -591,7 +591,7 @@
 
                 <div class="mt-3 p-4 rounded-lg text-sm text-white"
                     style="background: linear-gradient(135deg, #059669, #047857); box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);">
-                    <h6 class="font-bold mb-2">Formula Matriks Ternormalisasi:</h6>
+                    <h6 class="font-bold mb-2">Formula Utility :</h6>
                     <p class="mb-2">
                         <strong>MT<sub>ij</sub> = u<sub>ij</sub> × w<sub>j</sub></strong>
                     </p>
