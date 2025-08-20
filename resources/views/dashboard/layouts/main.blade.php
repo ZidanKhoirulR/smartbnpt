@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Laravel SMART | @yield('title', 'Dashboard')</title>
+    <title>BPNT Cirebon | @yield('title', 'Dashboard')</title>
 
     <link rel="apple-touch-icon" sizes="76x76" href="{{ asset("img/logo.jpg") }}" />
     <link rel="icon" type="image/png" href="{{ asset("img/logo.jpg") }}" />
@@ -28,16 +28,16 @@
         ::-webkit-scrollbar {
             width: 6px;
         }
-        
+
         ::-webkit-scrollbar-track {
             background: transparent;
         }
-        
+
         ::-webkit-scrollbar-thumb {
             background: linear-gradient(45deg, #6366f1, #8b5cf6);
             border-radius: 10px;
         }
-        
+
         ::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(45deg, #4f46e5, #7c3aed);
         }
@@ -100,27 +100,41 @@
 
         /* Floating animation - Gentler */
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-4px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-4px);
+            }
         }
-        
+
         .floating {
             animation: float 6s ease-in-out infinite;
         }
 
         /* Pulse animation - More subtle */
         @keyframes pulse-elegant {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
         }
-        
+
         .pulse-elegant {
             animation: pulse-elegant 4s infinite;
         }
 
         /* Background patterns - Much more subtle */
         .bg-pattern {
-            background-image: 
+            background-image:
                 radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(59, 130, 246, 0.06) 0%, transparent 50%);
@@ -149,21 +163,28 @@
     </style>
 </head>
 
-<body class="leading-default m-0 h-full bg-elegant-gradient-light dark:bg-elegant-gradient-dark font-sans text-base font-normal text-slate-700 dark:text-slate-200 antialiased min-h-screen">
-    
+<body
+    class="leading-default m-0 h-full bg-elegant-gradient-light dark:bg-elegant-gradient-dark font-sans text-base font-normal text-slate-700 dark:text-slate-200 antialiased min-h-screen">
+
     <!-- Background Elements - Much more subtle -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
         <!-- Very subtle gradient orbs -->
-        <div class="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-blue-100/20 to-blue-200/20 dark:from-blue-500/10 dark:to-blue-600/10 rounded-full blur-3xl floating" style="animation-delay: 0s;"></div>
-        <div class="absolute top-40 right-32 w-24 h-24 bg-gradient-to-br from-gray-100/20 to-gray-200/20 dark:from-gray-500/10 dark:to-gray-600/10 rounded-full blur-3xl floating" style="animation-delay: 2s;"></div>
-        <div class="absolute bottom-32 left-32 w-28 h-28 bg-gradient-to-br from-blue-100/20 to-gray-200/20 dark:from-blue-500/10 dark:to-gray-600/10 rounded-full blur-3xl floating" style="animation-delay: 4s;"></div>
-        
+        <div class="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-blue-100/20 to-blue-200/20 dark:from-blue-500/10 dark:to-blue-600/10 rounded-full blur-3xl floating"
+            style="animation-delay: 0s;"></div>
+        <div class="absolute top-40 right-32 w-24 h-24 bg-gradient-to-br from-gray-100/20 to-gray-200/20 dark:from-gray-500/10 dark:to-gray-600/10 rounded-full blur-3xl floating"
+            style="animation-delay: 2s;"></div>
+        <div class="absolute bottom-32 left-32 w-28 h-28 bg-gradient-to-br from-blue-100/20 to-gray-200/20 dark:from-blue-500/10 dark:to-gray-600/10 rounded-full blur-3xl floating"
+            style="animation-delay: 4s;"></div>
+
         <!-- Very subtle grid overlay -->
-        <div class="absolute inset-0 bg-[linear-gradient(rgba(100,116,139,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(100,116,139,0.015)_1px,transparent_1px)] bg-[size:60px_60px] dark:bg-[linear-gradient(rgba(148,163,184,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.01)_1px,transparent_1px)]"></div>
+        <div
+            class="absolute inset-0 bg-[linear-gradient(rgba(100,116,139,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(100,116,139,0.015)_1px,transparent_1px)] bg-[size:60px_60px] dark:bg-[linear-gradient(rgba(148,163,184,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.01)_1px,transparent_1px)]">
+        </div>
     </div>
 
     <!-- Enhanced header background - Much softer -->
-    <div class="min-h-75 absolute top-0 w-full bg-gradient-to-br from-gray-50 via-blue-50/50 to-gray-100 dark:from-gray-900 dark:via-blue-900/30 dark:to-gray-800 opacity-40">
+    <div
+        class="min-h-75 absolute top-0 w-full bg-gradient-to-br from-gray-50 via-blue-50/50 to-gray-100 dark:from-gray-900 dark:via-blue-900/30 dark:to-gray-800 opacity-40">
         <div class="absolute inset-0 bg-pattern"></div>
     </div>
 
@@ -175,20 +196,26 @@
         <!-- Enhanced content area -->
         <div class="mx-auto w-full px-6 py-6 relative z-10">
             <!-- Content wrapper with elegant styling -->
-            <div class="glass-effect dark:glass-effect-dark rounded-2xl p-8 shadow-lg min-h-[calc(100vh-180px)] border-gray-200/50 dark:border-gray-700/30">
+            <div
+                class="glass-effect dark:glass-effect-dark rounded-2xl p-8 shadow-lg min-h-[calc(100vh-180px)] border-gray-200/50 dark:border-gray-700/30">
                 @yield("container")
             </div>
-            
+
             @include("dashboard.layouts.footer")
         </div>
     </main>
 
     <!-- Enhanced loading indicator -->
-    <div id="loading-overlay" class="fixed inset-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+    <div id="loading-overlay"
+        class="fixed inset-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm z-50 flex items-center justify-center hidden">
         <div class="text-center">
             <div class="relative">
-                <div class="w-20 h-20 border-4 border-indigo-200 dark:border-indigo-800 rounded-full animate-spin border-t-indigo-600 dark:border-t-indigo-400"></div>
-                <div class="absolute inset-0 w-20 h-20 border-4 border-transparent rounded-full animate-ping border-t-indigo-400/50"></div>
+                <div
+                    class="w-20 h-20 border-4 border-indigo-200 dark:border-indigo-800 rounded-full animate-spin border-t-indigo-600 dark:border-t-indigo-400">
+                </div>
+                <div
+                    class="absolute inset-0 w-20 h-20 border-4 border-transparent rounded-full animate-ping border-t-indigo-400/50">
+                </div>
             </div>
             <p class="mt-6 text-slate-600 dark:text-slate-400 font-medium text-lg">Loading...</p>
         </div>
@@ -200,12 +227,12 @@
 
     <script>
         // Enhanced page load animation
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Fade in animation for content
             const content = document.querySelector('main');
             content.style.opacity = '0';
             content.style.transform = 'translateY(30px)';
-            
+
             setTimeout(() => {
                 content.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
                 content.style.opacity = '1';
@@ -228,7 +255,7 @@
 
             // Enhanced form handling
             document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', function() {
+                form.addEventListener('submit', function () {
                     const submitBtn = form.querySelector('button[type="submit"]');
                     if (submitBtn && !submitBtn.disabled) {
                         submitBtn.disabled = true;
@@ -240,7 +267,7 @@
                             </svg>
                             Processing...
                         `;
-                        
+
                         // Reset button after 10 seconds as fallback
                         setTimeout(() => {
                             submitBtn.disabled = false;
@@ -274,7 +301,7 @@
                 'warning': 'notification-warning',
                 'info': 'notification-info'
             };
-            
+
             const icons = {
                 'success': '<svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
                 'error': '<svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"></path></svg>',
@@ -298,14 +325,14 @@
                     </button>
                 </div>
             `;
-            
+
             document.body.appendChild(notification);
-            
+
             // Animate in
             setTimeout(() => {
                 notification.style.transform = 'translateX(0)';
             }, 100);
-            
+
             // Auto remove
             setTimeout(() => {
                 notification.style.transform = 'translateX(100%)';

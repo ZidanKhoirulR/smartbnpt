@@ -185,7 +185,7 @@
                                 @foreach ($nilaiAkhir as $index => $item)
                                     <tr
                                         class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200 
-                                                                        @if($index === 0) ranking-1 @elseif($index === 1) ranking-2 @elseif($index === 2) ranking-3 @endif">
+                                                                                @if($index === 0) ranking-1 @elseif($index === 1) ranking-2 @elseif($index === 2) ranking-3 @endif">
 
                                         <!-- Kode -->
                                         <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
@@ -208,10 +208,10 @@
                                                 <span
                                                     class="flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold text-white"
                                                     style="background: linear-gradient(135deg, 
-                                                                                        @if($index === 0) #f59e0b, #d97706 
-                                                                                        @elseif($index === 1) #6366f1, #4f46e5 
-                                                                                        @elseif($index === 2) #ef4444, #dc2626 
-                                                                                        @else #6b7280, #4b5563 @endif);">
+                                                                                                @if($index === 0) #f59e0b, #d97706 
+                                                                                                @elseif($index === 1) #6366f1, #4f46e5 
+                                                                                                @elseif($index === 2) #ef4444, #dc2626 
+                                                                                                @else #6b7280, #4b5563 @endif);">
                                                     {{ $index + 1 }}
                                                 </span>
 
@@ -232,16 +232,17 @@
 
                                         <!-- Nilai Akhir -->
                                         <td class="py-4 px-3 align-middle text-center">
-                                            <span class="px-3 py-2 rounded-full text-sm font-bold text-white" style="background: linear-gradient(135deg, 
-                                                                                    @if($index === 0) #f59e0b, #d97706
-                                                                                    @elseif($index === 1) #6366f1, #4f46e5
-                                                                                    @elseif($index === 2) #ef4444, #dc2626
-                                                                                    @else #10b981, #059669 @endif); 
-                                                                                    box-shadow: 0 4px 15px rgba(
-                                                                                        @if($index === 0) 245, 158, 11, 0.3
-                                                                                        @elseif($index === 1) 99, 102, 241, 0.3
-                                                                                        @elseif($index === 2) 239, 68, 68, 0.3
-                                                                                        @else 16, 185, 129, 0.3 @endif);">
+                                            <span class="px-3 py-2 rounded-full text-sm font-bold text-white"
+                                                style="background: linear-gradient(135deg, 
+                                                                                            @if($index === 0) #f59e0b, #d97706
+                                                                                            @elseif($index === 1) #6366f1, #4f46e5
+                                                                                            @elseif($index === 2) #ef4444, #dc2626
+                                                                                            @else #10b981, #059669 @endif); 
+                                                                                            box-shadow: 0 4px 15px rgba(
+                                                                                                @if($index === 0) 245, 158, 11, 0.3
+                                                                                                @elseif($index === 1) 99, 102, 241, 0.3
+                                                                                                @elseif($index === 2) 239, 68, 68, 0.3
+                                                                                                @else 16, 185, 129, 0.3 @endif);">
                                                 {{ $item->nilai }}
                                             </span>
                                         </td>
