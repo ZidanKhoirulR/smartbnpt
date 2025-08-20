@@ -28,7 +28,6 @@
 
             $(document).on('change', 'select[name="kriteria_id"]', function () {
                 validateKriteria(this);
-                updateWeightInfo();
             });
 
             // Auto-calculate weight info on modal open
@@ -48,7 +47,6 @@
 
             // Reset validation styling
             resetValidation();
-            updateWeightInfo();
 
             // Auto focus on first select
             setTimeout(() => {
@@ -220,27 +218,7 @@
                 return false;
             }
 
-            // Get current kriteria for weight calculation
-            const kriteriaId = $('input[name="kriteria_id"]').val() || $('select[name="kriteria_id"]').val();
-            if (kriteriaId) {
-                const currentTotal = getCurrentKriteriaTotal(kriteriaId);
-                const isEdit = $('input[name="id"]').val() !== '';
-                let originalWeight = 0;
-
-                if (isEdit) {
-                    originalWeight = parseFloat($input.data('original')) || 0;
-                }
-
-                const newTotal = currentTotal - originalWeight + value;
-
-                if (newTotal > 100) {
-                    const maxAllowed = 100 - currentTotal + originalWeight;
-                    showValidationError($input, `Bobot terlalu besar. Maksimal: ${maxAllowed.toFixed(2)}%`);
-                    return false;
-                }
-            }
-
-            showValidationSuccess($input);
+                      showValidationSuccess($input);
             return true;
         }
 
@@ -275,69 +253,6 @@
                 @endif
             @endforeach
             return total;
-        }
-
-        function updateWeightInfo() {
-            // Tentukan modal mana yang sedang aktif
-            const isEditModal = $('#edit_sub_kriteria').is(':checked');
-            const isCreateModal = $('#create_sub_kriteria').is(':checked');
-
-            let currentBobot, kriteriaId, bobotInput;
-
-            if (isEditModal) {
-                bobotInput = $("#edit_sub_kriteria_form input[name='bobot']");
-                currentBobot = parseFloat(bobotInput.val()) || 0;
-                kriteriaId = $("#edit_sub_kriteria_form input[name='kriteria_id']").val();
-            } else if (isCreateModal) {
-                bobotInput = $("#create_sub_kriteria_form input[name='bobot']");
-                currentBobot = parseFloat(bobotInput.val()) || 0;
-                kriteriaId = $("#create_sub_kriteria_form select[name='kriteria_id']").val();
-            } else {
-                return; // Tidak ada modal yang aktif
-            }
-
-            const isEdit = $("#edit_sub_kriteria_form input[name='id']").val() !== '';
-
-            if (!kriteriaId) {
-                $('.weight-info').remove();
-                return;
-            }
-
-            const totalBobot = getCurrentKriteriaTotal(kriteriaId);
-            let originalBobot = 0;
-
-            if (isEdit) {
-                originalBobot = parseFloat(bobotInput.data('original')) || 0;
-            }
-
-            const remaining = 100 - totalBobot + originalBobot - currentBobot;
-            const used = totalBobot - originalBobot + currentBobot;
-
-            // Update weight info in modal
-            $('.weight-info').remove();
-            const $bobotControl = bobotInput.closest('.form-control');
-
-            let colorClass = 'text-blue-600';
-            let icon = 'ri-information-line';
-
-            if (remaining < 0) {
-                colorClass = 'text-red-600';
-                icon = 'ri-error-warning-line';
-            } else if (remaining === 0) {
-                colorClass = 'text-green-600';
-                icon = 'ri-checkbox-circle-line';
-            }
-
-            const weightInfoHtml = `
-                <div class="label weight-info">
-                    <span class="label-text-alt text-xs ${colorClass}">
-                        <i class="${icon} mr-1"></i>
-                        Terpakai: ${used.toFixed(1)}% | Sisa: ${remaining.toFixed(1)}%
-                    </span>
-                </div>
-            `;
-
-            $bobotControl.append(weightInfoHtml);
         }
 
         // Validation helper functions

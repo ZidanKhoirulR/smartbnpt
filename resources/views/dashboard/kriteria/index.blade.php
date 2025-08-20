@@ -3,403 +3,403 @@
 @section("js")
     <script>
         // Global variable untuk menyimpan ID yang akan dihapus
-        let kriteriaToDelete = null;
+            let kriteriaToDelete = null;
 
-        $(document).ready(function () {
-            $('#myTable').DataTable({
-                responsive: {
-                    details: {
-                        type: 'column',
-                        target: 'tr',
+            $(document).ready(function () {
+                $('#myTable').DataTable({
+                    responsive: {
+                        details: {
+                            type: 'column',
+                            target: 'tr',
+                        },
                     },
-                },
-                order: [],
-                pagingType: 'full_numbers',
+                    order: [],
+                    pagingType: 'full_numbers',
+                });
+
+                // Real-time validation for all forms
+                $(document).on('input', 'input[name="ranking"]', function () {
+                    const isEditMode = $(this).closest('form').find("input[name='id']").val() !== '';
+                    if (!isEditMode) {
+                        validateRanking(this);
+                    }
+                });
+
+                $(document).on('input', 'input[name="kriteria"]', function () {
+                    validateKriteria(this);
+                });
             });
 
-            // Real-time validation for all forms
-            $(document).on('input', 'input[name="ranking"]', function () {
-                const isEditMode = $(this).closest('form').find("input[name='id']").val() !== '';
-                if (!isEditMode) {
-                    validateRanking(this);
-                }
-            });
+            function create_button() {
+                // Reset form
+                $("input[name='id']").val("");
+                $("input[name='kriteria']").val("");
+                $("input[name='ranking']").val("");
+                $("input[name='kode']").val("{{ $kode }}");
 
-            $(document).on('input', 'input[name="kriteria"]', function () {
-                validateKriteria(this);
-            });
-        });
+                // Reset radio buttons
+                $("input[name='jenis_kriteria']").prop('checked', false);
+                $("#benefit_create").prop("checked", true);
 
-        function create_button() {
-            // Reset form
-            $("input[name='id']").val("");
-            $("input[name='kriteria']").val("");
-            $("input[name='ranking']").val("");
-            $("input[name='kode']").val("{{ $kode }}");
+                // Reset validation styling
+                resetValidation();
 
-            // Reset radio buttons
-            $("input[name='jenis_kriteria']").prop('checked', false);
-            $("#benefit_create").prop("checked", true);
+                // Auto focus on first input
+                setTimeout(() => {
+                    $("#create_button").closest('.modal').find("input[name='ranking']").focus();
+                }, 200);
+            }
 
-            // Reset validation styling
-            resetValidation();
+            function edit_button(kriteria_id) {
+                console.log('Editing kriteria ID:', kriteria_id);
 
-            // Auto focus on first input
-            setTimeout(() => {
-                $("#create_button").closest('.modal').find("input[name='ranking']").focus();
-            }, 200);
-        }
+                // Show loading
+                showLoadingState();
 
-        function edit_button(kriteria_id) {
-            console.log('Editing kriteria ID:', kriteria_id);
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route("kriteria.edit") }}",
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "kriteria_id": kriteria_id
+                    },
+                    dataType: 'json',
+                    beforeSend: function () {
+                        console.log('Sending AJAX request to edit kriteria');
+                    },
+                    success: function (response) {
+                        console.log('Edit response received:', response);
 
-            // Show loading
-            showLoadingState();
+                        // Handle both resource wrapper and direct response
+                        const data = response.data || response;
 
-            $.ajax({
-                type: "GET",
-                url: "{{ route("kriteria.edit") }}",
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "kriteria_id": kriteria_id
-                },
-                dataType: 'json',
-                beforeSend: function () {
-                    console.log('Sending AJAX request to edit kriteria');
-                },
-                success: function (response) {
-                    console.log('Edit response received:', response);
+                        if (data && data.id) {
+                            // Populate form
+                            $("input[name='id']").val(data.id);
+                            $("input[name='kode']").val(data.kode);
+                            $("input[name='kriteria']").val(data.kriteria);
 
-                    // Handle both resource wrapper and direct response
-                    const data = response.data || response;
+                            // Set ranking - pastikan ada ranking
+                            if (data.ranking) {
+                                $("#ranking_display").text(data.ranking);
+                                $("#ranking_hidden").val(data.ranking);
+                            } else {
+                                $("#ranking_display").text('-');
+                                $("#ranking_hidden").val('');
+                            }
 
-                    if (data && data.id) {
-                        // Populate form
-                        $("input[name='id']").val(data.id);
-                        $("input[name='kode']").val(data.kode);
-                        $("input[name='kriteria']").val(data.kriteria);
+                            // Set radio button - reset first
+                            $("input[name='jenis_kriteria']").prop('checked', false);
 
-                        // Set ranking - pastikan ada ranking
-                        if (data.ranking) {
-                            $("#ranking_display").text(data.ranking);
-                            $("#ranking_hidden").val(data.ranking);
+                            if (data.jenis_kriteria == "benefit") {
+                                $("#benefit_edit").prop("checked", true);
+                            } else if (data.jenis_kriteria == "cost") {
+                                $("#cost_edit").prop("checked", true);
+                            }
+
+                            // Hide loading
+                            hideLoadingState();
+
+                            // Reset validation
+                            resetValidation();
+
+                            // Validate current values
+                            if ($("input[name='kriteria']").length > 0) {
+                                validateKriteria($("input[name='kriteria']")[0]);
+                            }
+
+                            showNotification('Data kriteria berhasil dimuat', 'success');
                         } else {
-                            $("#ranking_display").text('-');
-                            $("#ranking_hidden").val('');
+                            hideLoadingState();
+                            showNotification('Data tidak lengkap dari server', 'error');
+                            console.error('Incomplete data from server:', response);
                         }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX Error details:', {
+                            status: status,
+                            error: error,
+                            responseText: xhr.responseText,
+                            statusCode: xhr.status,
+                            url: "{{ route("kriteria.edit") }}"
+                        });
 
-                        // Set radio button - reset first
-                        $("input[name='jenis_kriteria']").prop('checked', false);
-
-                        if (data.jenis_kriteria == "benefit") {
-                            $("#benefit_edit").prop("checked", true);
-                        } else if (data.jenis_kriteria == "cost") {
-                            $("#cost_edit").prop("checked", true);
-                        }
-
-                        // Hide loading
                         hideLoadingState();
 
-                        // Reset validation
-                        resetValidation();
+                        let errorMessage = 'Gagal memuat data kriteria';
 
-                        // Validate current values
-                        if ($("input[name='kriteria']").length > 0) {
-                            validateKriteria($("input[name='kriteria']")[0]);
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            errorMessage = errorResponse.error || errorResponse.message || errorMessage;
+                        } catch (e) {
+                            console.error('Failed to parse error response');
                         }
 
-                        showNotification('Data kriteria berhasil dimuat', 'success');
-                    } else {
-                        hideLoadingState();
-                        showNotification('Data tidak lengkap dari server', 'error');
-                        console.error('Incomplete data from server:', response);
+                        if (xhr.status === 404) {
+                            errorMessage = 'Data kriteria tidak ditemukan';
+                        } else if (xhr.status === 500) {
+                            errorMessage = 'Terjadi kesalahan server';
+                        } else if (xhr.status === 403) {
+                            errorMessage = 'Tidak memiliki akses';
+                        } else if (xhr.status === 422) {
+                            errorMessage = 'Data tidak valid';
+                        }
+
+                        showNotification(errorMessage, 'error');
                     }
-                },
-                error: function (xhr, status, error) {
-                    console.error('AJAX Error details:', {
-                        status: status,
-                        error: error,
-                        responseText: xhr.responseText,
-                        statusCode: xhr.status,
-                        url: "{{ route("kriteria.edit") }}"
-                    });
-
-                    hideLoadingState();
-
-                    let errorMessage = 'Gagal memuat data kriteria';
-
-                    try {
-                        const errorResponse = JSON.parse(xhr.responseText);
-                        errorMessage = errorResponse.error || errorResponse.message || errorMessage;
-                    } catch (e) {
-                        console.error('Failed to parse error response');
-                    }
-
-                    if (xhr.status === 404) {
-                        errorMessage = 'Data kriteria tidak ditemukan';
-                    } else if (xhr.status === 500) {
-                        errorMessage = 'Terjadi kesalahan server';
-                    } else if (xhr.status === 403) {
-                        errorMessage = 'Tidak memiliki akses';
-                    } else if (xhr.status === 422) {
-                        errorMessage = 'Data tidak valid';
-                    }
-
-                    showNotification(errorMessage, 'error');
-                }
-            });
-        }
-
-        function delete_button(kriteria_id, kriteria_name) {
-            console.log('Preparing to delete kriteria ID:', kriteria_id);
-
-            // Simpan ID yang akan dihapus
-            kriteriaToDelete = kriteria_id;
-
-            // Update nama kriteria di modal
-            document.getElementById('delete_kriteria_name').textContent = kriteria_name || 'Kriteria ini';
-
-            // Buka modal
-            document.getElementById('delete_modal').checked = true;
-        }
-
-        // Fungsi untuk konfirmasi penghapusan
-        function confirmDelete() {
-            if (!kriteriaToDelete) {
-                showNotification('Tidak ada data yang dipilih untuk dihapus', 'error');
-                return;
+                });
             }
 
-            console.log('Confirming delete for kriteria ID:', kriteriaToDelete);
+            function delete_button(kriteria_id, kriteria_name) {
+                console.log('Preparing to delete kriteria ID:', kriteria_id);
 
-            // Tutup modal
-            document.getElementById('delete_modal').checked = false;
+                // Simpan ID yang akan dihapus
+                kriteriaToDelete = kriteria_id;
 
-            // Show loading notification
-            showNotification('Menghapus data kriteria...', 'info');
+                // Update nama kriteria di modal
+                document.getElementById('delete_kriteria_name').textContent = kriteria_name || 'Kriteria ini';
 
-            $.ajax({
-                type: "POST",
-                url: "{{ route('kriteria.delete') }}",
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "_method": "DELETE",
-                    "kriteria_id": kriteriaToDelete
-                },
-                dataType: 'json',
-                success: function (response) {
-                    console.log('Delete response received:', response);
+                // Buka modal
+                document.getElementById('delete_modal').checked = true;
+            }
 
-                    // Reset variable
-                    kriteriaToDelete = null;
-
-                    // Show success notification
-                    showNotification('Data kriteria berhasil dihapus', 'success');
-
-                    // Reload page to update the table
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
-                },
-                error: function (xhr, status, error) {
-                    console.error('Delete AJAX Error:', xhr.responseText);
-
-                    // Reset variable
-                    kriteriaToDelete = null;
-
-                    let errorMessage = 'Gagal menghapus data kriteria';
-
-                    try {
-                        const errorResponse = JSON.parse(xhr.responseText);
-                        errorMessage = errorResponse.error || errorResponse.message || errorMessage;
-                    } catch (e) {
-                        console.error('Failed to parse error response');
-                    }
-
-                    if (xhr.status === 404) {
-                        errorMessage = 'Data kriteria tidak ditemukan';
-                    } else if (xhr.status === 500) {
-                        errorMessage = 'Terjadi kesalahan server';
-                    } else if (xhr.status === 403) {
-                        errorMessage = 'Tidak memiliki akses untuk menghapus';
-                    } else if (xhr.status === 422) {
-                        errorMessage = 'Data tidak dapat dihapus (mungkin masih digunakan)';
-                    }
-
-                    showNotification(errorMessage, 'error');
+            // Fungsi untuk konfirmasi penghapusan
+            function confirmDelete() {
+                if (!kriteriaToDelete) {
+                    showNotification('Tidak ada data yang dipilih untuk dihapus', 'error');
+                    return;
                 }
-            });
-        }
 
-        // Update validasi form submission - hapus validasi ranking untuk mode edit
-        $(document).on('submit', 'form', function (e) {
-            const form = this;
-            let isValid = true;
-            const isEditMode = $(form).find("input[name='id']").val() !== '';
+                console.log('Confirming delete for kriteria ID:', kriteriaToDelete);
 
-            console.log('Form submission - Edit mode:', isEditMode);
+                // Tutup modal
+                document.getElementById('delete_modal').checked = false;
 
-            // Validate all required fields
-            $(form).find('input[required]').each(function () {
-                // Hanya validasi ranking jika bukan mode edit
-                if (this.name === 'ranking' && !isEditMode && !validateRanking(this)) {
+                // Show loading notification
+                showNotification('Menghapus data kriteria...', 'info');
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('kriteria.delete') }}",
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "_method": "DELETE",
+                        "kriteria_id": kriteriaToDelete
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        console.log('Delete response received:', response);
+
+                        // Reset variable
+                        kriteriaToDelete = null;
+
+                        // Show success notification
+                        showNotification('Data kriteria berhasil dihapus', 'success');
+
+                        // Reload page to update the table
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Delete AJAX Error:', xhr.responseText);
+
+                        // Reset variable
+                        kriteriaToDelete = null;
+
+                        let errorMessage = 'Gagal menghapus data kriteria';
+
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            errorMessage = errorResponse.error || errorResponse.message || errorMessage;
+                        } catch (e) {
+                            console.error('Failed to parse error response');
+                        }
+
+                        if (xhr.status === 404) {
+                            errorMessage = 'Data kriteria tidak ditemukan';
+                        } else if (xhr.status === 500) {
+                            errorMessage = 'Terjadi kesalahan server';
+                        } else if (xhr.status === 403) {
+                            errorMessage = 'Tidak memiliki akses untuk menghapus';
+                        } else if (xhr.status === 422) {
+                            errorMessage = 'Data tidak dapat dihapus (mungkin masih digunakan)';
+                        }
+
+                        showNotification(errorMessage, 'error');
+                    }
+                });
+            }
+
+            // Update validasi form submission - hapus validasi ranking untuk mode edit
+            $(document).on('submit', 'form', function (e) {
+                const form = this;
+                let isValid = true;
+                const isEditMode = $(form).find("input[name='id']").val() !== '';
+
+                console.log('Form submission - Edit mode:', isEditMode);
+
+                // Validate all required fields
+                $(form).find('input[required]').each(function () {
+                    // Hanya validasi ranking jika bukan mode edit
+                    if (this.name === 'ranking' && !isEditMode && !validateRanking(this)) {
+                        isValid = false;
+                    }
+                    if (this.name === 'kriteria' && !validateKriteria(this)) {
+                        isValid = false;
+                    }
+                });
+
+                // Check radio button
+                if (!$(form).find('input[name="jenis_kriteria"]:checked').length) {
+                    showNotification('Pilih jenis kriteria (Benefit atau Cost)', 'error');
                     isValid = false;
                 }
-                if (this.name === 'kriteria' && !validateKriteria(this)) {
-                    isValid = false;
+
+                if (!isValid) {
+                    e.preventDefault();
+                    showNotification('Periksa kembali form input Anda', 'error');
+                    return false;
                 }
+
+                // Debug: log form data
+                console.log('Form data being submitted:', $(form).serialize());
+
+                // Show loading on submit button
+                const $submitBtn = $(form).find('button[type="submit"]');
+                const originalText = $submitBtn.html();
+                $submitBtn.html('<span class="loading loading-spinner loading-sm"></span> Menyimpan...').prop('disabled', true);
+
+                // Restore button after 10 seconds (fallback)
+                setTimeout(() => {
+                    $submitBtn.html(originalText).prop('disabled', false);
+                }, 10000);
             });
 
-            // Check radio button
-            if (!$(form).find('input[name="jenis_kriteria"]:checked').length) {
-                showNotification('Pilih jenis kriteria (Benefit atau Cost)', 'error');
-                isValid = false;
-            }
+            // Validation functions
+            function validateRanking(input) {
+                const value = parseInt(input.value);
+                const $input = $(input);
+                const $formControl = $input.closest('.form-control');
+                const isEditMode = $input.closest('form').find("input[name='id']").val() !== '';
 
-            if (!isValid) {
-                e.preventDefault();
-                showNotification('Periksa kembali form input Anda', 'error');
-                return false;
-            }
+                // Remove previous validation
+                $input.removeClass('input-error input-success border-red-500 border-green-500');
+                $formControl.find('.validation-message').remove();
 
-            // Debug: log form data
-            console.log('Form data being submitted:', $(form).serialize());
+                // Skip validasi ranking untuk edit mode
+                if (isEditMode) {
+                    return true;
+                }
 
-            // Show loading on submit button
-            const $submitBtn = $(form).find('button[type="submit"]');
-            const originalText = $submitBtn.html();
-            $submitBtn.html('<span class="loading loading-spinner loading-sm"></span> Menyimpan...').prop('disabled', true);
+                if (!input.value.trim()) {
+                    showValidationError($input, 'Ranking wajib diisi');
+                    return false;
+                }
 
-            // Restore button after 10 seconds (fallback)
-            setTimeout(() => {
-                $submitBtn.html(originalText).prop('disabled', false);
-            }, 10000);
-        });
+                if (isNaN(value) || value < 1) {
+                    showValidationError($input, 'Ranking minimal adalah 1');
+                    return false;
+                }
 
-        // Validation functions
-        function validateRanking(input) {
-            const value = parseInt(input.value);
-            const $input = $(input);
-            const $formControl = $input.closest('.form-control');
-            const isEditMode = $input.closest('form').find("input[name='id']").val() !== '';
+                const maxRanking = {{ $kriteria->count() + 1 }};
+                if (value > maxRanking) {
+                    showValidationError($input, `Ranking maksimal adalah ${maxRanking}`);
+                    return false;
+                }
 
-            // Remove previous validation
-            $input.removeClass('input-error input-success border-red-500 border-green-500');
-            $formControl.find('.validation-message').remove();
-
-            // Skip validasi ranking untuk edit mode
-            if (isEditMode) {
+                showValidationSuccess($input);
                 return true;
             }
 
-            if (!input.value.trim()) {
-                showValidationError($input, 'Ranking wajib diisi');
-                return false;
-            }
+            function validateKriteria(input) {
+                const $input = $(input);
+                const $formControl = $input.closest('.form-control');
 
-            if (isNaN(value) || value < 1) {
-                showValidationError($input, 'Ranking minimal adalah 1');
-                return false;
-            }
+                // Remove previous validation
+                $input.removeClass('input-error input-success border-red-500 border-green-500');
+                $formControl.find('.validation-message').remove();
 
-            const maxRanking = {{ $kriteria->count() + 1 }};
-            if (value > maxRanking) {
-                showValidationError($input, `Ranking maksimal adalah ${maxRanking}`);
-                return false;
-            }
-
-            showValidationSuccess($input);
-            return true;
-        }
-
-        function validateKriteria(input) {
-            const $input = $(input);
-            const $formControl = $input.closest('.form-control');
-
-            // Remove previous validation
-            $input.removeClass('input-error input-success border-red-500 border-green-500');
-            $formControl.find('.validation-message').remove();
-
-            if (!input.value.trim()) {
-                showValidationError($input, 'Nama kriteria wajib diisi');
-                return false;
-            }
-
-            if (input.value.trim().length < 3) {
-                showValidationError($input, 'Nama kriteria minimal 3 karakter');
-                return false;
-            }
-
-            showValidationSuccess($input);
-            return true;
-        }
-
-        function showValidationError($input, message) {
-            $input.addClass('input-error border-red-500');
-            const $formControl = $input.closest('.form-control');
-            $formControl.append(`<div class="validation-message text-red-500 text-xs mt-1">${message}</div>`);
-        }
-
-        function showValidationSuccess($input) {
-            $input.addClass('input-success border-green-500');
-        }
-
-        function resetValidation() {
-            $('input').removeClass('input-error input-success border-red-500 border-green-500');
-            $('.validation-message').remove();
-        }
-
-        // Loading state functions
-        function showLoadingState() {
-            const loading = `<span class="loading loading-dots loading-md text-purple-600"></span>`;
-            for (let i = 1; i <= 2; i++) {
-                $(`#loading_edit${i}`).html(loading);
-            }
-        }
-
-        function hideLoadingState() {
-            for (let i = 1; i <= 2; i++) {
-                $(`#loading_edit${i}`).html('');
-            }
-        }
-
-        // Enhanced notification with auto-dismiss and better styling
-        function showNotification(message, type = 'info') {
-            // Remove existing notifications
-            document.querySelectorAll('.toast-notification').forEach(toast => toast.remove());
-
-            const toast = document.createElement('div');
-            toast.className = `toast-notification alert alert-${type} fixed top-4 right-4 w-auto max-w-sm z-50 shadow-lg animate-pulse`;
-
-            const iconMap = {
-                'success': 'ri-checkbox-circle-line',
-                'error': 'ri-error-warning-line',
-                'warning': 'ri-alert-line',
-                'info': 'ri-information-line'
-            };
-
-            toast.innerHTML = `
-                                                    <div class="flex items-center gap-2">
-                                                        <i class="${iconMap[type] || iconMap.info}"></i>
-                                                        <span class="text-sm">${message}</span>
-                                                        <button class="btn btn-ghost btn-xs ml-2" onclick="this.parentElement.parentElement.remove()">
-                                                            <i class="ri-close-line"></i>
-                                                        </button>
-                                                    </div>
-                                                `;
-
-            document.body.appendChild(toast);
-
-            // Auto-dismiss after 5 seconds
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.style.opacity = '0';
-                    toast.style.transform = 'translateX(100%)';
-                    setTimeout(() => toast.remove(), 300);
+                if (!input.value.trim()) {
+                    showValidationError($input, 'Nama kriteria wajib diisi');
+                    return false;
                 }
-            }, 5000);
-        }
-    </script>
+
+                if (input.value.trim().length < 3) {
+                    showValidationError($input, 'Nama kriteria minimal 3 karakter');
+                    return false;
+                }
+
+                showValidationSuccess($input);
+                return true;
+            }
+
+            function showValidationError($input, message) {
+                $input.addClass('input-error border-red-500');
+                const $formControl = $input.closest('.form-control');
+                $formControl.append(`<div class="validation-message text-red-500 text-xs mt-1">${message}</div>`);
+            }
+
+            function showValidationSuccess($input) {
+                $input.addClass('input-success border-green-500');
+            }
+
+            function resetValidation() {
+                $('input').removeClass('input-error input-success border-red-500 border-green-500');
+                $('.validation-message').remove();
+            }
+
+            // Loading state functions
+            function showLoadingState() {
+                const loading = `<span class="loading loading-dots loading-md text-purple-600"></span>`;
+                for (let i = 1; i <= 2; i++) {
+                    $(`#loading_edit${i}`).html(loading);
+                }
+            }
+
+            function hideLoadingState() {
+                for (let i = 1; i <= 2; i++) {
+                    $(`#loading_edit${i}`).html('');
+                }
+            }
+
+            // Enhanced notification with auto-dismiss and better styling
+            function showNotification(message, type = 'info') {
+                // Remove existing notifications
+                document.querySelectorAll('.toast-notification').forEach(toast => toast.remove());
+
+                const toast = document.createElement('div');
+                toast.className = `toast-notification alert alert-${type} fixed top-4 right-4 w-auto max-w-sm z-50 shadow-lg animate-pulse`;
+
+                const iconMap = {
+                    'success': 'ri-checkbox-circle-line',
+                    'error': 'ri-error-warning-line',
+                    'warning': 'ri-alert-line',
+                    'info': 'ri-information-line'
+                };
+
+                toast.innerHTML = `
+                                                        <div class="flex items-center gap-2">
+                                                            <i class="${iconMap[type] || iconMap.info}"></i>
+                                                            <span class="text-sm">${message}</span>
+                                                            <button class="btn btn-ghost btn-xs ml-2" onclick="this.parentElement.parentElement.remove()">
+                                                                <i class="ri-close-line"></i>
+                                                            </button>
+                                                        </div>
+                                                    `;
+
+                document.body.appendChild(toast);
+
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.style.opacity = '0';
+                        toast.style.transform = 'translateX(100%)';
+                        setTimeout(() => toast.remove(), 300);
+                    }
+                }, 5000);
+            }
+        </script>
 @endsection
 
 @section("css")
