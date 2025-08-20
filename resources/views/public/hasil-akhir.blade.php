@@ -79,9 +79,36 @@
             padding: 12px 8px !important;
         }
 
-        #myTable td:nth-child(2),
-        #myTable th:nth-child(2) {
-            text-align: left !important;
+        /* Kolom Alternatif center alignment */
+        #myTable td:nth-child(3),
+        #myTable th:nth-child(3) {
+            text-align: center !important;
+        }
+
+        /* Konsistensi lebar kolom untuk 5 kolom */
+        #myTable th:nth-child(1),
+        #myTable td:nth-child(1) {
+            width: 12%;
+        }
+
+        #myTable th:nth-child(2),
+        #myTable td:nth-child(2) {
+            width: 18%;
+        }
+
+        #myTable th:nth-child(3),
+        #myTable td:nth-child(3) {
+            width: 35%;
+        }
+
+        #myTable th:nth-child(4),
+        #myTable td:nth-child(4) {
+            width: 15%;
+        }
+
+        #myTable th:nth-child(5),
+        #myTable td:nth-child(5) {
+            width: 20%;
         }
 
         /* Ranking styles */
@@ -113,6 +140,44 @@
         .medal-bronze {
             color: #d97706;
             font-size: 1.2rem;
+        }
+
+        /* Status badges */
+        .status-diterima {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .status-tidak-diterima {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        /* NIK styling */
+        .nik-badge {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            word-break: break-all;
         }
 
         .btn-primary {
@@ -161,6 +226,7 @@
                 <a href="{{ route('welcome') }}"
                     class="text-gray-700 hover:text-blue-600 font-medium transition-colors px-3 py-2 rounded-lg hover:bg-blue-50">
                     <i class="ri-home-line mr-1"></i>Beranda
+                </a>
             </div>
         </div>
     </nav>
@@ -172,8 +238,8 @@
                 <h1 class="text-5xl font-bold mb-4">{{ $title }}</h1>
                 <p class="text-xl text-blue-100 leading-relaxed max-w-3xl mx-auto">
                     Sistem Pendukung Keputusan Penerimaan BPNT dengan metode SMARTER-ROC
-                    <br>Hasil perhitungan telah diurutkan berdasarkan nilai tertinggi
-                </p>
+                    <br>Status <strong>DITERIMA</strong> untuk nilai ≥ 0.75, <strong>TIDAK DITERIMA</strong> untuk nilai
+                    < 0.75 </p>
             </div>
         </div>
     </section>
@@ -190,8 +256,8 @@
                 </div>
                 <p class="text-purple-100">
                     Hasil perhitungan menggunakan metode SMARTER-ROC telah diurutkan berdasarkan nilai tertinggi.
-                    Alternatif dengan nilai tertinggi adalah yang terbaik sesuai kriteria yang telah ditetapkan.
-                </p>
+                    Status <strong>DITERIMA</strong> untuk nilai ≥ 0.75, <strong>TIDAK DITERIMA</strong> untuk nilai <
+                        0.75. </p>
             </div>
 
             <!-- Results Table -->
@@ -212,18 +278,25 @@
                         <thead class="align-bottom">
                             <tr class="text-xs font-bold uppercase text-white text-center"
                                 style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);">
-                                <th class="text-center py-4 px-3 border-r border-gray-600">Ranking</th>
-                                <th class="text-left py-4 px-3 border-r border-gray-600">Alternatif</th>
-                                <th class="text-center py-4 px-3">Nilai Akhir</th>
+                                <th class="text-center py-4 px-3 border-r border-gray-600">Kode</th>
+                                <th class="text-center py-4 px-3 border-r border-gray-600">NIK</th>
+                                <th class="text-center py-4 px-3 border-r border-gray-600">Alternatif</th>
+                                <th class="text-center py-4 px-3 border-r border-gray-600">Nilai Akhir</th>
+                                <th class="text-center py-4 px-3">Keterangan</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($nilaiAkhir as $index => $item)
+                                @php
+                                    $nilai = isset($item->nilai_raw) ? $item->nilai_raw : (is_numeric($item->nilai) ? (float) $item->nilai : 0.0);
+                                    $status = $nilai >= 0.75 ? 'diterima' : 'tidak_diterima';
+                                    $nilaiDisplay = isset($item->nilai_formatted) ? $item->nilai_formatted : number_format($nilai, 4);
+                                @endphp
                                 <tr
                                     class="border-b border-gray-200 bg-transparent hover:bg-gray-50 transition-colors duration-200 
-                                                @if($index === 0) ranking-1 @elseif($index === 1) ranking-2 @elseif($index === 2) ranking-3 @endif">
+                                        @if($index === 0) ranking-1 @elseif($index === 1) ranking-2 @elseif($index === 2) ranking-3 @endif">
 
-                                    <!-- Ranking -->
+                                    <!-- Kode -->
                                     <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
                                         <div class="flex items-center justify-center gap-2">
                                             @if($index === 0)
@@ -233,25 +306,32 @@
                                             @elseif($index === 2)
                                                 <i class="ri-medal-line medal-bronze"></i>
                                             @endif
-                                            <span class="text-2xl font-bold text-gray-800">{{ $index + 1 }}</span>
+                                            <span class="font-semibold text-lg">{{ $item->kode }}</span>
                                         </div>
                                     </td>
 
+                                    <!-- NIK -->
+                                    <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
+                                        <span class="nik-badge">
+                                            {{ $item->nik ?? 'N/A' }}
+                                        </span>
+                                    </td>
+
                                     <!-- Alternatif -->
-                                    <td class="py-4 px-3 border-r border-gray-200 align-middle text-left">
-                                        <div class="flex items-center gap-3">
+                                    <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
+                                        <div class="flex flex-col items-center gap-2">
                                             <!-- Ranking Badge -->
                                             <span
                                                 class="flex items-center justify-center w-10 h-10 rounded-full text-sm font-bold text-white"
                                                 style="background: linear-gradient(135deg, 
-                                                                    @if($index === 0) #f59e0b, #d97706 
-                                                                    @elseif($index === 1) #6366f1, #4f46e5 
-                                                                    @elseif($index === 2) #ef4444, #dc2626 
-                                                                    @else #6b7280, #4b5563 @endif);">
-                                                {{ $item->kode }}
+                                                        @if($index === 0) #f59e0b, #d97706 
+                                                        @elseif($index === 1) #6366f1, #4f46e5 
+                                                        @elseif($index === 2) #ef4444, #dc2626 
+                                                        @else #6b7280, #4b5563 @endif);">
+                                                {{ $index + 1 }}
                                             </span>
 
-                                            <div>
+                                            <div class="text-center">
                                                 <div class="font-semibold text-lg text-gray-900">{{ $item->alternatif }}
                                                 </div>
                                                 @if($index === 0)
@@ -268,24 +348,82 @@
                                     </td>
 
                                     <!-- Nilai Akhir -->
-                                    <td class="py-4 px-3 align-middle text-center">
+                                    <td class="py-4 px-3 border-r border-gray-200 align-middle text-center">
                                         <span class="px-4 py-3 rounded-full text-lg font-bold text-white" style="background: linear-gradient(135deg, 
-                                                                @if($index === 0) #f59e0b, #d97706
-                                                                @elseif($index === 1) #6366f1, #4f46e5
-                                                                @elseif($index === 2) #ef4444, #dc2626
-                                                                @else #10b981, #059669 @endif); 
-                                                                box-shadow: 0 4px 15px rgba(
-                                                                    @if($index === 0) 245, 158, 11, 0.3
-                                                                    @elseif($index === 1) 99, 102, 241, 0.3
-                                                                    @elseif($index === 2) 239, 68, 68, 0.3
-                                                                    @else 16, 185, 129, 0.3 @endif);">
-                                            {{ $item->nilai }}
+                                                    @if($index === 0) #f59e0b, #d97706
+                                                    @elseif($index === 1) #6366f1, #4f46e5
+                                                    @elseif($index === 2) #ef4444, #dc2626
+                                                    @else #10b981, #059669 @endif); 
+                                                    box-shadow: 0 4px 15px rgba(
+                                                        @if($index === 0) 245, 158, 11, 0.3
+                                                        @elseif($index === 1) 99, 102, 241, 0.3
+                                                        @elseif($index === 2) 239, 68, 68, 0.3
+                                                        @else 16, 185, 129, 0.3 @endif);">
+                                            {{ $nilaiDisplay }}
                                         </span>
+                                    </td>
+
+                                    <!-- Keterangan Status -->
+                                    <td class="py-4 px-3 align-middle text-center">
+                                        @if($status === 'diterima')
+                                            <span class="status-diterima">
+                                                <i class="ri-checkbox-circle-line"></i>
+                                                DITERIMA
+                                            </span>
+                                        @else
+                                            <span class="status-tidak-diterima">
+                                                <i class="ri-close-circle-line"></i>
+                                                TIDAK DITERIMA
+                                            </span>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+
+                {{-- Statistik Status --}}
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    @php
+                        $totalDiterima = collect($nilaiAkhir)->filter(function ($item) {
+                            $nilai = isset($item->nilai_raw) ? $item->nilai_raw : (is_numeric($item->nilai) ? (float) $item->nilai : 0.0);
+                            return $nilai >= 0.75;
+                        })->count();
+                        $totalTidakDiterima = collect($nilaiAkhir)->count() - $totalDiterima;
+                    @endphp
+
+                    <div class="p-6 rounded-xl text-sm text-white"
+                        style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="ri-checkbox-circle-line text-2xl"></i>
+                            <span class="font-bold text-lg">Status DITERIMA</span>
+                        </div>
+                        <p class="text-green-100">{{ $totalDiterima }} alternatif dengan nilai ≥ 0.75</p>
+                        <div class="mt-3">
+                            <div class="bg-white bg-opacity-30 rounded-full h-3">
+                                <div class="bg-white rounded-full h-3"
+                                    style="width: {{ $nilaiAkhir->count() > 0 ? ($totalDiterima / $nilaiAkhir->count()) * 100 : 0 }}%">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 rounded-xl text-sm text-white"
+                        style="background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="ri-close-circle-line text-2xl"></i>
+                            <span class="font-bold text-lg">Status TIDAK DITERIMA</span>
+                        </div>
+                        <p class="text-red-100">{{ $totalTidakDiterima }} alternatif dengan nilai < 0.75</p>
+                                <div class="mt-3">
+                                    <div class="bg-white bg-opacity-30 rounded-full h-3">
+                                        <div class="bg-white rounded-full h-3"
+                                            style="width: {{ $nilaiAkhir->count() > 0 ? ($totalTidakDiterima / $nilaiAkhir->count()) * 100 : 0 }}%">
+                                        </div>
+                                    </div>
+                                </div>
+                    </div>
                 </div>
 
                 <!-- Info Cards -->
@@ -294,11 +432,11 @@
                         style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);">
                         <div class="flex items-center gap-2 mb-3">
                             <i class="ri-trophy-line text-2xl"></i>
-                            <span class="font-bold text-lg">Peringkat Teratas</span>
+                            <span class="font-bold text-lg">Syarat Penerimaan BPNT</span>
                         </div>
                         <p class="text-yellow-100">
-                            Alternatif dengan nilai tertinggi dan performa terbaik sesuai kriteria yang ditetapkan dalam
-                            sistem BPNT.
+                            Alternatif dengan nilai ≥ 0.75 berstatus <strong>DITERIMA</strong>,
+                            nilai < 0.75 berstatus <strong>TIDAK DITERIMA</strong>
                         </p>
                     </div>
 
@@ -331,25 +469,26 @@
                     style="background: linear-gradient(135deg, #06b6d4, #0891b2); box-shadow: 0 8px 25px rgba(6, 182, 212, 0.3);">
                     <h3 class="font-bold text-xl mb-4 flex items-center gap-2">
                         <i class="ri-information-line text-2xl"></i>
-                        Interpretasi Nilai Akhir
+                        Interpretasi Nilai Akhir & Status
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <h4 class="font-semibold mb-2 text-cyan-100">Kategori Nilai:</h4>
                             <ul class="space-y-1 text-cyan-100">
-                                <li><strong>0.8 - 1.0:</strong> Sangat Baik - Sangat layak menerima BPNT</li>
-                                <li><strong>0.6 - 0.8:</strong> Baik - Layak menerima BPNT</li>
-                                <li><strong>0.4 - 0.6:</strong> Cukup - Dapat dipertimbangkan</li>
-                                <li><strong>0.2 - 0.4:</strong> Kurang - Prioritas rendah</li>
+                                <li><strong>0.8 - 1.0:</strong> Sangat Baik</li>
+                                <li><strong>0.75 - 0.8:</strong> Baik (DITERIMA)</li>
+                                <li><strong>0.6 - 0.75:</strong> Cukup (TIDAK DITERIMA)</li>
+                                <li><strong>
+                                        < 0.6:</strong> Kurang (TIDAK DITERIMA)</li>
                             </ul>
                         </div>
                         <div>
-                            <h4 class="font-semibold mb-2 text-cyan-100">Metodologi:</h4>
+                            <h4 class="font-semibold mb-2 text-cyan-100">Status & Metodologi:</h4>
                             <ul class="space-y-1 text-cyan-100">
-                                <li>• Nilai dihitung berdasarkan normalisasi utility</li>
-                                <li>• Pembobotan menggunakan metode ROC (Rank Order Centroid)</li>
-                                <li>• Semakin tinggi nilai, semakin baik alternatif</li>
+                                <li>🟢 Status DITERIMA: Nilai ≥ 0.75</li>
+                                <li>🔴 Status TIDAK DITERIMA: Nilai < 0.75</li>
                                 <li>• Ranking otomatis berdasarkan nilai tertinggi</li>
+                                <li>• Batas minimum penerimaan: 0.75</li>
                             </ul>
                         </div>
                     </div>
@@ -389,65 +528,75 @@
     </footer>
 
     <script>
-     $(document).ready(function () {
-    // Inisialisasi DataTable dengan error handling
-    function initializeDataTable(tableId) {
-        try {
-            if ($.fn.DataTable.isDataTable('#' + tableId)) {
-                $('#' + tableId).DataTable().destroy();
-            }
-            
-            // Hitung jumlah kolom dari header
-            var columnCount = $('#' + tableId + ' thead tr:first th').length;
-            
-            // Validasi konsistensi kolom
-            var isValidTable = true;
-            $('#' + tableId + ' tbody tr').each(function() {
-                var rowColumnCount = $(this).find('td').length;
-                if (rowColumnCount !== columnCount) {
-                    console.warn('Table ' + tableId + ' has inconsistent column count. Header: ' + columnCount + ', Row: ' + rowColumnCount);
-                    isValidTable = false;
-                }
-            });
-            
-            if (isValidTable) {
-                $('#' + tableId).DataTable({
-                    responsive: {
-                        details: {
-                            type: 'column',
-                            target: 'tr',
-                        },
-                    },
-                    order: [],
-                    pagingType: 'full_numbers',
-                    columnDefs: [
-                        { targets: '_all', className: 'text-center' }
-                    ],
-                    language: {
-                        emptyTable: "Tidak ada data yang tersedia",
-                        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entries",
-                        infoEmpty: "Menampilkan 0 sampai 0 dari 0 entries",
-                        infoFiltered: "(disaring dari _MAX_ total entries)",
-                        lengthMenu: "Tampilkan _MENU_ entries",
-                        loadingRecords: "Memuat...",
-                        processing: "Sedang memproses...",
-                        search: "Cari:",
-                        zeroRecords: "Tidak ditemukan data yang sesuai",
-                        paginate: {
-                            first: "Pertama",
-                            last: "Terakhir",
-                            next: "Selanjutnya",
-                            previous: "Sebelumnya"
-                        }
+        $(document).ready(function () {
+            // Inisialisasi DataTable dengan error handling
+            function initializeDataTable(tableId) {
+                try {
+                    if ($.fn.DataTable.isDataTable('#' + tableId)) {
+                        $('#' + tableId).DataTable().destroy();
                     }
-                });
-            } else {
-                console.error('Skipping DataTable initialization for ' + tableId + ' due to column mismatch');
+
+                    // Hitung jumlah kolom dari header
+                    var columnCount = $('#' + tableId + ' thead tr:first th').length;
+
+                    // Validasi konsistensi kolom
+                    var isValidTable = true;
+                    $('#' + tableId + ' tbody tr').each(function () {
+                        var rowColumnCount = $(this).find('td').length;
+                        if (rowColumnCount !== columnCount) {
+                            console.warn('Table ' + tableId + ' has inconsistent column count. Header: ' + columnCount + ', Row: ' + rowColumnCount);
+                            isValidTable = false;
+                        }
+                    });
+
+                    if (isValidTable) {
+                        $('#' + tableId).DataTable({
+                            responsive: {
+                                details: {
+                                    type: 'column',
+                                    target: 'tr',
+                                },
+                            },
+                            order: [],
+                            pagingType: 'full_numbers',
+                            columnDefs: [
+                                { width: "12%", targets: 0 },   // Kode
+                                { width: "18%", targets: 1 },   // NIK
+                                { width: "35%", targets: 2 },   // Alternatif
+                                { width: "15%", targets: 3 },   // Nilai Akhir
+                                { width: "20%", targets: 4 },   // Keterangan
+                                { className: "text-center", targets: [0, 1, 2, 3, 4] }
+                            ],
+                            autoWidth: false,
+                            language: {
+                                emptyTable: "Tidak ada data yang tersedia",
+                                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entries",
+                                infoEmpty: "Menampilkan 0 sampai 0 dari 0 entries",
+                                infoFiltered: "(disaring dari _MAX_ total entries)",
+                                lengthMenu: "Tampilkan _MENU_ entries",
+                                loadingRecords: "Memuat...",
+                                processing: "Sedang memproses...",
+                                search: "Cari:",
+                                zeroRecords: "Tidak ditemukan data yang sesuai",
+                                paginate: {
+                                    first: "Pertama",
+                                    last: "Terakhir",
+                                    next: "Selanjutnya",
+                                    previous: "Sebelumnya"
+                                }
+                            }
+                        });
+                    } else {
+                        console.error('Skipping DataTable initialization for ' + tableId + ' due to column mismatch');
+                    }
+                } catch (error) {
+                    console.error('Error initializing DataTable for ' + tableId + ':', error);
+                }
             }
-        } catch (error) {
-            console.error('Error initializing DataTable for ' + tableId + ':', error);
-        }
-    }
+
+            // Inisialisasi DataTable untuk tabel hasil akhir
+            initializeDataTable('myTable');
+        });
     </script>
 
 </body>

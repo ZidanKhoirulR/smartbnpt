@@ -6,10 +6,12 @@ use App\Models\Alternatif;
 use App\Models\Kriteria;
 use App\Models\NilaiAkhir;
 use App\Models\SubKriteria;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     const MAX_RECIPIENTS = 150; // Konstanta untuk batasan penerima
+    const THRESHOLD_VALUE = 0.75; // Konstanta untuk threshold penerimaan
 
     public function index()
     {
@@ -28,14 +30,14 @@ class DashboardController extends Controller
     {
         $title = "Hasil Akhir";
 
-        // Query dengan ranking dan tie-breaking
+        // Query dengan ranking dan status berdasarkan threshold 0.75
         $nilaiAkhir = NilaiAkhir::query()
             ->join('alternatif as a', 'a.id', '=', 'nilai_akhir.alternatif_id')
             ->selectRaw("
                 a.kode, 
                 a.nik,
                 a.alternatif, 
-                SUM(nilai_akhir.nilai) as nilai,
+                CAST(SUM(nilai_akhir.nilai) AS DECIMAL(10,4)) as nilai,
                 ROW_NUMBER() OVER (ORDER BY SUM(nilai_akhir.nilai) DESC, a.created_at ASC) as ranking
             ")
             ->groupBy('a.kode', 'a.nik', 'a.alternatif', 'a.created_at')
@@ -43,8 +45,13 @@ class DashboardController extends Controller
             ->orderBy('a.created_at', 'asc') // Tie-breaker
             ->get()
             ->map(function ($item) {
-                // Tentukan status berdasarkan ranking
-                $item->status = $item->ranking <= self::MAX_RECIPIENTS ? 'Diterima' : 'Tidak Diterima';
+                // Tentukan status berdasarkan threshold 0.75
+                $nilai = (float) $item->nilai;
+                $item->status = $nilai >= self::THRESHOLD_VALUE ? 'DITERIMA' : 'TIDAK DITERIMA';
+
+                // Format nilai untuk display yang konsisten
+                $item->nilai = number_format($nilai, 4);
+
                 return $item;
             });
 
@@ -61,7 +68,7 @@ class DashboardController extends Controller
                 a.kode, 
                 a.nik,
                 a.alternatif, 
-                SUM(nilai_akhir.nilai) as nilai
+                CAST(SUM(nilai_akhir.nilai) AS DECIMAL(10,4)) as nilai
             ")
             ->groupBy('a.kode', 'a.nik', 'a.alternatif')
             ->first();
@@ -73,7 +80,7 @@ class DashboardController extends Controller
         // Hitung ranking
         $ranking = NilaiAkhir::query()
             ->join('alternatif as a2', 'a2.id', '=', 'nilai_akhir.alternatif_id')
-            ->selectRaw("SUM(nilai_akhir.nilai) as total_nilai, a2.created_at")
+            ->selectRaw("CAST(SUM(nilai_akhir.nilai) AS DECIMAL(10,4)) as total_nilai, a2.created_at")
             ->groupBy('a2.id', 'a2.created_at')
             ->havingRaw(
                 'total_nilai > ? OR (total_nilai = ? AND a2.created_at < (SELECT created_at FROM alternatif WHERE nik = ?))',
@@ -82,8 +89,104 @@ class DashboardController extends Controller
             ->count() + 1;
 
         $result->ranking = $ranking;
-        $result->status = $ranking <= self::MAX_RECIPIENTS ? 'Diterima' : 'Tidak Diterima';
+
+        // Status berdasarkan threshold, bukan ranking
+        $nilai = (float) $result->nilai;
+        $result->status = $nilai >= self::THRESHOLD_VALUE ? 'DITERIMA' : 'TIDAK DITERIMA';
+
+        // Format nilai untuk display
+        $result->nilai = number_format($nilai, 4);
 
         return $result;
+    }
+
+    // Method untuk mendapatkan statistik hasil akhir
+    public function getStatistikHasilAkhir()
+    {
+        $nilaiAkhir = NilaiAkhir::query()
+            ->join('alternatif as a', 'a.id', '=', 'nilai_akhir.alternatif_id')
+            ->selectRaw("
+                a.kode, 
+                a.nik,
+                a.alternatif, 
+                CAST(SUM(nilai_akhir.nilai) AS DECIMAL(10,4)) as nilai
+            ")
+            ->groupBy('a.kode', 'a.nik', 'a.alternatif')
+            ->get();
+
+        $totalAlternatif = $nilaiAkhir->count();
+        $totalDiterima = $nilaiAkhir->filter(function ($item) {
+            return (float) $item->nilai >= self::THRESHOLD_VALUE;
+        })->count();
+        $totalTidakDiterima = $totalAlternatif - $totalDiterima;
+
+        $persentaseDiterima = $totalAlternatif > 0 ? ($totalDiterima / $totalAlternatif) * 100 : 0;
+
+        return [
+            'total_alternatif' => $totalAlternatif,
+            'total_diterima' => $totalDiterima,
+            'total_tidak_diterima' => $totalTidakDiterima,
+            'persentase_diterima' => number_format($persentaseDiterima, 1),
+            'threshold' => self::THRESHOLD_VALUE
+        ];
+    }
+
+    // Method untuk validasi data hasil akhir
+    public function validateHasilAkhir()
+    {
+        try {
+            // Cek apakah ada data nilai akhir
+            $nilaiAkhirCount = NilaiAkhir::count();
+            if ($nilaiAkhirCount === 0) {
+                return [
+                    'valid' => false,
+                    'message' => 'Tidak ada data nilai akhir. Silakan lakukan perhitungan terlebih dahulu.',
+                    'data' => []
+                ];
+            }
+
+            // Cek konsistensi data
+            $alternatifCount = Alternatif::count();
+            $alternatifWithNilai = NilaiAkhir::distinct('alternatif_id')->count('alternatif_id');
+
+            if ($alternatifCount !== $alternatifWithNilai) {
+                return [
+                    'valid' => false,
+                    'message' => "Inkonsistensi data: {$alternatifCount} alternatif tetapi hanya {$alternatifWithNilai} yang memiliki nilai akhir.",
+                    'data' => [
+                        'total_alternatif' => $alternatifCount,
+                        'alternatif_dengan_nilai' => $alternatifWithNilai
+                    ]
+                ];
+            }
+
+            // Cek apakah ada nilai null atau invalid
+            $invalidNilai = NilaiAkhir::whereNull('nilai')
+                ->orWhere('nilai', '')
+                ->orWhere('nilai', '<', 0)
+                ->orWhere('nilai', '>', 1)
+                ->count();
+
+            if ($invalidNilai > 0) {
+                return [
+                    'valid' => false,
+                    'message' => "Ditemukan {$invalidNilai} nilai akhir yang tidak valid (null, kosong, atau di luar rentang 0-1).",
+                    'data' => ['invalid_nilai_count' => $invalidNilai]
+                ];
+            }
+
+            return [
+                'valid' => true,
+                'message' => 'Data hasil akhir valid dan siap ditampilkan.',
+                'data' => $this->getStatistikHasilAkhir()
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'valid' => false,
+                'message' => 'Error saat validasi data: ' . $e->getMessage(),
+                'data' => []
+            ];
+        }
     }
 }
