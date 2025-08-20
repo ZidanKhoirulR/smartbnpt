@@ -218,7 +218,7 @@
                 return false;
             }
 
-                      showValidationSuccess($input);
+            showValidationSuccess($input);
             return true;
         }
 
@@ -265,11 +265,7 @@
 
             // Add error message
             const errorHtml = `
-                <div class="label validation-message">
-                    <span class="label-text-alt text-sm text-red-500">
-                        <i class="ri-error-warning-line mr-1"></i>${message}
-                    </span>
-                </div>
+                <div class="validation-message text-red-500 text-xs mt-1">${message}</div>
             `;
             $formControl.append(errorHtml);
         }
@@ -301,20 +297,39 @@
 
         // Enhanced notification
         function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            document.querySelectorAll('.toast-notification').forEach(toast => toast.remove());
+
             const toast = document.createElement('div');
-            toast.className = `alert alert-${type} fixed top-4 right-4 w-auto z-50 shadow-lg`;
+            toast.className = `toast-notification alert alert-${type} fixed top-4 right-4 w-auto max-w-sm z-50 shadow-lg animate-pulse`;
+
+            const iconMap = {
+                'success': 'ri-checkbox-circle-line',
+                'error': 'ri-error-warning-line',
+                'warning': 'ri-alert-line',
+                'info': 'ri-information-line'
+            };
+
             toast.innerHTML = `
                 <div class="flex items-center gap-2">
-                    <i class="ri-${type === 'error' ? 'error-warning' : 'information'}-line"></i>
-                    <span>${message}</span>
+                    <i class="${iconMap[type] || iconMap.info}"></i>
+                    <span class="text-sm">${message}</span>
+                    <button class="btn btn-ghost btn-xs ml-2" onclick="this.parentElement.parentElement.remove()">
+                        <i class="ri-close-line"></i>
+                    </button>
                 </div>
             `;
 
             document.body.appendChild(toast);
 
+            // Auto-dismiss after 5 seconds
             setTimeout(() => {
-                toast.remove();
-            }, 3000);
+                if (toast.parentNode) {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(100%)';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 5000);
         }
 
         // Form submission validation
@@ -346,10 +361,10 @@
             const originalText = $submitBtn.html();
             $submitBtn.html('<span class="loading loading-spinner loading-sm"></span> Menyimpan...').prop('disabled', true);
 
-            // Restore button after 3 seconds (fallback)
+            // Restore button after 10 seconds (fallback)
             setTimeout(() => {
                 $submitBtn.html(originalText).prop('disabled', false);
-            }, 3000);
+            }, 10000);
         });
     </script>
 @endsection
@@ -443,6 +458,26 @@
     .table-container tfoot td.total-value {
         text-align: center !important;
     }
+
+    /* MODAL TOP POSITIONING - sama seperti kriteria */
+    .modal {
+        align-items: flex-start !important;
+        padding-top: 2rem !important;
+    }
+
+    .modal-box {
+        margin-top: 0 !important;
+        margin-bottom: auto !important;
+        position: relative !important;
+        transform: none !important;
+    }
+
+    /* Responsive adjustment */
+    @media (max-height: 600px) {
+        .modal {
+            padding-top: 1rem !important;
+        }
+    }
 </style>
 @endsection
 
@@ -461,11 +496,11 @@
             {{-- Awal Modal Create --}}
             <input type="checkbox" id="create_sub_kriteria" class="modal-toggle" />
             <div class="modal" role="dialog">
-                <div class="modal-box max-w-2xl">
-                    <div class="mb-3 flex justify-between">
-                        <h3 class="text-lg font-bold">Tambah {{ $title }}</h3>
+                <div class="modal-box w-96 max-w-lg">
+                    <div class="mb-2 flex justify-between items-center">
+                        <h3 class="text-sm font-bold">Tambah {{ $title }}</h3>
                         <label for="create_sub_kriteria" class="cursor-pointer">
-                            <i class="ri-close-large-fill"></i>
+                            <i class="ri-close-large-fill text-sm"></i>
                         </label>
                     </div>
                     <div>
@@ -474,15 +509,15 @@
                             @csrf
                             <input type="hidden" name="id">
 
-                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <div class="space-y-1">
                                 {{-- Kriteria --}}
                                 <label class="form-control w-full">
-                                    <div class="label">
-                                        <span class="label-text font-semibold">
+                                    <div class="label py-0.5">
+                                        <span class="label-text text-xs font-semibold">
                                             <x-label-input-required>Kriteria</x-label-input-required>
                                         </span>
                                     </div>
-                                    <select name="kriteria_id" class="select select-bordered w-full text-primary-color"
+                                    <select name="kriteria_id" class="select select-bordered select-xs w-full text-primary-color text-xs"
                                         required>
                                         <option value="" disabled selected>Pilih Kriteria!</option>
                                         @foreach ($kriteria as $item)
@@ -491,55 +526,38 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                    @error('kriteria_id')
-                                        <div class="label">
-                                            <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                                        </div>
-                                    @enderror
+                                </label>
+
+                                {{-- Sub Kriteria --}}
+                                <label class="form-control w-full">
+                                    <div class="label py-0.5">
+                                        <span class="label-text text-xs font-semibold">
+                                            <x-label-input-required>Sub Kriteria</x-label-input-required>
+                                        </span>
+                                    </div>
+                                    <input type="text" name="sub_kriteria"
+                                        class="input input-bordered input-xs w-full text-primary-color text-xs"
+                                        value="{{ old('sub_kriteria') }}" placeholder="Contoh: Sangat Baik" required />
                                 </label>
 
                                 {{-- Bobot --}}
                                 <label class="form-control w-full">
-                                    <div class="label">
-                                        <span class="label-text font-semibold">
+                                    <div class="label py-0.5">
+                                        <span class="label-text text-xs font-semibold">
                                             <x-label-input-required>Bobot (%)</x-label-input-required>
                                         </span>
-                                        <span class="label-text-alt text-xs text-gray-500">Nilai numerik untuk
-                                            perhitungan</span>
                                     </div>
                                     <input type="number" min="0" max="100" step="0.01" name="bobot"
-                                        class="input input-bordered w-full text-primary-color" value="{{ old('bobot') }}"
-                                        placeholder="0-100" required />
-                                    @error('bobot')
-                                        <div class="label">
-                                            <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                                        </div>
-                                    @enderror
+                                        class="input input-bordered input-xs w-full text-primary-color text-xs"
+                                        value="{{ old('bobot') }}" placeholder="0-100" required />
                                 </label>
                             </div>
 
-                            {{-- Sub Kriteria --}}
-                            <label class="form-control w-full">
-                                <div class="label">
-                                    <span class="label-text font-semibold">
-                                        <x-label-input-required>Sub Kriteria</x-label-input-required>
-                                    </span>
-                                </div>
-                                <input type="text" name="sub_kriteria"
-                                    class="input input-bordered w-full text-primary-color" value="{{ old('sub_kriteria') }}"
-                                    placeholder="Contoh: Sangat Baik, Baik, Cukup" required />
-                                @error('sub_kriteria')
-                                    <div class="label">
-                                        <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                                    </div>
-                                @enderror
-                            </label>
-
                             <button type="submit"
-                                class="mt-4 w-full text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 hover:opacity-90"
-                                style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);">
+                                class="mt-2 w-full text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 hover:opacity-90"
+                                style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
                                 <i class="ri-save-line"></i>
-                                Simpan Sub Kriteria
+                                Simpan
                             </button>
                         </form>
                     </div>
@@ -550,11 +568,11 @@
             {{-- Awal Modal Edit --}}
             <input type="checkbox" id="edit_sub_kriteria" class="modal-toggle" />
             <div class="modal" role="dialog">
-                <div class="modal-box max-w-2xl">
-                    <div class="mb-3 flex justify-between">
-                        <h3 class="text-lg font-bold">Ubah {{ $title }}</h3>
+                <div class="modal-box w-96 max-w-lg">
+                    <div class="mb-2 flex justify-between items-center">
+                        <h3 class="text-sm font-bold">Ubah {{ $title }}</h3>
                         <label for="edit_sub_kriteria" class="cursor-pointer">
-                            <i class="ri-close-large-fill"></i>
+                            <i class="ri-close-large-fill text-sm"></i>
                         </label>
                     </div>
                     <div>
@@ -564,60 +582,50 @@
                             <input type="hidden" name="id">
                             <input type="hidden" name="kriteria_id">
 
-                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <div class="space-y-1">
                                 {{-- Kriteria (read-only) --}}
                                 <label class="form-control w-full">
-                                    <div class="label">
-                                        <span class="label-text font-semibold">
-                                            Kriteria
-                                        </span>
+                                    <div class="label py-0.5">
+                                        <span class="label-text text-xs font-semibold">Kriteria</span>
                                         <span class="label-text-alt" id="loading_edit1"></span>
                                     </div>
                                     <input type="text" name="kriteria_nama"
-                                        class="input input-bordered w-full cursor-default bg-slate-100 text-primary-color"
+                                        class="input input-bordered input-xs w-full cursor-default bg-slate-100 text-primary-color text-xs"
                                         readonly />
+                                </label>
+
+                                {{-- Sub Kriteria --}}
+                                <label class="form-control w-full">
+                                    <div class="label py-0.5">
+                                        <span class="label-text text-xs font-semibold">
+                                            <x-label-input-required>Sub Kriteria</x-label-input-required>
+                                        </span>
+                                        <span class="label-text-alt" id="loading_edit2"></span>
+                                    </div>
+                                    <input type="text" name="sub_kriteria"
+                                        class="input input-bordered input-xs w-full text-primary-color text-xs"
+                                        placeholder="Contoh: Sangat Baik" required />
                                 </label>
 
                                 {{-- Bobot --}}
                                 <label class="form-control w-full">
-                                    <div class="label">
-                                        <span class="label-text font-semibold">
+                                    <div class="label py-0.5">
+                                        <span class="label-text text-xs font-semibold">
                                             <x-label-input-required>Bobot (%)</x-label-input-required>
                                         </span>
-                                        <span class="label-text-alt" id="loading_edit2"></span>
+                                        <span class="label-text-alt" id="loading_edit3"></span>
                                     </div>
                                     <input type="number" min="0" max="100" step="0.01" name="bobot"
-                                        class="input input-bordered w-full text-primary-color" required />
-                                    @error('bobot')
-                                        <div class="label">
-                                            <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                                        </div>
-                                    @enderror
+                                        class="input input-bordered input-xs w-full text-primary-color text-xs"
+                                        placeholder="0-100" required />
                                 </label>
                             </div>
 
-                            {{-- Sub Kriteria --}}
-                            <label class="form-control w-full">
-                                <div class="label">
-                                    <span class="label-text font-semibold">
-                                        <x-label-input-required>Sub Kriteria</x-label-input-required>
-                                    </span>
-                                    <span class="label-text-alt" id="loading_edit3"></span>
-                                </div>
-                                <input type="text" name="sub_kriteria"
-                                    class="input input-bordered w-full text-primary-color" required />
-                                @error('sub_kriteria')
-                                    <div class="label">
-                                        <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                                    </div>
-                                @enderror
-                            </label>
-
                             <button type="submit"
-                                class="mt-4 w-full text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 hover:opacity-90"
-                                style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);">
+                                class="mt-2 w-full text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 hover:opacity-90"
+                                style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
                                 <i class="ri-refresh-line"></i>
-                                Perbarui Sub Kriteria
+                                Perbarui
                             </button>
                         </form>
                     </div>
@@ -625,7 +633,7 @@
             </div>
             {{-- Akhir Modal Edit --}}
 
-            {{-- Tabel Sub Kriteria --}}
+              {{-- Tabel Sub Kriteria --}}
             @foreach ($kriteria as $kri)
                 <div
                     class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">

@@ -7,6 +7,7 @@ use App\Models\Kriteria;
 use App\Models\NilaiAkhir;
 use App\Models\NilaiUtility;
 use App\Models\NormalisasiBobot;
+use App\Helpers\SMARTERHelper;
 use App\Models\Penilaian;
 use Barryvdh\DomPDF\Facade\PDF;
 

@@ -156,3 +156,103 @@ Route::middleware(['auth'])->group(function () {
         }
     })->name('kriteria.recalculate-weights');
 });
+
+Route::get('/debug-nilai-akhir', function () {
+    try {
+        echo "<h2>Debug Data Nilai Akhir</h2>";
+
+        // 1. Cek jumlah data
+        $nilaiAkhirCount = DB::table('nilai_akhir')->count();
+        echo "<p>Total records di nilai_akhir: " . $nilaiAkhirCount . "</p>";
+
+        if ($nilaiAkhirCount === 0) {
+            echo "<p style='color: red;'>TIDAK ADA DATA di tabel nilai_akhir!</p>";
+            return;
+        }
+
+        // 2. Cek struktur data
+        echo "<h3>Sample Data (5 records pertama):</h3>";
+        $sampleData = DB::table('nilai_akhir')->limit(5)->get();
+        echo "<pre>" . json_encode($sampleData, JSON_PRETTY_PRINT) . "</pre>";
+
+        // 3. Cek tipe data kolom nilai
+        echo "<h3>Tipe Data Kolom 'nilai':</h3>";
+        $columnInfo = DB::select("DESCRIBE nilai_akhir");
+        foreach ($columnInfo as $column) {
+            if ($column->Field === 'nilai') {
+                echo "<pre>" . json_encode($column, JSON_PRETTY_PRINT) . "</pre>";
+            }
+        }
+
+        // 4. Test query manual
+        echo "<h3>Test Query Manual:</h3>";
+        try {
+            $testQuery = DB::select("
+                SELECT 
+                    a.kode,
+                    a.alternatif,
+                    na.nilai,
+                    CAST(na.nilai AS DECIMAL(10,4)) as nilai_decimal
+                FROM nilai_akhir na
+                JOIN alternatif a ON a.id = na.alternatif_id
+                LIMIT 10
+            ");
+            echo "<pre>" . json_encode($testQuery, JSON_PRETTY_PRINT) . "</pre>";
+        } catch (\Exception $e) {
+            echo "<p style='color: red;'>Error: " . $e->getMessage() . "</p>";
+        }
+
+        // 5. Test SUM query
+        echo "<h3>Test SUM Query:</h3>";
+        try {
+            $sumQuery = DB::select("
+                SELECT 
+                    a.kode,
+                    a.alternatif,
+                    SUM(CAST(na.nilai AS DECIMAL(10,4))) as total_nilai
+                FROM nilai_akhir na
+                JOIN alternatif a ON a.id = na.alternatif_id
+                GROUP BY a.id, a.kode, a.alternatif
+                ORDER BY total_nilai DESC
+                LIMIT 5
+            ");
+            echo "<pre>" . json_encode($sumQuery, JSON_PRETTY_PRINT) . "</pre>";
+        } catch (\Exception $e) {
+            echo "<p style='color: red;'>Error di SUM Query: " . $e->getMessage() . "</p>";
+        }
+
+        // 6. Cek data alternatif
+        echo "<h3>Data Alternatif:</h3>";
+        $alternatifCount = DB::table('alternatif')->count();
+        echo "<p>Total alternatif: " . $alternatifCount . "</p>";
+
+        // 7. Cek relasi
+        echo "<h3>Cek Relasi nilai_akhir dengan alternatif:</h3>";
+        $relationCheck = DB::select("
+            SELECT 
+                COUNT(*) as total_nilai_akhir,
+                COUNT(DISTINCT na.alternatif_id) as distinct_alternatif_ids,
+                COUNT(DISTINCT a.id) as valid_alternatif_relations
+            FROM nilai_akhir na
+            LEFT JOIN alternatif a ON a.id = na.alternatif_id
+        ");
+        echo "<pre>" . json_encode($relationCheck, JSON_PRETTY_PRINT) . "</pre>";
+
+    } catch (\Exception $e) {
+        echo "<p style='color: red;'>General Error: " . $e->getMessage() . "</p>";
+        echo "<pre>Stack Trace:\n" . $e->getTraceAsString() . "</pre>";
+    }
+})->name('debug.nilai-akhir');
+
+// Route untuk clear cache jika diperlukan
+Route::get('/debug-clear-cache', function () {
+    try {
+        Artisan::call('config:clear');
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+
+        return "Cache cleared successfully!";
+    } catch (\Exception $e) {
+        return "Error clearing cache: " . $e->getMessage();
+    }
+})->name('debug.clear-cache');
