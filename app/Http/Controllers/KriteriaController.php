@@ -188,41 +188,140 @@ class KriteriaController extends Controller
      */
     public function delete(Request $request)
     {
+        // Validate input
+        $request->validate([
+            'kriteria_id' => 'required|exists:kriteria,id'
+        ]);
+
         try {
             DB::beginTransaction();
 
             $kriteriaId = $request->kriteria_id;
-            $kriteria = Kriteria::findOrFail($kriteriaId);
+
+            // Check if kriteria exists
+            $kriteria = Kriteria::find($kriteriaId);
+            if (!$kriteria) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data kriteria tidak ditemukan'
+                ], 404);
+            }
+
             $deletedRanking = $kriteria->ranking;
 
             Log::info("Deleting kriteria with ID: {$kriteriaId}, ranking: {$deletedRanking}");
 
-            // Hapus relasi terkait
-            Penilaian::where('kriteria_id', $kriteriaId)->delete();
-            SubKriteria::where('kriteria_id', $kriteriaId)->delete();
-            NormalisasiBobot::where('kriteria_id', $kriteriaId)->delete();
-            NilaiUtility::where('kriteria_id', $kriteriaId)->delete();
-            NilaiAkhir::where('kriteria_id', $kriteriaId)->delete();
+            // Check if kriteria is being used in calculations
+            $hasActiveCalculations = NilaiAkhir::where('kriteria_id', $kriteriaId)->exists();
+            if ($hasActiveCalculations) {
+                Log::warning("Attempting to delete kriteria {$kriteriaId} that has active calculations");
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kriteria tidak dapat dihapus karena masih digunakan dalam perhitungan'
+                ], 422);
+            }
 
-            // Hapus kriteria
+            // Delete related records with error handling
+            try {
+                // Delete penilaian
+                $deletedPenilaian = Penilaian::where('kriteria_id', $kriteriaId)->delete();
+                Log::info("Deleted {$deletedPenilaian} penilaian records");
+
+                // Delete sub kriteria
+                $deletedSubKriteria = SubKriteria::where('kriteria_id', $kriteriaId)->delete();
+                Log::info("Deleted {$deletedSubKriteria} sub kriteria records");
+
+                // Delete normalisasi bobot
+                $deletedNormalisasi = NormalisasiBobot::where('kriteria_id', $kriteriaId)->delete();
+                Log::info("Deleted {$deletedNormalisasi} normalisasi bobot records");
+
+                // Delete nilai utility
+                $deletedUtility = NilaiUtility::where('kriteria_id', $kriteriaId)->delete();
+                Log::info("Deleted {$deletedUtility} nilai utility records");
+
+                // Delete nilai akhir
+                $deletedNilaiAkhir = NilaiAkhir::where('kriteria_id', $kriteriaId)->delete();
+                Log::info("Deleted {$deletedNilaiAkhir} nilai akhir records");
+
+            } catch (\Exception $e) {
+                Log::error('Error deleting related records: ' . $e->getMessage());
+                throw new \Exception('Gagal menghapus data terkait: ' . $e->getMessage());
+            }
+
+            // Delete the kriteria itself
             $kriteria->delete();
+            Log::info("Kriteria {$kriteriaId} successfully deleted");
 
             // Adjust ranking kriteria yang tersisa
             if ($deletedRanking) {
-                $this->adjustRankingsAfterDelete($deletedRanking);
+                try {
+                    $this->adjustRankingsAfterDelete($deletedRanking);
+                    Log::info("Rankings adjusted after deleting ranking {$deletedRanking}");
+                } catch (\Exception $e) {
+                    Log::error('Error adjusting rankings: ' . $e->getMessage());
+                    // Don't fail the entire operation for ranking adjustment issues
+                }
             }
 
             DB::commit();
 
-            return to_route('kriteria')->with('success', 'Kriteria berhasil dihapus');
+            Log::info("Kriteria deletion completed successfully");
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil dihapus'
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            Log::error('Validation error deleting kriteria: ' . json_encode($e->errors()));
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak valid',
+                'errors' => $e->errors()
+            ], 422);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            Log::error('Model not found error deleting kriteria: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Data kriteria tidak ditemukan'
+            ], 404);
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            Log::error('Database error deleting kriteria: ' . $e->getMessage(), [
+                'sql' => $e->getSql(),
+                'bindings' => $e->getBindings()
+            ]);
+
+            // Check for foreign key constraint error
+            if (str_contains($e->getMessage(), 'foreign key constraint')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak dapat dihapus karena masih digunakan di tabel lain'
+                ], 422);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan database: ' . $e->getMessage()
+            ], 500);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error deleting kriteria: ' . $e->getMessage());
-            return to_route('kriteria')->with('error', 'Kriteria gagal dihapus: ' . $e->getMessage());
+            Log::error('General error deleting kriteria: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
         }
     }
-
     /**
      * METODE BARU: Hitung bobot menggunakan ROC (Rank Order Centroid)
      * Ini untuk keperluan perhitungan internal saja, tidak disimpan ke database

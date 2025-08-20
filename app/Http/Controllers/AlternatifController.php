@@ -10,6 +10,7 @@ use App\Models\Kriteria;
 use App\Models\NilaiAkhir;
 use App\Models\NilaiUtility;
 use App\Models\Penilaian;
+use App\Models\MatriksTernormalisasi;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -104,17 +105,46 @@ class AlternatifController extends Controller
      */
     public function delete(Request $request)
     {
-        $penilaian = Penilaian::where('alternatif_id', $request->alternatif_id)->first();
-        if ($penilaian) {
+        try {
+            // Mulai transaction untuk memastikan konsistensi data
+            \DB::beginTransaction();
+
+            // Hapus data terkait berdasarkan foreign key dependencies
+            // 1. Hapus dari tabel matriks_ternormalisasi
+            MatriksTernormalisasi::where('alternatif_id', $request->alternatif_id)->delete();
+
+            // 2. Hapus dari tabel penilaian
             Penilaian::where('alternatif_id', $request->alternatif_id)->delete();
-        }
-        NilaiUtility::where('alternatif_id', $request->alternatif_id)->delete();
-        NilaiAkhir::where('alternatif_id', $request->alternatif_id)->delete();
-        $hapus = Alternatif::where('id', $request->alternatif_id)->delete();
-        if ($hapus) {
-            return to_route('alternatif')->with('success', 'Alternatif Berhasil Dihapus');
-        } else {
-            return to_route('alternatif')->with('error', 'Alternatif Gagal Dihapus');
+
+            // 3. Hapus dari tabel nilai_utility
+            NilaiUtility::where('alternatif_id', $request->alternatif_id)->delete();
+
+            // 4. Hapus dari tabel nilai_akhir
+            NilaiAkhir::where('alternatif_id', $request->alternatif_id)->delete();
+
+            // 5. Terakhir, hapus data alternatif
+            $hapus = Alternatif::where('id', $request->alternatif_id)->delete();
+
+            // Commit transaction
+            \DB::commit();
+
+            if ($hapus) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Alternatif berhasil dihapus'
+                ]);
+            } else {
+                throw new \Exception('Gagal menghapus alternatif');
+            }
+
+        } catch (\Exception $e) {
+            // Rollback transaction jika ada error
+            \DB::rollback();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Alternatif gagal dihapus: ' . $e->getMessage()
+            ], 500);
         }
     }
 

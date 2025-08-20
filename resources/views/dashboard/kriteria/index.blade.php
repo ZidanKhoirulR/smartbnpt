@@ -2,234 +2,271 @@
 
 @section("js")
     <script>
-        // Global variable untuk menyimpan ID yang akan dihapus
-            let kriteriaToDelete = null;
-
-            $(document).ready(function () {
-                $('#myTable').DataTable({
-                    responsive: {
-                        details: {
-                            type: 'column',
-                            target: 'tr',
-                        },
+        $(document).ready(function () {
+            $('#myTable').DataTable({
+                responsive: {
+                    details: {
+                        type: 'column',
+                        target: 'tr',
                     },
-                    order: [],
-                    pagingType: 'full_numbers',
-                });
-
-                // Real-time validation for all forms
-                $(document).on('input', 'input[name="ranking"]', function () {
-                    const isEditMode = $(this).closest('form').find("input[name='id']").val() !== '';
-                    if (!isEditMode) {
-                        validateRanking(this);
-                    }
-                });
-
-                $(document).on('input', 'input[name="kriteria"]', function () {
-                    validateKriteria(this);
-                });
+                },
+                order: [],
+                pagingType: 'full_numbers',
             });
 
-            function create_button() {
-                // Reset form
-                $("input[name='id']").val("");
-                $("input[name='kriteria']").val("");
-                $("input[name='ranking']").val("");
-                $("input[name='kode']").val("{{ $kode }}");
+            // Real-time validation for all forms
+            $(document).on('input', 'input[name="ranking"]', function () {
+                const isEditMode = $(this).closest('form').find("input[name='id']").val() !== '';
+                if (!isEditMode) {
+                    validateRanking(this);
+                }
+            });
 
-                // Reset radio buttons
-                $("input[name='jenis_kriteria']").prop('checked', false);
-                $("#benefit_create").prop("checked", true);
+            $(document).on('input', 'input[name="kriteria"]', function () {
+                validateKriteria(this);
+            });
+        });
 
-                // Reset validation styling
-                resetValidation();
+        function create_button() {
+            // Reset form
+            $("input[name='id']").val("");
+            $("input[name='kriteria']").val("");
+            $("input[name='ranking']").val("");
+            $("input[name='kode']").val("{{ $kode }}");
 
-                // Auto focus on first input
-                setTimeout(() => {
-                    $("#create_button").closest('.modal').find("input[name='ranking']").focus();
-                }, 200);
-            }
+            // Reset radio buttons
+            $("input[name='jenis_kriteria']").prop('checked', false);
+            $("#benefit_create").prop("checked", true);
 
-            function edit_button(kriteria_id) {
-                console.log('Editing kriteria ID:', kriteria_id);
+            // Reset validation styling
+            resetValidation();
 
-                // Show loading
-                showLoadingState();
+            // Auto focus on first input
+            setTimeout(() => {
+                $("#create_button").closest('.modal').find("input[name='ranking']").focus();
+            }, 200);
+        }
 
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route("kriteria.edit") }}",
-                    data: {
-                        "_token": "{{ csrf_token() }}",
-                        "kriteria_id": kriteria_id
-                    },
-                    dataType: 'json',
-                    beforeSend: function () {
-                        console.log('Sending AJAX request to edit kriteria');
-                    },
-                    success: function (response) {
-                        console.log('Edit response received:', response);
+        function edit_button(kriteria_id) {
+            console.log('Editing kriteria ID:', kriteria_id);
 
-                        // Handle both resource wrapper and direct response
-                        const data = response.data || response;
+            // Show loading
+            showLoadingState();
 
-                        if (data && data.id) {
-                            // Populate form
-                            $("input[name='id']").val(data.id);
-                            $("input[name='kode']").val(data.kode);
-                            $("input[name='kriteria']").val(data.kriteria);
+            $.ajax({
+                type: "GET",
+                url: "{{ route("kriteria.edit") }}",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "kriteria_id": kriteria_id
+                },
+                dataType: 'json',
+                beforeSend: function () {
+                    console.log('Sending AJAX request to edit kriteria');
+                },
+                success: function (response) {
+                    console.log('Edit response received:', response);
 
-                            // Set ranking - pastikan ada ranking
-                            if (data.ranking) {
-                                $("#ranking_display").text(data.ranking);
-                                $("#ranking_hidden").val(data.ranking);
-                            } else {
-                                $("#ranking_display").text('-');
-                                $("#ranking_hidden").val('');
-                            }
+                    // Handle both resource wrapper and direct response
+                    const data = response.data || response;
 
-                            // Set radio button - reset first
-                            $("input[name='jenis_kriteria']").prop('checked', false);
+                    if (data && data.id) {
+                        // Populate form
+                        $("input[name='id']").val(data.id);
+                        $("input[name='kode']").val(data.kode);
+                        $("input[name='kriteria']").val(data.kriteria);
 
-                            if (data.jenis_kriteria == "benefit") {
-                                $("#benefit_edit").prop("checked", true);
-                            } else if (data.jenis_kriteria == "cost") {
-                                $("#cost_edit").prop("checked", true);
-                            }
-
-                            // Hide loading
-                            hideLoadingState();
-
-                            // Reset validation
-                            resetValidation();
-
-                            // Validate current values
-                            if ($("input[name='kriteria']").length > 0) {
-                                validateKriteria($("input[name='kriteria']")[0]);
-                            }
-
-                            showNotification('Data kriteria berhasil dimuat', 'success');
+                        // Set ranking - pastikan ada ranking
+                        if (data.ranking) {
+                            $("#ranking_display").text(data.ranking);
+                            $("#ranking_hidden").val(data.ranking);
                         } else {
-                            hideLoadingState();
-                            showNotification('Data tidak lengkap dari server', 'error');
-                            console.error('Incomplete data from server:', response);
+                            $("#ranking_display").text('-');
+                            $("#ranking_hidden").val('');
                         }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('AJAX Error details:', {
-                            status: status,
-                            error: error,
-                            responseText: xhr.responseText,
-                            statusCode: xhr.status,
-                            url: "{{ route("kriteria.edit") }}"
-                        });
 
+                        // Set radio button - reset first
+                        $("input[name='jenis_kriteria']").prop('checked', false);
+
+                        if (data.jenis_kriteria == "benefit") {
+                            $("#benefit_edit").prop("checked", true);
+                        } else if (data.jenis_kriteria == "cost") {
+                            $("#cost_edit").prop("checked", true);
+                        }
+
+                        // Hide loading
                         hideLoadingState();
 
-                        let errorMessage = 'Gagal memuat data kriteria';
+                        // Reset validation
+                        resetValidation();
 
-                        try {
-                            const errorResponse = JSON.parse(xhr.responseText);
-                            errorMessage = errorResponse.error || errorResponse.message || errorMessage;
-                        } catch (e) {
-                            console.error('Failed to parse error response');
+                        // Validate current values
+                        if ($("input[name='kriteria']").length > 0) {
+                            validateKriteria($("input[name='kriteria']")[0]);
                         }
 
-                        if (xhr.status === 404) {
-                            errorMessage = 'Data kriteria tidak ditemukan';
-                        } else if (xhr.status === 500) {
-                            errorMessage = 'Terjadi kesalahan server';
-                        } else if (xhr.status === 403) {
-                            errorMessage = 'Tidak memiliki akses';
-                        } else if (xhr.status === 422) {
-                            errorMessage = 'Data tidak valid';
-                        }
-
-                        showNotification(errorMessage, 'error');
+                        showNotification('Data kriteria berhasil dimuat', 'success');
+                    } else {
+                        hideLoadingState();
+                        showNotification('Data tidak lengkap dari server', 'error');
+                        console.error('Incomplete data from server:', response);
                     }
-                });
-            }
+                },
+                error: function (xhr, status, error) {
+                    console.error('AJAX Error details:', {
+                        status: status,
+                        error: error,
+                        responseText: xhr.responseText,
+                        statusCode: xhr.status,
+                        url: "{{ route("kriteria.edit") }}"
+                    });
 
-            function delete_button(kriteria_id, kriteria_name) {
-                console.log('Preparing to delete kriteria ID:', kriteria_id);
+                    hideLoadingState();
 
-                // Simpan ID yang akan dihapus
-                kriteriaToDelete = kriteria_id;
+                    let errorMessage = 'Gagal memuat data kriteria';
 
-                // Update nama kriteria di modal
-                document.getElementById('delete_kriteria_name').textContent = kriteria_name || 'Kriteria ini';
+                    try {
+                        const errorResponse = JSON.parse(xhr.responseText);
+                        errorMessage = errorResponse.error || errorResponse.message || errorMessage;
+                    } catch (e) {
+                        console.error('Failed to parse error response');
+                    }
 
-                // Buka modal
-                document.getElementById('delete_modal').checked = true;
-            }
+                    if (xhr.status === 404) {
+                        errorMessage = 'Data kriteria tidak ditemukan';
+                    } else if (xhr.status === 500) {
+                        errorMessage = 'Terjadi kesalahan server';
+                    } else if (xhr.status === 403) {
+                        errorMessage = 'Tidak memiliki akses';
+                    } else if (xhr.status === 422) {
+                        errorMessage = 'Data tidak valid';
+                    }
 
-            // Fungsi untuk konfirmasi penghapusan
-            function confirmDelete() {
-                if (!kriteriaToDelete) {
-                    showNotification('Tidak ada data yang dipilih untuk dihapus', 'error');
-                    return;
+                    showNotification(errorMessage, 'error');
                 }
+            });
+        }
 
-                console.log('Confirming delete for kriteria ID:', kriteriaToDelete);
+        // FUNGSI DELETE YANG SUDAH DISAMAKAN DENGAN ALTERNATIF
+        function delete_button(kriteria_id) {
+            console.log('Mencoba hapus kriteria ID:', kriteria_id);
 
-                // Tutup modal
-                document.getElementById('delete_modal').checked = false;
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data yang dihapus tidak dapat dipulihkan kembali!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#6419E6',
+                cancelButtonColor: '#F87272',
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Tampilkan loading
+                    Swal.fire({
+                        title: 'Menghapus data...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
 
-                // Show loading notification
-                showNotification('Menghapus data kriteria...', 'info');
+                    // Get fresh CSRF token
+                const metaToken = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = metaToken ? metaToken.getAttribute('content') : "{{ csrf_token() }}";
+
+                console.log('Using CSRF Token:', csrfToken);
 
                 $.ajax({
                     type: "POST",
                     url: "{{ route('kriteria.delete') }}",
-                    data: {
-                        "_token": "{{ csrf_token() }}",
-                        "_method": "DELETE",
-                        "kriteria_id": kriteriaToDelete
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    dataType: 'json',
+                    data: {
+                        "_token": csrfToken,
+                        "kriteria_id": kriteria_id
+                    },
+                    timeout: 30000, // 30 second timeout
+                    beforeSend: function (xhr, settings) {
+                        console.log('=== SEBELUM KIRIM ===');
+                        console.log('URL:', settings.url);
+                        console.log('Data:', settings.data);
+                        console.log('Method:', settings.type);
+                        console.log('Headers:', xhr.getAllResponseHeaders());
+                        console.log('====================');
+                    },
                     success: function (response) {
-                        console.log('Delete response received:', response);
+                        console.log('=== BERHASIL ===');
+                        console.log('Response:', response);
+                        console.log('================');
 
-                        // Reset variable
-                        kriteriaToDelete = null;
-
-                        // Show success notification
-                        showNotification('Data kriteria berhasil dihapus', 'success');
-
-                        // Reload page to update the table
-                        setTimeout(() => {
+                        Swal.fire({
+                            title: 'Data berhasil dihapus!',
+                            icon: 'success',
+                            confirmButtonColor: '#6419E6',
+                            confirmButtonText: 'OK',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
                             window.location.reload();
-                        }, 1500);
+                        });
                     },
                     error: function (xhr, status, error) {
-                        console.error('Delete AJAX Error:', xhr.responseText);
+                        console.log('=== TERJADI ERROR ===');
+                        console.log('Status Code:', xhr.status);
+                        console.log('Status Text:', xhr.statusText);
+                        console.log('Response Text:', xhr.responseText);
+                        console.log('Error:', error);
+                        console.log('Status:', status);
+                        console.log('Ready State:', xhr.readyState);
+                        console.log('Response Headers:', xhr.getAllResponseHeaders());
+                        console.log('====================');
 
-                        // Reset variable
-                        kriteriaToDelete = null;
+                        let message = 'Data gagal dihapus!';
 
-                        let errorMessage = 'Gagal menghapus data kriteria';
-
-                        try {
-                            const errorResponse = JSON.parse(xhr.responseText);
-                            errorMessage = errorResponse.error || errorResponse.message || errorMessage;
-                        } catch (e) {
-                            console.error('Failed to parse error response');
-                        }
-
-                        if (xhr.status === 404) {
-                            errorMessage = 'Data kriteria tidak ditemukan';
-                        } else if (xhr.status === 500) {
-                            errorMessage = 'Terjadi kesalahan server';
-                        } else if (xhr.status === 403) {
-                            errorMessage = 'Tidak memiliki akses untuk menghapus';
+                        // Handle different error types
+                        if (xhr.status === 0) {
+                            message = 'Tidak dapat terhubung ke server. Periksa koneksi internet.';
+                        } else if (xhr.status === 404) {
+                            message = 'Route tidak ditemukan (404). Periksa route di web.php';
+                        } else if (xhr.status === 405) {
+                            message = 'Method tidak diizinkan (405). Route tidak mendukung POST';
+                        } else if (xhr.status === 419) {
+                            message = 'CSRF token expired. Refresh halaman dan coba lagi.';
+                            // Auto refresh on CSRF error
+                            setTimeout(() => window.location.reload(), 2000);
                         } else if (xhr.status === 422) {
-                            errorMessage = 'Data tidak dapat dihapus (mungkin masih digunakan)';
+                            message = 'Data tidak valid atau masih digunakan';
+                        } else if (xhr.status === 500) {
+                            message = 'Error server (500). Periksa log Laravel di storage/logs/laravel.log';
+
+                            // Try to parse error response for more details
+                            try {
+                                if (xhr.responseText) {
+                                    const errorResponse = JSON.parse(xhr.responseText);
+                                    if (errorResponse.message) {
+                                        message += '\n\nDetail: ' + errorResponse.message;
+                                    }
+                                }
+                            } catch (e) {
+                                console.error('Could not parse error response');
+                            }
                         }
 
-                        showNotification(errorMessage, 'error');
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: message,
+                            icon: 'error',
+                            confirmButtonColor: '#6419E6',
+                            confirmButtonText: 'OK'
+                        });
                     }
                 });
             }
+        });
+    }
 
             // Update validasi form submission - hapus validasi ranking untuk mode edit
             $(document).on('submit', 'form', function (e) {
@@ -379,14 +416,14 @@
                 };
 
                 toast.innerHTML = `
-                                                        <div class="flex items-center gap-2">
-                                                            <i class="${iconMap[type] || iconMap.info}"></i>
-                                                            <span class="text-sm">${message}</span>
-                                                            <button class="btn btn-ghost btn-xs ml-2" onclick="this.parentElement.parentElement.remove()">
-                                                                <i class="ri-close-line"></i>
-                                                            </button>
-                                                        </div>
-                                                    `;
+                                                    <div class="flex items-center gap-2">
+                                                        <i class="${iconMap[type] || iconMap.info}"></i>
+                                                        <span class="text-sm">${message}</span>
+                                                        <button class="btn btn-ghost btn-xs ml-2" onclick="this.parentElement.parentElement.remove()">
+                                                            <i class="ri-close-line"></i>
+                                                        </button>
+                                                    </div>
+                                                `;
 
                 document.body.appendChild(toast);
 
@@ -485,50 +522,36 @@
             padding: 12px 8px !important;
         }
 
-        /* UPDATE BAGIAN CSS DI INDEX.BLADE.PHP - SECTION CSS */
-
         /* Konsistensi lebar kolom - kembali ke layout tanpa kolom bobot */
         #myTable th:nth-child(1),
         #myTable td:nth-child(1) {
             width: 8%;
         }
 
-        /* No */
-
         #myTable th:nth-child(2),
         #myTable td:nth-child(2) {
             width: 12%;
         }
-
-        /* Kode */
 
         #myTable th:nth-child(3),
         #myTable td:nth-child(3) {
             width: 12%;
         }
 
-        /* Ranking */
-
         #myTable th:nth-child(4),
         #myTable td:nth-child(4) {
             width: 50%;
         }
-
-        /* Nama Kriteria */
 
         #myTable th:nth-child(5),
         #myTable td:nth-child(5) {
             width: 12%;
         }
 
-        /* Jenis */
-
         #myTable th:nth-child(6),
         #myTable td:nth-child(6) {
             width: 6%;
         }
-
-        /* Aksi */
     </style>
 @endsection
 
@@ -732,48 +755,13 @@
             </div>
             {{-- Akhir Modal Edit --}}
 
-            {{-- Awal Modal Delete --}}
-            <input type="checkbox" id="delete_modal" class="modal-toggle" />
-            <div class="modal" role="dialog">
-                <div class="modal-box w-80 max-w-xs">
-                    <div class="mb-2 flex justify-between items-center">
-                        <h3 class="text-sm font-bold text-red-600">Hapus Kriteria</h3>
-                        <label for="delete_modal" class="cursor-pointer">
-                            <i class="ri-close-large-fill text-sm"></i>
-                        </label>
-                    </div>
-                    <div class="py-4">
-                        <div class="text-center">
-                            <i class="ri-delete-bin-line text-4xl text-red-500 mb-3"></i>
-                            <p class="text-sm text-gray-600 mb-2">Apakah Anda yakin ingin menghapus kriteria ini?</p>
-                            <p class="text-xs text-red-500 mb-4 font-semibold" id="delete_kriteria_name"></p>
-                            <p class="text-xs text-gray-400">Data yang dihapus tidak dapat dikembalikan!</p>
-                        </div>
-
-                        <div class="flex gap-2 mt-6">
-                            <label for="delete_modal"
-                                class="flex-1 text-center px-3 py-2 rounded-lg text-gray-600 font-semibold cursor-pointer transition-all duration-200 hover:opacity-90 text-xs border border-gray-300">
-                                Batal
-                            </label>
-                            <button onclick="confirmDelete()"
-                                class="flex-1 text-white px-3 py-2 rounded-lg font-semibold transition-all duration-200 hover:opacity-90 text-xs"
-                                style="background: linear-gradient(135deg, #e11d48, #be185d); box-shadow: 0 4px 15px rgba(225, 29, 72, 0.3);">
-                                <i class="ri-delete-bin-line mr-1"></i>
-                                Hapus
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {{-- Akhir Modal Delete --}}
-
             {{-- Awal Tabel Kriteria --}}
             <div
                 class="relative mb-6 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid border-transparent bg-white bg-clip-border shadow-xl dark:bg-white dark:shadow-secondary-color-dark/20">
                 <div
                     class="border-b-solid mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-b-transparent p-6 pb-3">
                     <h6 class="font-bold text-primary-color dark:text-primary-color-dark">Tabel {{ $title }}</h6>
-                    <div class="w-1/2 max-w-full flex-none px-3 text-right">
+                    <div class="flex gap-2">
                         <label for="create_button"
                             class="mb-0 inline-block cursor-pointer rounded-lg px-4 py-1 text-center align-middle text-sm font-bold leading-normal tracking-tight text-white shadow-none transition-all ease-in hover:-translate-y-px hover:opacity-75 active:opacity-90 md:px-8 md:py-2"
                             onclick="return create_button()"
@@ -786,7 +774,7 @@
                 <div class="flex-auto px-0 pb-2 pt-0">
                     <div class="overflow-x-auto p-0 px-6 pb-6">
                         <table id="myTable"
-                            class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-toptext-center"
+                            class="nowrap stripe mb-3 w-full max-w-full border-collapse items-center align-top text-center"
                             style="width: 100%;">
                             <thead class="align-bottom">
                                 <tr class="text-xs font-bold uppercase text-white text-center"
@@ -845,12 +833,13 @@
                                                 style="background: linear-gradient(135deg, #8b5cf6, #a855f7); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
                                                 <i class="ri-pencil-line text-base"></i>
                                             </label>
-                                            <label for="delete_modal"
+                                            <!-- BUTTON DELETE YANG SUDAH DIUPDATE - HAPUS for="delete_modal" DAN GANTI onclick -->
+                                            <button type="button"
                                                 class="px-3 py-2 rounded-lg text-white font-semibold cursor-pointer transition-all duration-200 hover:opacity-90 text-sm inline-flex items-center"
-                                                onclick="return delete_button('{{ $item->id }}', '{{ $item->kriteria }}')"
+                                                onclick="return delete_button('{{ $item->id }}')"
                                                 style="background: linear-gradient(135deg, #e11d48, #be185d); box-shadow: 0 4px 15px rgba(225, 29, 72, 0.3);">
                                                 <i class="ri-delete-bin-line text-base"></i>
-                                            </label>
+                                            </button>
                                         </td>
                                     </tr>
                                 @endforeach
