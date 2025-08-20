@@ -465,7 +465,7 @@
             <!-- Statistics -->
             <div class="welcome-card rounded-3xl p-8 lg:p-10 mb-8 slide-in" style="animation-delay: 0.4s;">
                 <h3 class="text-3xl font-bold text-gray-900 text-center mb-8">Keunggulan Metode SMARTER</h3>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center mb-8">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
                     <div>
                         <div class="text-4xl font-bold text-blue-600 mb-2" id="accuracy">98%</div>
                         <div class="text-gray-700 font-medium">Akurasi Seleksi</div>
@@ -486,18 +486,6 @@
                         <div class="text-gray-700 font-medium">Kepuasan</div>
                         <div class="text-sm text-gray-500">Berdasarkan survey</div>
                     </div>
-                </div>
-                <!-- Call to Action Buttons -->
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <a href="/login"
-                        class="btn-primary text-white font-bold py-4 px-8 rounded-xl text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        Login Admin
-                    </a>
                 </div>
             </div>
         </div>
