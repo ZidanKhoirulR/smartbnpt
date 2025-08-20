@@ -2,228 +2,244 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Helpers\SMARTERHelper;
 use App\Models\NilaiAkhir;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class WelcomeController extends Controller
 {
+    const THRESHOLD_VALUE = 0.75;
+
     public function index()
     {
-        return view('welcome');
+        // Halaman welcome utama
+        $title = "Selamat Datang";
+        return view('welcome', compact('title'));
     }
 
-    /**
-     * Menampilkan hasil akhir untuk user umum (public)
-     */
     public function hasilAkhir()
     {
-        try {
-            // Method 1: Coba ambil dari database nilai_akhir langsung
-            $nilaiAkhir = $this->getNilaiAkhirFromDatabase();
+        $title = "Hasil Akhir";
 
-            if (!empty($nilaiAkhir) && count($nilaiAkhir) > 0) {
-                return view('public.hasil-akhir', [
-                    'title' => 'Hasil Akhir BPNT',
-                    'nilaiAkhir' => $nilaiAkhir
+        try {
+            // Debug: Cek total data di nilai_akhir
+            $totalNilaiAkhir = NilaiAkhir::count();
+
+            if ($totalNilaiAkhir === 0) {
+                return view('public.hasil-akhir-kosong', [
+                    'title' => $title,
+                    'error' => 'Hasil perhitungan belum tersedia. Silakan hubungi administrator untuk melakukan perhitungan terlebih dahulu.',
+                    'details' => [
+                        'Tidak ada data dalam tabel hasil akhir',
+                        'Perhitungan SMARTER-ROC belum dilakukan',
+                        'Silakan hubungi admin untuk memproses data'
+                    ]
                 ]);
             }
 
-            // Method 2: Jika database kosong, coba gunakan SMARTERHelper
-            return $this->getResultsFromSMARTERHelper();
+            // Query utama - pastikan semua alternatif muncul termasuk yang nilai 0
+            $nilaiAkhir = NilaiAkhir::query()
+                ->join('alternatif as a', 'a.id', '=', 'nilai_akhir.alternatif_id')
+                ->selectRaw("
+                    a.kode, 
+                    a.nik,
+                    a.alternatif, 
+                    a.created_at,
+                    COALESCE(CAST(SUM(nilai_akhir.nilai) AS DECIMAL(10,4)), 0.0000) as nilai_raw
+                ")
+                ->groupBy('a.id', 'a.kode', 'a.nik', 'a.alternatif', 'a.created_at')
+                ->orderByRaw('nilai_raw DESC, a.created_at ASC') // Urutkan berdasarkan nilai, termasuk 0
+                ->get()
+                ->map(function ($item, $index) {
+                    // Konversi nilai ke float untuk konsistensi
+                    $nilai = (float) $item->nilai_raw;
 
-        } catch (\Exception $e) {
-            Log::error('Error in hasilAkhir: ' . $e->getMessage());
-            Log::error('Stack trace: ' . $e->getTraceAsString());
+                    // Format untuk display
+                    $item->nilai_formatted = number_format($nilai, 4);
+                    $item->nilai = $item->nilai_formatted; // Untuk kompatibilitas dengan view
+                    $item->ranking = $index + 1;
 
-            return view('public.hasil-akhir-kosong', [
-                'title' => 'Hasil Akhir BPNT',
-                'error' => 'Terjadi kesalahan dalam memuat hasil akhir.',
-                'details' => [
-                    'Error: ' . $e->getMessage(),
-                    'Silakan coba lagi nanti atau hubungi administrator.'
-                ]
-            ]);
-        }
-    }
+                    // Status berdasarkan threshold
+                    $item->status = $nilai >= self::THRESHOLD_VALUE ? 'DITERIMA' : 'TIDAK DITERIMA';
 
-    /**
-     * Method 1: Ambil data langsung dari tabel nilai_akhir
-     */
-    private function getNilaiAkhirFromDatabase()
-    {
-        try {
-            // Cek apakah tabel nilai_akhir ada data
-            $count = DB::table('nilai_akhir')->count();
-            if ($count === 0) {
-                return null;
-            }
-
-            // Query dengan error handling untuk tipe data
-            $results = DB::select("
-                SELECT 
-                    a.id as alternatif_id,
-                    a.kode,
-                    a.alternatif,
-                    ROUND(SUM(
-                        CASE 
-                            WHEN na.nilai REGEXP '^[0-9]+([.][0-9]+)?$' 
-                            THEN CAST(na.nilai AS DECIMAL(10,4))
-                            WHEN na.nilai REGEXP '^[0-9]+([,][0-9]+)?$' 
-                            THEN CAST(REPLACE(na.nilai, ',', '.') AS DECIMAL(10,4))
-                            ELSE 0 
-                        END
-                    ), 4) as total_nilai,
-                    ROUND(SUM(
-                        CASE 
-                            WHEN na.nilai REGEXP '^[0-9]+([.][0-9]+)?$' 
-                            THEN CAST(na.nilai AS DECIMAL(10,4))
-                            WHEN na.nilai REGEXP '^[0-9]+([,][0-9]+)?$' 
-                            THEN CAST(REPLACE(na.nilai, ',', '.') AS DECIMAL(10,4))
-                            ELSE 0 
-                        END
-                    ), 4) as nilai
-                FROM nilai_akhir na
-                JOIN alternatif a ON a.id = na.alternatif_id
-                GROUP BY a.id, a.kode, a.alternatif
-                HAVING total_nilai > 0
-                ORDER BY total_nilai DESC
-            ");
-
-            if (!empty($results)) {
-                return collect($results);
-            }
-
-            // Fallback ke query sederhana
-            return $this->getFallbackResults();
-
-        } catch (\Exception $e) {
-            Log::error('Error in getNilaiAkhirFromDatabase: ' . $e->getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Fallback query yang lebih sederhana
-     */
-    private function getFallbackResults()
-    {
-        try {
-            // Ambil semua data dan proses di PHP
-            $nilaiAkhir = DB::table('nilai_akhir')
-                ->join('alternatif', 'nilai_akhir.alternatif_id', '=', 'alternatif.id')
-                ->select('alternatif.id', 'alternatif.kode', 'alternatif.alternatif', 'nilai_akhir.nilai')
-                ->get();
-
-            if ($nilaiAkhir->isEmpty()) {
-                return null;
-            }
-
-            // Group dan sum di PHP
-            $grouped = $nilaiAkhir->groupBy('id')->map(function ($group) {
-                $first = $group->first();
-                $totalNilai = $group->sum(function ($item) {
-                    return $this->convertToNumeric($item->nilai);
+                    return $item;
                 });
 
-                return (object) [
-                    'alternatif_id' => $first->id,
-                    'kode' => $first->kode,
-                    'alternatif' => $first->alternatif,
-                    'total_nilai' => round($totalNilai, 4),
-                    'nilai' => number_format(round($totalNilai, 4), 4)
-                ];
-            })->sortByDesc('total_nilai')->values();
+            // Debug: Log jumlah data yang ditemukan
+            \Log::info("Public Hasil Akhir - Total data ditemukan: " . $nilaiAkhir->count());
 
-            return $grouped;
-
-        } catch (\Exception $e) {
-            Log::error('Error in getFallbackResults: ' . $e->getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Method 2: Gunakan SMARTERHelper dengan error handling
-     */
-    private function getResultsFromSMARTERHelper()
-    {
-        try {
-            // Validasi data terlebih dahulu
-            $validation = SMARTERHelper::validasiData();
-
-            if (!$validation['valid']) {
+            if ($nilaiAkhir->isEmpty()) {
                 return view('public.hasil-akhir-kosong', [
-                    'title' => 'Hasil Akhir BPNT',
-                    'error' => 'Data belum lengkap untuk menampilkan hasil akhir.',
-                    'details' => $validation['errors']
+                    'title' => $title,
+                    'error' => 'Data tidak dapat ditampilkan. Terjadi masalah dalam pemrosesan data.',
+                    'details' => [
+                        'Query tidak mengembalikan hasil',
+                        'Kemungkinan ada masalah relasi data',
+                        'Silakan hubungi administrator sistem'
+                    ]
                 ]);
             }
 
-            // Coba hitung nilai akhir
-            $nilaiAkhir = SMARTERHelper::hitungNilaiAkhir();
-
-            // Jika tidak ada data hasil
-            if (empty($nilaiAkhir)) {
-                return view('public.hasil-akhir-kosong', [
-                    'title' => 'Hasil Akhir BPNT',
-                    'error' => 'Belum ada hasil perhitungan yang tersedia.',
-                    'details' => ['Silakan hubungi admin untuk melakukan perhitungan SMARTER-ROC.']
-                ]);
-            }
-
-            // Pastikan format data konsisten
-            $formattedResults = collect($nilaiAkhir)->map(function ($item) {
-                if (is_array($item)) {
-                    $item = (object) $item;
-                }
-
-                // Pastikan ada field yang dibutuhkan
-                if (!isset($item->nilai) && isset($item->total_nilai)) {
-                    $item->nilai = $item->total_nilai;
-                }
-
-                return $item;
-            });
-
-            return view('public.hasil-akhir', [
-                'title' => 'Hasil Akhir BPNT',
-                'nilaiAkhir' => $formattedResults
+            // Debug: Log beberapa sampel data
+            \Log::info("Sample data:", [
+                'first' => $nilaiAkhir->first(),
+                'last' => $nilaiAkhir->last(),
+                'count' => $nilaiAkhir->count()
             ]);
 
+            return view('public.hasil-akhir', compact('title', 'nilaiAkhir'));
+
         } catch (\Exception $e) {
-            Log::error('Error in getResultsFromSMARTERHelper: ' . $e->getMessage());
+            \Log::error("Error di hasilAkhir: " . $e->getMessage());
+            \Log::error("Stack trace: " . $e->getTraceAsString());
 
             return view('public.hasil-akhir-kosong', [
-                'title' => 'Hasil Akhir BPNT',
-                'error' => 'Terjadi kesalahan dalam perhitungan SMARTER-ROC.',
+                'title' => $title,
+                'error' => 'Terjadi kesalahan sistem saat mengambil data hasil akhir.',
                 'details' => [
                     'Error: ' . $e->getMessage(),
-                    'Silakan hubungi administrator untuk memperbaiki perhitungan.'
+                    'Silakan hubungi administrator sistem',
+                    'Atau coba akses kembali beberapa saat lagi'
                 ]
             ]);
         }
     }
 
-    /**
-     * Helper function untuk convert nilai ke numeric
-     */
-    private function convertToNumeric($value)
+    // Method untuk pencarian berdasarkan NIK (untuk welcome page)
+    public function searchByNik($nik)
     {
-        if (is_numeric($value)) {
-            return (float) $value;
-        }
+        try {
+            $result = NilaiAkhir::query()
+                ->join('alternatif as a', 'a.id', '=', 'nilai_akhir.alternatif_id')
+                ->where('a.nik', $nik)
+                ->selectRaw("
+                    a.kode, 
+                    a.nik,
+                    a.alternatif, 
+                    a.created_at,
+                    COALESCE(CAST(SUM(nilai_akhir.nilai) AS DECIMAL(10,4)), 0.0000) as nilai_raw
+                ")
+                ->groupBy('a.id', 'a.kode', 'a.nik', 'a.alternatif', 'a.created_at')
+                ->first();
 
-        if (is_string($value)) {
-            // Replace comma with dot
-            $cleaned = str_replace(',', '.', $value);
-            if (is_numeric($cleaned)) {
-                return (float) $cleaned;
+            if (!$result) {
+                return null;
             }
-        }
 
-        return 0.0;
+            // Hitung ranking dengan query terpisah - termasuk nilai 0
+            $ranking = NilaiAkhir::query()
+                ->join('alternatif as a2', 'a2.id', '=', 'nilai_akhir.alternatif_id')
+                ->selectRaw("
+                    COALESCE(CAST(SUM(nilai_akhir.nilai) AS DECIMAL(10,4)), 0.0000) as total_nilai, 
+                    a2.created_at
+                ")
+                ->groupBy('a2.id', 'a2.created_at')
+                ->havingRaw(
+                    'total_nilai > ? OR (total_nilai = ? AND a2.created_at < ?)',
+                    [$result->nilai_raw, $result->nilai_raw, $result->created_at]
+                )
+                ->count() + 1;
+
+            $result->ranking = $ranking;
+
+            // Status berdasarkan threshold
+            $nilai = (float) $result->nilai_raw;
+            $result->status = $nilai >= self::THRESHOLD_VALUE ? 'DITERIMA' : 'TIDAK DITERIMA';
+
+            // Format nilai untuk display
+            $result->nilai = number_format($nilai, 4);
+
+            return $result;
+
+        } catch (\Exception $e) {
+            \Log::error("Error di searchByNik: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    // Method untuk mendapatkan statistik hasil akhir
+    public function getStatistikHasilAkhir()
+    {
+        try {
+            $nilaiAkhir = NilaiAkhir::query()
+                ->join('alternatif as a', 'a.id', '=', 'nilai_akhir.alternatif_id')
+                ->selectRaw("
+                    a.kode, 
+                    a.nik,
+                    a.alternatif, 
+                    COALESCE(CAST(SUM(nilai_akhir.nilai) AS DECIMAL(10,4)), 0.0000) as nilai_raw
+                ")
+                ->groupBy('a.id', 'a.kode', 'a.nik', 'a.alternatif')
+                ->get();
+
+            $totalAlternatif = $nilaiAkhir->count();
+            $totalDiterima = $nilaiAkhir->filter(function ($item) {
+                return (float) $item->nilai_raw >= self::THRESHOLD_VALUE;
+            })->count();
+            $totalTidakDiterima = $totalAlternatif - $totalDiterima;
+
+            $persentaseDiterima = $totalAlternatif > 0 ? ($totalDiterima / $totalAlternatif) * 100 : 0;
+
+            return [
+                'total_alternatif' => $totalAlternatif,
+                'total_diterima' => $totalDiterima,
+                'total_tidak_diterima' => $totalTidakDiterima,
+                'persentase_diterima' => number_format($persentaseDiterima, 1),
+                'threshold' => self::THRESHOLD_VALUE
+            ];
+
+        } catch (\Exception $e) {
+            \Log::error("Error di getStatistikHasilAkhir: " . $e->getMessage());
+            return [
+                'total_alternatif' => 0,
+                'total_diterima' => 0,
+                'total_tidak_diterima' => 0,
+                'persentase_diterima' => 0,
+                'threshold' => self::THRESHOLD_VALUE
+            ];
+        }
+    }
+
+    // Method untuk debug - bisa digunakan sementara untuk testing
+    public function debugNilaiAkhir()
+    {
+        try {
+            // 1. Cek data mentah
+            $rawData = DB::table('nilai_akhir')
+                ->join('alternatif', 'alternatif.id', '=', 'nilai_akhir.alternatif_id')
+                ->select(
+                    'alternatif.kode',
+                    'alternatif.alternatif',
+                    'nilai_akhir.nilai'
+                )
+                ->orderBy('alternatif.kode')
+                ->get();
+
+            // 2. Cek hasil SUM
+            $sumData = DB::table('nilai_akhir')
+                ->join('alternatif', 'alternatif.id', '=', 'nilai_akhir.alternatif_id')
+                ->selectRaw('
+                    alternatif.kode,
+                    alternatif.alternatif,
+                    COALESCE(CAST(SUM(nilai_akhir.nilai) AS DECIMAL(10,4)), 0.0000) as total_nilai
+                ')
+                ->groupBy('alternatif.id', 'alternatif.kode', 'alternatif.alternatif')
+                ->orderByRaw('total_nilai DESC')
+                ->get();
+
+            return response()->json([
+                'raw_count' => $rawData->count(),
+                'sum_count' => $sumData->count(),
+                'raw_sample' => $rawData->take(5),
+                'sum_sample' => $sumData->take(5),
+                'sum_all' => $sumData
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
     }
 }

@@ -104,7 +104,7 @@ class DashboardController extends Controller
     public function getStatistikHasilAkhir()
     {
         $nilaiAkhir = NilaiAkhir::query()
-            ->join('alternatif as a', 'a.id', '=', 'nilai_akhir.alternatif_id')
+            ->leftjoin('alternatif as a', 'a.id', '=', 'nilai_akhir.alternatif_id')
             ->selectRaw("
                 a.kode, 
                 a.nik,
